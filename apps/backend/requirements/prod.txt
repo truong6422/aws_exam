@@ -1,0 +1,10 @@
+-r base.txt
+
+# WSGI server
+gunicorn==22.0.0
+
+# Static files
+whitenoise==6.6.0
+
+# Sentry error tracking
+sentry-sdk==1.45.0

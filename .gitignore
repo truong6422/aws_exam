@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# aws-exam-app — root .gitignore
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Environment / secrets (NEVER commit) ─────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Python virtual environment ────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Python compiled / cache ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Django artefacts ──────────────────────────────────────────────────────────
+apps/backend/staticfiles/
+apps/backend/media/
+apps/backend/db.sqlite3
+
+# ── Pytest / coverage ─────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# ── Ruff ──────────────────────────────────────────────────────────────────────
+.ruff_cache/
+
+# ── Node / frontend ───────────────────────────────────────────────────────────
+node_modules/
+apps/frontend/dist/
+apps/frontend/.vite/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+# .idea/ kept for shared run configs if desired; add back to ignore if not

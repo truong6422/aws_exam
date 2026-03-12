@@ -1,0 +1,66 @@
+# Test-focused compose — spins up only what the Django test suite needs.
+# Usage: docker compose -f docker-compose.test.yml run --rm test
+#
+# Intentionally minimal:
+#   - Ephemeral test DB (no named volume; dropped after the run)
+#   - No celery, no nginx, no frontend
+#   - CI-friendly: exits with the pytest/manage.py exit code
+
+services:
+  db_test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: awsexam_test
+      POSTGRES_USER: awsexam_test
+      POSTGRES_PASSWORD: testpassword
+    # tmpfs keeps the DB purely in RAM — faster tests, no leftovers
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - test_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U awsexam_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis_test:
+    image: redis:7-alpine
+    tmpfs:
+      - /data
+    networks:
+      - test_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  test:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+      target: development   # dev stage has test deps (pytest, coverage, etc.)
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DATABASE_URL: postgresql://awsexam_test:testpassword@db_test:5432/awsexam_test
+      REDIS_URL: redis://redis_test:6379/0
+      SECRET_KEY: ci-only-insecure-secret-key
+      DEBUG: "0"
+    depends_on:
+      db_test:
+        condition: service_healthy
+      redis_test:
+        condition: service_healthy
+    networks:
+      - test_net
+    volumes:
+      - ./apps/backend:/app  # mount source so tests run against latest code
+    # Override command at call-site if needed, e.g.:
+    #   docker compose -f docker-compose.test.yml run --rm test pytest -x -v
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             pytest --tb=short --cov=. --cov-report=term-missing"
+
+networks:
+  test_net:
