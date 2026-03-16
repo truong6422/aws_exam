@@ -1,0 +1,28 @@
+{
+  "queueId": "aws-exam-app:auto:20260315",
+  "project": "aws-exam-app",
+  "workflow": "04",
+  "tasks": [
+    {
+      "taskId": "login-home-ui-v3",
+      "description": "Làm lại UI login + homepage",
+      "status": "done",
+      "steps": {
+        "plan": "success",
+        "cook": "success",
+        "test": "success"
+      }
+    },
+    {
+      "taskId": "theme-orange-v1",
+      "description": "Chuyển màu chủ đạo site từ trắng/xanh sang cam (brand mới)",
+      "status": "done",
+      "steps": {
+        "plan": "success",
+        "cook": "success",
+        "test": "success"
+      }
+    }
+  ],
+  "currentTaskId": "theme-orange-v1"
+}
