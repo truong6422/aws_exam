@@ -66,13 +66,13 @@ export default function Sidebar() {
       {/* User info + logout */}
       <div className="border-t border-brand-700 p-3">
         {sidebarOpen && (
-          <p className="mb-2 truncate text-xs text-blue-200">
+          <p className="mb-2 truncate text-xs text-brand-200">
             {user?.full_name ?? 'Guest'}
           </p>
         )}
         <button
           onClick={handleLogout}
-          className="w-full rounded px-2 py-1.5 text-left text-sm text-blue-200 hover:bg-brand-700 hover:text-white"
+          className="w-full rounded px-2 py-1.5 text-left text-sm text-brand-200 hover:bg-brand-700 hover:text-white"
         >
           {sidebarOpen ? '🚪 Logout' : '🚪'}
         </button>
@@ -90,7 +90,7 @@ function SidebarLink({ item, collapsed }: { item: NavItem; collapsed: boolean })
           'flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
           isActive
             ? 'bg-brand-600 text-white'
-            : 'text-blue-200 hover:bg-brand-700 hover:text-white',
+            : 'text-brand-200 hover:bg-brand-700 hover:text-white',
         )
       }
     >

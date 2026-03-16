@@ -22,7 +22,7 @@ export default function AdminLayout() {
                 clsx(
                   'border-b-2 pb-3 text-sm font-medium transition-colors',
                   isActive
-                    ? 'border-brand-600 text-brand-600'
+                    ? 'border-brand-600 text-brand-700'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                 )
               }
