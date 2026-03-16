@@ -2,6 +2,8 @@
   "queueId": "aws-exam-app:auto:20260315",
   "project": "aws-exam-app",
   "workflow": "04",
+  "status": "completed",
+  "completedAt": "2026-03-16",
   "tasks": [
     {
       "taskId": "login-home-ui-v3",
@@ -24,5 +26,5 @@
       }
     }
   ],
-  "currentTaskId": "theme-orange-v1"
+  "currentTaskId": null
 }
