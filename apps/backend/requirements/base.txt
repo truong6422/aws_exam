@@ -23,3 +23,6 @@ celery==5.3.6
 
 # Health check
 django-health-check==3.18.1
+
+# JSON schema validation
+jsonschema>=4.0,<5.0

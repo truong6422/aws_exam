@@ -1,7 +1,6 @@
 """
 Custom User model for the accounts app.
 Extends AbstractUser so all built-in auth machinery is preserved.
-Real profile fields (avatar, subscription tier, etc.) added in Phase 2.
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -13,9 +12,11 @@ class User(AbstractUser, TimestampedModel):
     """
     Project-wide user model.
     AUTH_USER_MODEL = 'accounts.User'
+    Login via email. Username is auto-generated from email on registration.
     """
 
     email = models.EmailField(unique=True)
+    name = models.CharField(max_length=150, blank=True, default="")
 
     # Use email as the primary login identifier
     USERNAME_FIELD = "email"

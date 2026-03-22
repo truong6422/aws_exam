@@ -60,6 +60,7 @@ export const router = createBrowserRouter([
           { path: '/exam/setup', element: <ExamSetupPage /> },
           { path: '/exam/:sessionId', element: <ExamSessionPage /> },
           { path: '/exam/:sessionId/result', element: <ExamResultPage /> },
+          { path: '/exam/:sessionId/review', element: <ExamResultPage /> },
 
           // Practice flow
           { path: '/practice/setup', element: <PracticeSetupPage /> },

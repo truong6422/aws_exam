@@ -1,17 +1,5 @@
 """
-Accounts views — placeholder stubs expanded in Phase 2.
-JWT token views are wired directly from simplejwt in urls.py.
+Accounts views — re-exports from auth_views and profile_views for URL routing.
 """
-from rest_framework import generics, permissions
-
-from .serializers import UserSerializer
-
-
-class CurrentUserView(generics.RetrieveAPIView):
-    """GET /api/auth/me/ — return the authenticated user's profile."""
-
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
+from .auth_views import LoginView, LogoutView, RegisterView  # noqa: F401
+from .profile_views import ChangePasswordView, CurrentUserView  # noqa: F401

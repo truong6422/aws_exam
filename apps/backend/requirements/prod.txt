@@ -6,5 +6,5 @@ gunicorn==22.0.0
 # Static files
 whitenoise==6.6.0
 
-# Sentry error tracking
-sentry-sdk==1.45.0
+# Sentry error tracking (django extra includes DjangoIntegration)
+sentry-sdk[django]>=2.0,<3.0

@@ -1,11 +1,15 @@
 """
 Production settings — DEBUG off, strict security, structured logging.
 """
-from decouple import config
+from decouple import Csv, config
 
 from .base import *  # noqa: F401, F403
 
 DEBUG = False
+
+# Explicitly required in production — no defaults
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv(), default="localhost")
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv(), default="")
 
 # ---------------------------------------------------------------------------
 # Security hardening
@@ -46,6 +50,7 @@ if SENTRY_DSN:
         integrations=[DjangoIntegration()],
         traces_sample_rate=0.1,
         send_default_pii=False,
+        environment=config("ENVIRONMENT", default="production"),
     )
 
 # ---------------------------------------------------------------------------

@@ -1,14 +1,15 @@
 """
 Root URL configuration.
 
-Endpoints wired here (Phase 1 skeleton):
+Endpoints:
   /health/            — django-health-check (liveness probe)
   /api/               — browsable API root
-  /api/auth/          — JWT token + /me/
-  /api/questions/     — question list placeholder
-  /api/exams/         — exam list placeholder
-  /api/analytics/     — user progress placeholder
-  /api/imports/       — import job list placeholder
+  /api/auth/          — auth endpoints (token, login, register, logout, me)
+  /api/v1/auth/       — same auth endpoints under versioned prefix
+  /api/questions/     — question list
+  /api/exams/         — exam list
+  /api/analytics/     — user progress
+  /api/imports/       — import jobs
   /api/core/ping/     — internal liveness ping
   /admin/             — Django admin
 """
@@ -42,16 +43,26 @@ urlpatterns = [
     # Health check (used by Docker / k8s liveness probes)
     path("health/", include("health_check.urls")),
 
-    # API root (Phase 1 placeholder)
+    # API root
     path("api/", api_root, name="api-root"),
 
-    # Auth: /api/auth/token/, /api/auth/token/refresh/, /api/auth/me/
-    path("api/auth/", include("apps.accounts.urls")),
+    # Auth — unversioned (backward compatible)
+    path("api/auth/", include(("apps.accounts.urls", "accounts"))),
 
-    # Domain apps (placeholder endpoints — expanded in Phase 2)
+    # Auth — versioned prefix (used by frontend and tests)
+    path("api/v1/auth/", include(("apps.accounts.urls", "accounts_v1"))),
+
+    # Questions — versioned (new) + unversioned (backward compat)
+    path("api/v1/questions/", include(("apps.questions.urls", "questions_v1"))),
     path("api/questions/", include("apps.questions.urls")),
+    # Exams — versioned (new) + unversioned (backward compat)
+    path("api/v1/exams/", include(("apps.exams.urls", "exams_v1"))),
     path("api/exams/", include("apps.exams.urls")),
-    path("api/analytics/", include("apps.analytics.urls")),
+    # Analytics — versioned (new) + unversioned (backward compat)
+    path("api/v1/analytics/", include(("apps.analytics.urls", "analytics_v1"))),
+    path("api/analytics/", include(("apps.analytics.urls", "analytics"))),
+    # Imports — versioned (new) + unversioned (backward compat)
+    path("api/v1/imports/", include(("apps.imports.urls", "imports_v1"))),
     path("api/imports/", include("apps.imports.urls")),
 
     # Core utilities: /api/core/ping/

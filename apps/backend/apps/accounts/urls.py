@@ -1,19 +1,24 @@
 """
 Accounts URL configuration.
-Provides JWT token endpoints plus a /me/ stub.
 """
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import CurrentUserView
-
-app_name = "accounts"
+from .views import ChangePasswordView, CurrentUserView, LoginView, LogoutView, RegisterView
 
 urlpatterns = [
-    # POST /api/auth/token/         — obtain access + refresh tokens
+    # POST  — obtain tokens (original path, kept for compatibility)
     path("token/", TokenObtainPairView.as_view(), name="token-obtain"),
-    # POST /api/auth/token/refresh/ — exchange refresh for new access token
+    # POST  — exchange refresh for new access token
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
-    # GET  /api/auth/me/            — current user profile
+    # POST  — login alias with rate limiting
+    path("login/", LoginView.as_view(), name="login"),
+    # POST  — register new user and receive tokens
+    path("register/", RegisterView.as_view(), name="register"),
+    # POST  — blacklist access + refresh JTI in Redis
+    path("logout/", LogoutView.as_view(), name="logout"),
+    # GET/PATCH — current authenticated user profile
     path("me/", CurrentUserView.as_view(), name="current-user"),
+    # POST  — validate old password and set new one
+    path("change-password/", ChangePasswordView.as_view(), name="change-password"),
 ]
