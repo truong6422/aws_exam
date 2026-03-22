@@ -20,10 +20,10 @@ export default function Navbar() {
 
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-600">
-          {user?.full_name ?? user?.email ?? 'Guest'}
+          {user?.name ?? user?.email ?? 'Guest'}
         </span>
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white">
-          {(user?.full_name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()}
+          {(user?.name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()}
         </div>
       </div>
     </header>

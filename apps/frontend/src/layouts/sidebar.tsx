@@ -53,7 +53,7 @@ export default function Sidebar() {
           <SidebarLink key={item.to} item={item} collapsed={!sidebarOpen} />
         ))}
 
-        {user?.role === 'admin' && (
+        {user?.is_staff && (
           <>
             <div className="my-2 border-t border-brand-700" />
             {ADMIN_ITEMS.map((item) => (
@@ -67,7 +67,7 @@ export default function Sidebar() {
       <div className="border-t border-brand-700 p-3">
         {sidebarOpen && (
           <p className="mb-2 truncate text-xs text-brand-200">
-            {user?.full_name ?? 'Guest'}
+            {user?.name ?? user?.email ?? 'Guest'}
           </p>
         )}
         <button

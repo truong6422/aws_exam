@@ -11,6 +11,8 @@ MANAGE        := $(PYTHON) apps/backend/manage.py
 PYTEST        := .venv/bin/pytest
 RUFF          := .venv/bin/ruff
 REQUIREMENTS  := apps/backend/requirements/dev.txt
+NPM           := npm
+FRONTEND_DIR  := apps/frontend
 
 # Export DJANGO_SETTINGS_MODULE so every target picks it up without a shell profile
 export DJANGO_SETTINGS_MODULE := config.settings.development
@@ -18,7 +20,7 @@ export DJANGO_SETTINGS_MODULE := config.settings.development
 # from repo root means it finds the root .env automatically.
 export PYTHONPATH := apps/backend
 
-.PHONY: help venv dev-backend migrate makemigrations createsuper \
+.PHONY: help venv dev dev-backend dev-frontend migrate makemigrations createsuper \
         test-backend lint shell clean
 
 # ── Default target ────────────────────────────────────────────────────────────
@@ -27,7 +29,9 @@ help:
 	@echo "  aws-exam-app — available make targets"
 	@echo "  ──────────────────────────────────────────────────────"
 	@echo "  venv           Create .venv and install dev requirements"
+	@echo "  dev            Run BE + FE together (Ctrl+C stops both)"
 	@echo "  dev-backend    Run Django dev server on :8000"
+	@echo "  dev-frontend   Run Vite dev server on :5173"
 	@echo "  migrate        Apply Django database migrations"
 	@echo "  makemigrations Generate new migration files"
 	@echo "  createsuper    Create a Django superuser (non-interactive)"
@@ -49,9 +53,22 @@ venv:
 	$(PIP) install -r $(REQUIREMENTS)
 	@echo "✓ Virtual environment ready. Activate with: source .venv/bin/activate"
 
+# ── Dev: run BE + FE together ─────────────────────────────────────────────────
+dev:
+	@echo "→ Starting backend :8000 and frontend :5173  (Ctrl+C stops both)"
+	@$(MANAGE) migrate --run-syncdb -v 0
+	@trap 'kill 0' INT; \
+		$(MANAGE) runserver 0.0.0.0:8000 & \
+		(cd $(FRONTEND_DIR) && $(NPM) run dev) & \
+		wait
+
 # ── Backend dev server ────────────────────────────────────────────────────────
 dev-backend:
 	$(MANAGE) runserver 0.0.0.0:8000
+
+# ── Frontend dev server ───────────────────────────────────────────────────────
+dev-frontend:
+	cd $(FRONTEND_DIR) && $(NPM) run dev
 
 # ── Database migrations ───────────────────────────────────────────────────────
 migrate:

@@ -6,8 +6,9 @@ from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.tokens import RefreshToken, UntypedToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .serializers import RegisterSerializer, UserProfileSerializer
 from .throttles import LoginRateThrottle
@@ -40,6 +41,23 @@ class LoginView(TokenObtainPairView):
     throttle_classes = [LoginRateThrottle]
 
 
+class BlacklistCheckTokenRefreshView(TokenRefreshView):
+    """POST /api/auth/token/refresh/ — refresh access token, but reject blacklisted refresh JTIs."""
+
+    def post(self, request, *args, **kwargs):
+        refresh_str = request.data.get("refresh", "")
+        # Validate and check blacklist before delegating to SimpleJWT
+        try:
+            token = UntypedToken(refresh_str)
+            jti = token.get("jti")
+            if jti and cache.get(f"token:blacklist:{jti}"):
+                raise InvalidToken("Refresh token has been revoked")
+        except TokenError as exc:
+            raise InvalidToken(exc.args[0]) from exc
+
+        return super().post(request, *args, **kwargs)
+
+
 class LogoutView(APIView):
     """POST /api/auth/logout/ — blacklist access + optional refresh JTI in Redis."""
 
@@ -62,13 +80,15 @@ class LogoutView(APIView):
         refresh_token_str = request.data.get("refresh")
         if refresh_token_str:
             try:
-                from rest_framework_simplejwt.tokens import RefreshToken as RT  # noqa: PLC0415
-                refresh = RT(refresh_token_str)
+                refresh = RefreshToken(refresh_token_str)
                 r_jti = refresh.get("jti")
                 r_exp = refresh.get("exp")
                 r_ttl = max(0, int(r_exp - timezone.now().timestamp()))
                 cache.set(f"token:blacklist:{r_jti}", True, timeout=r_ttl or 604800)
-            except Exception:
-                pass  # Invalid refresh token — ignore silently
+            except TokenError:
+                return Response(
+                    {"detail": "Invalid refresh token."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)

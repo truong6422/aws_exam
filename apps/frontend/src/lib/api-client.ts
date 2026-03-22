@@ -12,8 +12,8 @@ function getStoredToken(): string | null {
   try {
     const raw = localStorage.getItem('aws-exam-auth')
     if (!raw) return null
-    const parsed = JSON.parse(raw) as { state?: { accessToken?: string | null } }
-    return parsed?.state?.accessToken ?? null
+    const parsed = JSON.parse(raw) as { state?: { token?: string | null } }
+    return parsed?.state?.token ?? null
   } catch {
     return null
   }
@@ -90,4 +90,9 @@ export const apiClient = {
 
   delete: <T>(path: string, options?: Omit<RequestOptions, 'method' | 'body'>) =>
     request<T>(path, { ...options, method: 'DELETE' }),
+
+  /** Fetch a DRF list endpoint and unwrap paginated {results:[]} or plain array. */
+  list: <T>(path: string, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<T[]> =>
+    request<{ results: T[] } | T[]>(path, { ...options, method: 'GET' })
+      .then((data) => (Array.isArray(data) ? data : (data.results ?? []))),
 }

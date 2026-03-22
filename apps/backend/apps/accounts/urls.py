@@ -2,15 +2,22 @@
 Accounts URL configuration.
 """
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .views import ChangePasswordView, CurrentUserView, LoginView, LogoutView, RegisterView
+from .views import (
+    BlacklistCheckTokenRefreshView,
+    ChangePasswordView,
+    CurrentUserView,
+    LoginView,
+    LogoutView,
+    RegisterView,
+)
 
 urlpatterns = [
     # POST  — obtain tokens (original path, kept for compatibility)
     path("token/", TokenObtainPairView.as_view(), name="token-obtain"),
-    # POST  — exchange refresh for new access token
-    path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    # POST  — exchange refresh for new access token (checks Redis blacklist)
+    path("token/refresh/", BlacklistCheckTokenRefreshView.as_view(), name="token-refresh"),
     # POST  — login alias with rate limiting
     path("login/", LoginView.as_view(), name="login"),
     # POST  — register new user and receive tokens

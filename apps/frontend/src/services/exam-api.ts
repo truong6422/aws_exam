@@ -108,10 +108,10 @@ export interface PaginatedExamList {
 
 export const examApi = {
   getCertifications: () =>
-    apiClient.get<Certification[]>('/questions/certifications/'),
+    apiClient.list<Certification>('/questions/certifications/'),
 
   getDomains: (certId: number) =>
-    apiClient.get<Domain[]>(`/questions/certifications/${certId}/domains/`),
+    apiClient.list<Domain>(`/questions/certifications/${certId}/domains/`),
 
   startExam: (certificationId: number) =>
     apiClient.post<ExamAttempt>('/exams/start/', { certification_id: certificationId }),

@@ -1,154 +1,196 @@
 ---
 spec_id: phase-04-backend-analytics
 version: "1.0"
-status: pending
+status: completed
+blockedBy:
+  - phase-02-backend-exam-engine
 agents:
   - fullstack-developer
 acceptance_criteria:
-  - UserProgress aggregated correctly after each session
-  - DomainScore tracked per domain per user
-  - Analytics API endpoint returns structured data for dashboard
-  - Async Celery task for heavy aggregation
-  - Unit + integration tests pass
+  - "GET /api/v1/analytics/overview/ returns total_attempts, avg_score, best_score, recent_trend"
+  - "GET /api/v1/analytics/weak-domains/?certification_id=X returns domains ranked by avg score (lowest first)"
+  - "GET /api/v1/analytics/history/ returns paginated exam attempt list with scores"
+  - "All analytics endpoints return only the authenticated user's data"
+  - "Empty state (no attempts) returns sensible defaults (zeros, empty arrays)"
+  - "recent_trend contains last 7 submitted attempts ordered by date"
 ---
 
-# Phase 04 — Backend: Analytics & Progress Tracking
-
-**Priority:** Medium
-**Depends on:** Phase 02 (Exam Engine), Phase 03 (Auth/Profile)
-**Blocks:** Phase 07 (Frontend Dashboard/Analytics)
+# Phase 04 — Backend: Analytics & Progress
 
 ## Overview
 
-Aggregate and expose user performance data. The analytics layer reads from `AttemptAnswer` / `ExamSession` records and materializes summaries for fast dashboard rendering.
-
-## Key Insights
-
-- Dashboard needs: total questions answered, overall accuracy %, recent sessions, domain breakdown
-- Analytics page needs: per-domain scores, trend over time, weakest/strongest domains
-- Materialized via `UserProgress` and `DomainScore` models (updated after each session)
-- Heavy recalculation (e.g., rebuild all history) → Celery task
-- Incremental update (after single session) → sync, triggered by signal from Phase 02
-
-## Requirements
-
-### Models (expand stubs)
-
-**`UserProgress`** (expand stub)
-```python
-user                    # OneToOneField (already in stub)
-total_questions_answered # PositiveIntegerField (already in stub)
-total_correct           # PositiveIntegerField (already in stub)
-total_sessions          # PositiveIntegerField(default=0)
-total_exam_sessions     # PositiveIntegerField(default=0)
-total_practice_sessions # PositiveIntegerField(default=0)
-last_session_at         # DateTimeField(null=True)
-current_streak_days     # PositiveSmallIntegerField(default=0)
-```
-
-**`DomainScore`**
-```python
-user            # ForeignKey → User
-domain          # ForeignKey → Domain
-questions_seen  # PositiveIntegerField(default=0)
-correct_count   # PositiveIntegerField(default=0)
-accuracy_pct    # DecimalField (computed property or stored)
-last_updated    # DateTimeField(auto_now=True)
-
-class Meta:
-    unique_together = ('user', 'domain')
-```
-
-**`SessionHistory`** (denormalized view for History page)
-```python
-session         # OneToOneField → ExamSession
-user            # ForeignKey → User (denormalized for fast query)
-score_pct       # DecimalField
-passed          # BooleanField
-question_count  # PositiveSmallIntegerField
-mode            # CharField
-domain_name     # CharField (snapshot at time of session)
-```
-
-### API Endpoints
-
-```
-GET /api/analytics/summary/         Dashboard summary (UserProgress + top domains)
-GET /api/analytics/domains/         Per-domain breakdown with accuracy
-GET /api/analytics/history/         Paginated session history list
-GET /api/analytics/trends/          Score trend over time (last 30 sessions)
-```
-
-### Celery Task
-
-```python
-# tasks.py
-@shared_task
-def rebuild_user_analytics(user_id: int):
-    """Full recalculation from scratch — run on-demand or scheduled."""
-```
-
-## Architecture
-
-```
-apps/analytics/
-├── models.py       # UserProgress (expand), DomainScore, SessionHistory
-├── serializers.py  # SummarySerializer, DomainScoreSerializer, HistorySerializer
-├── views.py        # SummaryView, DomainListView, HistoryListView, TrendView
-├── services.py     # update_analytics_after_session(session), rebuild_user_analytics(user)
-├── tasks.py        # rebuild_user_analytics Celery task
-├── urls.py
-└── tests/
-    ├── test_services.py
-    └── test_views.py
-```
+- **Priority**: P2 (Dashboard data — needed for P7 frontend)
+- **Depends on**: P2 (ExamAttempt + AttemptAnswer models must exist)
+- **Blocks**: P7 (Frontend Dashboard & Analytics)
+- **Description**: Aggregate exam history into analytics. No new models — purely computed from ExamAttempt + AttemptAnswer using Django ORM aggregations.
 
 ## Related Code Files
 
-**Modify:**
-- `apps/analytics/models.py` — expand stubs
-- `apps/analytics/serializers.py` — expand
-- `apps/analytics/views.py` — expand
-- `apps/analytics/urls.py` — wire endpoints
+### Modify
+- `apps/backend/apps/analytics/views.py` — create 3 analytics views
+- `apps/backend/apps/analytics/serializers.py` — create response serializers
+- `apps/backend/apps/analytics/urls.py` — wire 3 endpoints
+- `apps/backend/config/urls.py` — add `/api/v1/analytics/` prefix
 
-**Create:**
-- `apps/analytics/services.py`
-- `apps/analytics/tasks.py`
-- `apps/analytics/tests/test_services.py`
-- `apps/analytics/tests/test_views.py`
+### Create
+- None (all files exist as stubs)
 
-**Integration point:**
-- `apps/exams/signals.py` → calls `analytics.services.update_analytics_after_session`
+### Delete
+- None
 
 ## Implementation Steps
 
-1. Expand `models.py` with `DomainScore`, `SessionHistory`, expand `UserProgress`
-2. Generate migrations
-3. Write `services.py`:
-   - `update_analytics_after_session(session_id)` — incremental update
-   - `rebuild_user_analytics(user_id)` — full recalculation
-4. Write `tasks.py` wrapping rebuild service
-5. Write `serializers.py` for all endpoints
-6. Write `views.py`:
-   - `SummaryView` — aggregate UserProgress + top 5 domains
-   - `DomainListView` — all DomainScore for user, sorted by accuracy
-   - `HistoryListView` — paginated SessionHistory
-   - `TrendView` — last 30 sessions' score_pct for chart
-7. Wire `urls.py`
-8. Write tests
+### Step 1: Create Serializers
 
-## Success Criteria
+In `apps/analytics/serializers.py`:
 
-- After submitting exam session, analytics auto-update
-- `GET /api/analytics/summary/` returns correct aggregates
-- Domain scores reflect actual attempt history
-- Celery task runs without errors
-- All tests pass
+1. **OverviewSerializer** (Serializer, not ModelSerializer):
+   - `total_attempts`: IntegerField()
+   - `avg_score`: DecimalField(max_digits=5, decimal_places=2)
+   - `best_score`: DecimalField(max_digits=5, decimal_places=2)
+   - `total_submitted`: IntegerField()
+   - `recent_trend`: ListField(child=DictField()) — last 7 attempts: [{date, score, certification_code}]
 
-## Risk Assessment
+2. **WeakDomainSerializer** (Serializer):
+   - `domain_id`: IntegerField()
+   - `domain_name`: CharField()
+   - `certification_code`: CharField()
+   - `total_questions`: IntegerField()
+   - `correct_count`: IntegerField()
+   - `accuracy_percentage`: DecimalField(max_digits=5, decimal_places=2)
 
-| Risk | Level | Mitigation |
-|------|-------|-----------|
-| Analytics stale after failed signal | 🟡 Medium | Idempotent update logic, retry on failure |
-| Celery not running in dev | 🟢 Low | Fallback to sync in development settings |
-| Large history queries slow | 🟡 Medium | Paginate, index `user` FK on all analytics models |
+3. **HistoryItemSerializer** (ModelSerializer on ExamAttempt):
+   - Fields: `[id, certification_code, certification_name, started_at, submitted_at, status, score_percentage, total_questions, correct_count]`
+   - `certification_code` and `certification_name` via SerializerMethodField
+
+### Step 2: Create Overview View
+
+**OverviewView** (GET `/analytics/overview/`):
+
+Query logic:
+```python
+attempts = ExamAttempt.objects.filter(
+    user=request.user,
+    status__in=['submitted', 'expired']
+)
+total_attempts = attempts.count()
+aggregates = attempts.aggregate(
+    avg_score=Avg('score_percentage'),
+    best_score=Max('score_percentage')
+)
+recent_trend = attempts.order_by('-submitted_at')[:7].values(
+    'submitted_at', 'score_percentage', 'certification__code'
+)
+```
+
+Return sensible defaults when no attempts:
+```python
+{
+    'total_attempts': 0,
+    'avg_score': 0,
+    'best_score': 0,
+    'total_submitted': 0,
+    'recent_trend': []
+}
+```
+
+### Step 3: Create Weak Domains View
+
+**WeakDomainsView** (GET `/analytics/weak-domains/?certification_id=X`):
+
+Query logic:
+- Get all AttemptAnswers for user's submitted attempts, filtered by certification_id
+- Group by `question__domain`, calculate accuracy per domain
+- Use annotate + aggregate:
+
+```python
+domain_stats = AttemptAnswer.objects.filter(
+    attempt__user=request.user,
+    attempt__status__in=['submitted', 'expired'],
+    attempt__certification_id=certification_id
+).values(
+    'question__domain__id',
+    'question__domain__name',
+    'question__domain__certification__code'
+).annotate(
+    total_questions=Count('id'),
+).order_by('question__domain__name')
+```
+
+For correctness calculation: iterate domain_stats and check each AttemptAnswer's selected_answers vs correct answers. (Alternative: pre-compute `is_correct` boolean field on AttemptAnswer during submit — simpler query later.)
+
+**Optimization**: During exam submit (Phase 2), add `is_correct` BooleanField to AttemptAnswer. Then weak domains query becomes a simple `Avg('is_correct')` group-by.
+
+If `is_correct` field not available, compute in Python:
+```python
+for stat in domain_stats:
+    # Count correct answers per domain
+    correct = AttemptAnswer.objects.filter(
+        attempt__user=request.user,
+        question__domain_id=stat['question__domain__id'],
+        ...
+    )  # check in Python loop
+```
+
+Order results by accuracy ascending (weakest first).
+
+### Step 4: Create History View
+
+**HistoryView** (GET `/analytics/history/`):
+
+Simple paginated list:
+```python
+queryset = ExamAttempt.objects.filter(
+    user=request.user
+).select_related('certification').order_by('-started_at')
+```
+
+Uses `HistoryItemSerializer` and DRF's built-in pagination.
+
+### Step 5: Wire URLs
+
+In `apps/analytics/urls.py`:
+```
+overview/ → OverviewView (GET)
+weak-domains/ → WeakDomainsView (GET)
+history/ → HistoryView (GET)
+```
+
+In `config/urls.py`, add:
+```python
+path("api/v1/analytics/", include(("apps.analytics.urls", "analytics_v1"))),
+```
+
+### Step 6: Optimization — Add is_correct to AttemptAnswer
+
+Consider adding `is_correct = BooleanField(null=True)` to `AttemptAnswer` model (in Phase 2). Set during exam submit. This makes analytics queries O(1) instead of O(n) per answer.
+
+If this optimization is added to Phase 2, update weak-domains query to:
+```python
+.annotate(accuracy=Avg(Cast('is_correct', FloatField())))
+.order_by('accuracy')
+```
+
+## API Endpoints
+
+| Method | Path | Auth | Request Body | Response |
+|--------|------|------|-------------|----------|
+| GET | `/api/v1/analytics/overview/` | Bearer JWT | — | `{total_attempts, avg_score, best_score, total_submitted, recent_trend: [{date, score, certification_code}]}` |
+| GET | `/api/v1/analytics/weak-domains/?certification_id=X` | Bearer JWT | — | `[{domain_id, domain_name, certification_code, total_questions, correct_count, accuracy_percentage}]` |
+| GET | `/api/v1/analytics/history/` | Bearer JWT | — | Paginated `[{id, certification_code, certification_name, started_at, submitted_at, status, score_percentage, total_questions, correct_count}]` |
+
+## Security Considerations
+
+- **User isolation**: All queries MUST filter by `request.user`. Never expose another user's analytics.
+- **No write endpoints**: Analytics are read-only computed views — no data mutation.
+- **Query performance**: Use `select_related('certification')` to avoid N+1. For weak-domains, prefetch answers.
+- **Pagination**: History endpoint must be paginated (DRF default PAGE_SIZE=20).
+
+## Acceptance Criteria
+
+- GET /api/v1/analytics/overview/ returns total_attempts, avg_score, best_score, recent_trend
+- GET /api/v1/analytics/weak-domains/?certification_id=X returns domains ranked by avg score (lowest first)
+- GET /api/v1/analytics/history/ returns paginated exam attempt list with scores
+- All analytics endpoints return only the authenticated user's data
+- Empty state (no attempts) returns sensible defaults (zeros, empty arrays)
+- recent_trend contains last 7 submitted attempts ordered by date

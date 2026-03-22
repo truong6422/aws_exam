@@ -1,154 +1,201 @@
 ---
 spec_id: phase-05-backend-import
 version: "1.0"
-status: pending
+status: in-progress
+blockedBy:
+  - phase-01-backend-question-bank
 agents:
   - fullstack-developer
 acceptance_criteria:
-  - CSV and JSON import formats documented and working
-  - ImportJob model tracks status/progress
-  - Celery async processing for large files
-  - Validation errors reported per-row (not fail-all)
-  - Admin-only access enforced
-  - Unit tests for parser + views
+  - "POST /api/v1/imports/questions/ requires is_staff permission"
+  - "Valid JSON import creates questions atomically (all or nothing)"
+  - "Invalid JSON schema returns 400 with clear error messages"
+  - "Import response includes {imported: N, errors: []}"
+  - "Single-answer questions must have exactly 1 is_correct=True"
+  - "Multiple-answer questions must have >= 2 is_correct=True"
+  - "Non-staff users get 403"
+  - "jsonschema library added to requirements"
 ---
 
 # Phase 05 — Backend: Admin Import Pipeline
 
-**Priority:** Medium
-**Depends on:** Phase 01 (Question Bank models exist)
-**Blocks:** Phase 08 (Frontend Admin panel)
-
 ## Overview
 
-Allow admins to bulk-upload questions via CSV or JSON file. Processing happens async via Celery. The existing `imports` app has stubs — expand into a working pipeline.
-
-## Key Insights
-
-- Admins need to seed the question bank (100–1000+ questions)
-- Manual creation via Django admin is impractical at scale
-- CSV format: easy to prepare in Excel/Sheets; JSON: easier for programmatic export
-- Validation errors should be reported per-row so admins can fix and re-upload
-- Large files (500+ questions) block the request — use Celery
-- Import job tracks: file, status, rows_processed, rows_failed, error_log
-
-## Requirements
-
-### Model (expand `ImportJob` stub)
-
-**`ImportJob`**
-```python
-uploaded_by      # ForeignKey → User
-file             # FileField (upload_to='imports/')
-file_format      # CharField: 'csv' | 'json'
-status           # CharField: 'pending' | 'processing' | 'done' | 'failed'
-rows_total       # PositiveIntegerField(null=True)
-rows_processed   # PositiveIntegerField(default=0)
-rows_failed      # PositiveIntegerField(default=0)
-error_log        # JSONField(default=list)  [{row, error_message}]
-started_at       # DateTimeField(null=True)
-completed_at     # DateTimeField(null=True)
-```
-
-### CSV Format
-
-```csv
-stem,question_type,domain,tags,difficulty,explanation,choice_1,correct_1,choice_2,correct_2,...
-"What is S3?",single,S3,"SAA-C03,storage",easy,"S3 is object storage",Object storage,true,Block storage,false,...
-```
-
-### JSON Format
-
-```json
-[{
-  "stem": "What is S3?",
-  "question_type": "single",
-  "domain": "S3",
-  "tags": ["SAA-C03", "storage"],
-  "difficulty": "easy",
-  "explanation": "S3 is object storage",
-  "choices": [
-    {"text": "Object storage", "is_correct": true},
-    {"text": "Block storage", "is_correct": false}
-  ]
-}]
-```
-
-### API Endpoints
-
-```
-POST /api/imports/           Upload file → create ImportJob → queue Celery task
-GET  /api/imports/           List import jobs (admin only)
-GET  /api/imports/{id}/      Get job status + error log
-```
-
-### Permissions
-- All endpoints: `IsAdminUser`
-
-## Architecture
-
-```
-apps/imports/
-├── models.py       # ImportJob (expand stub)
-├── serializers.py  # ImportJobSerializer, ImportJobCreateSerializer
-├── views.py        # ImportJobViewSet
-├── parsers/
-│   ├── __init__.py
-│   ├── csv_parser.py   # parse CSV → list of question dicts
-│   └── json_parser.py  # parse JSON → list of question dicts
-├── services.py     # process_import_job(job_id)
-├── tasks.py        # run_import_job Celery task
-├── validators.py   # per-row validation
-├── urls.py
-└── tests/
-    ├── test_parsers.py
-    ├── test_services.py
-    └── test_views.py
-```
+- **Priority**: P2 (Content pipeline — needed for P8 frontend admin)
+- **Depends on**: P1 (Certification, Domain, Question, Answer models)
+- **Blocks**: P8 (Frontend Admin Panel)
+- **Description**: Staff-only bulk question import via JSON with schema validation. Atomic transaction — all questions import or none do.
 
 ## Related Code Files
 
-**Modify:**
-- `apps/imports/models.py` — expand stub
-- `apps/imports/serializers.py` — expand
-- `apps/imports/views.py` — expand
-- `apps/imports/urls.py`
+### Modify
+- `apps/backend/apps/imports/views.py` — create BulkQuestionImportView
+- `apps/backend/apps/imports/serializers.py` — create import serializer
+- `apps/backend/apps/imports/urls.py` — wire endpoint
+- `apps/backend/config/urls.py` — add `/api/v1/imports/` prefix
+- `apps/backend/requirements/base.txt` (or `requirements.txt`) — add `jsonschema`
 
-**Create:**
-- `apps/imports/parsers/csv_parser.py`
-- `apps/imports/parsers/json_parser.py`
-- `apps/imports/validators.py`
-- `apps/imports/services.py`
-- `apps/imports/tasks.py`
-- Test files
+### Create
+- `apps/backend/apps/imports/validators.py` — JSON schema + business logic validation
+
+### Delete
+- None
 
 ## Implementation Steps
 
-1. Expand `ImportJob` model, generate migration
-2. Write `parsers/csv_parser.py` → returns `list[dict]` + row errors
-3. Write `parsers/json_parser.py` → same output contract
-4. Write `validators.py` → validates each question dict (required fields, choice count, etc.)
-5. Write `services.py`:
-   - `process_import_job(job_id)` — parse → validate → bulk_create questions/choices/domains/tags
-   - Update `ImportJob` status/progress throughout
-6. Write `tasks.py` wrapping service
-7. Write `views.py` — upload triggers task, list/retrieve for status polling
-8. Write serializers
-9. Wire `urls.py`
-10. Write tests (parser unit + service integration + view)
+### Step 1: Add jsonschema Dependency
 
-## Success Criteria
+Add `jsonschema>=4.0,<5.0` to requirements file. Verify install:
+```bash
+pip install jsonschema
+```
 
-- Upload CSV → job created → questions appear in `/api/questions/`
-- Upload with invalid rows → job completes with per-row errors in `error_log`
-- Job status polling shows progress
-- Admin-only access enforced
-- All tests pass
+### Step 2: Create JSON Schema Validator
 
-## Risk Assessment
+In `apps/imports/validators.py`, define `QUESTION_IMPORT_SCHEMA`:
 
-| Risk | Level | Mitigation |
-|------|-------|-----------|
-| Large file upload memory | 🟡 Medium | Stream/chunk CSV reading with `csv.reader` |
-| Domain/tag auto-creation race | 🟢 Low | Use `get_or_create` in service |
-| Celery not available in test | 🟢 Low | Use `task.apply()` (sync) in tests |
+```python
+QUESTION_IMPORT_SCHEMA = {
+    "type": "object",
+    "required": ["certification_code", "domain_name", "questions"],
+    "properties": {
+        "certification_code": {"type": "string", "minLength": 1},
+        "domain_name": {"type": "string", "minLength": 1},
+        "questions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["text", "answers"],
+                "properties": {
+                    "text": {"type": "string", "minLength": 10},
+                    "explanation": {"type": "string"},
+                    "source": {"type": "string"},
+                    "question_type": {"enum": ["single", "multiple"], "default": "single"},
+                    "answers": {
+                        "type": "array",
+                        "minItems": 2,
+                        "items": {
+                            "type": "object",
+                            "required": ["text", "is_correct"],
+                            "properties": {
+                                "text": {"type": "string", "minLength": 1},
+                                "is_correct": {"type": "boolean"}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Create `validate_import_data(data)` function:
+1. Run `jsonschema.validate(data, QUESTION_IMPORT_SCHEMA)` — catch `ValidationError`
+2. Verify `certification_code` exists in DB
+3. Verify `domain_name` exists for that certification
+4. Business logic: for each question:
+   - If `question_type == 'single'`: exactly 1 answer must have `is_correct=True`
+   - If `question_type == 'multiple'`: at least 2 answers must have `is_correct=True`
+   - Default `question_type` to 'single' if not provided
+5. Return `(is_valid: bool, errors: list[str])`
+
+### Step 3: Create Import Serializer
+
+In `apps/imports/serializers.py`:
+
+**BulkQuestionImportSerializer** (Serializer):
+- Field: `data` = JSONField() — the entire import payload
+- `validate_data`: call `validate_import_data()`, raise `ValidationError` with error list
+- `create`: inside `transaction.atomic()`:
+  1. Look up Certification by `certification_code`
+  2. Look up Domain by `domain_name` + certification
+  3. For each question in `data['questions']`:
+     - Create `Question` with domain, text, explanation, source, question_type
+     - Create `Answer` objects for each answer entry
+  4. Return `{imported: count, errors: []}`
+
+### Step 4: Create Import View
+
+In `apps/imports/views.py`:
+
+**BulkQuestionImportView** (generics.CreateAPIView):
+- `permission_classes = [IsAuthenticated, IsAdminUser]` (IsAdminUser checks is_staff)
+- `serializer_class = BulkQuestionImportSerializer`
+- Override `create`:
+  - Validate serializer
+  - Call `serializer.save()`
+  - Return `{imported: N, errors: []}` with status 201
+
+Error handling:
+- Schema validation failure → 400 with `{errors: ['Schema: ...']}`
+- Certification not found → 400 with `{errors: ['Certification SAA-C03 not found']}`
+- Domain not found → 400 with `{errors: ['Domain X not found for certification Y']}`
+- DB error → 400 (atomic rollback), return error message
+
+### Step 5: Wire URLs
+
+In `apps/imports/urls.py`:
+```
+questions/ → BulkQuestionImportView (POST)
+```
+
+In `config/urls.py`, add:
+```python
+path("api/v1/imports/", include(("apps.imports.urls", "imports_v1"))),
+```
+
+### Step 6: Example Import JSON
+
+Document the expected format for frontend and testing:
+```json
+{
+  "certification_code": "SAA-C03",
+  "domain_name": "Design Secure Architectures",
+  "questions": [
+    {
+      "text": "A company needs to encrypt data at rest in S3. Which approach requires the LEAST operational overhead?",
+      "explanation": "SSE-S3 is fully managed by AWS...",
+      "source": "AWS Docs - S3 Encryption",
+      "question_type": "single",
+      "answers": [
+        {"text": "SSE-S3", "is_correct": true},
+        {"text": "SSE-KMS with customer-managed key", "is_correct": false},
+        {"text": "Client-side encryption", "is_correct": false},
+        {"text": "SSE-C", "is_correct": false}
+      ]
+    }
+  ]
+}
+```
+
+## API Endpoints
+
+| Method | Path | Auth | Request Body | Response |
+|--------|------|------|-------------|----------|
+| POST | `/api/v1/imports/questions/` | Bearer JWT + is_staff | `{certification_code, domain_name, questions: [{text, explanation?, source?, question_type?, answers: [{text, is_correct}]}]}` | `{imported: int, errors: []}` |
+
+**Error responses:**
+- 400: `{errors: ['Schema validation: ...', 'Certification not found', ...]}`
+- 403: `{detail: 'You do not have permission to perform this action.'}`
+- 401: `{detail: 'Authentication credentials were not provided.'}`
+
+## Security Considerations
+
+- **Staff-only**: `IsAdminUser` permission class checks `user.is_staff`. Non-staff users get 403.
+- **Atomic transactions**: All questions import or none do. Prevents partial imports on error.
+- **Input sanitization**: `jsonschema` validates structure. Text fields stored as-is (Django templates auto-escape on render; React escapes by default).
+- **Rate limiting**: Consider adding custom throttle for import endpoint (e.g., 10/hour) to prevent abuse. Use DRF's `ScopedRateThrottle`.
+- **File size**: For large imports, consider max body size in Nginx config (default 1MB may be too small).
+
+## Acceptance Criteria
+
+- POST /api/v1/imports/questions/ requires is_staff permission
+- Valid JSON import creates questions atomically (all or nothing)
+- Invalid JSON schema returns 400 with clear error messages
+- Import response includes {imported: N, errors: []}
+- Single-answer questions must have exactly 1 is_correct=True
+- Multiple-answer questions must have >= 2 is_correct=True
+- Non-staff users get 403
+- jsonschema library added to requirements

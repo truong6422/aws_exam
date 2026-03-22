@@ -1,171 +1,160 @@
 ---
 spec_id: phase-07-frontend-dashboard-analytics
 version: "1.0"
-status: pending
+status: completed
+blockedBy:
+  - phase-04-backend-analytics
 agents:
   - fullstack-developer
 acceptance_criteria:
-  - Dashboard stats wired to real /api/analytics/summary/ data
-  - History page shows real session list with pagination
-  - Analytics page shows domain breakdown chart + trend
-  - Loading/empty states handled
-  - API layer functions written and typed
+  - "Dashboard page shows recent 5 exam attempts with scores"
+  - "Dashboard shows average score card and 'Start Exam' CTA"
+  - "Analytics page displays weak domains chart per certification"
+  - "Analytics page shows score trend for last 7 attempts"
+  - "History page shows paginated exam attempt list"
+  - "Empty states display helpful messages with CTA to start first exam"
+  - "All data fetched from /api/v1/analytics/ endpoints"
 ---
 
-# Phase 07 — Frontend: Dashboard & Analytics (API-wired)
-
-**Priority:** Medium
-**Depends on:** Phase 00 (UI Redesign), Phase 04 (Analytics API)
-**Blocks:** Phase 09 (Integration Tests)
+# Phase 07 — Frontend: Dashboard & Analytics
 
 ## Overview
 
-Wire the dashboard, history, and analytics page stubs to the real analytics API. UI components come from Phase 00. This phase adds data fetching, charting, and state management.
-
-## Key Insights
-
-- Dashboard is the first screen after login — must load fast
-- Stat cards (total answered, accuracy %, sessions, streak) come from `/api/analytics/summary/`
-- History page is paginated session list from `/api/analytics/history/`
-- Analytics page shows domain breakdown (bar chart) + score trend (line chart)
-- Charts: use **Recharts** (already commonly used with Tailwind React projects; add as dependency)
-- Empty states are critical: new users have no data — show "Take your first exam" CTA
-
-## Requirements
-
-### API Client Functions (`lib/api/analytics.ts`)
-
-```typescript
-getSummary(): Promise<AnalyticsSummary>
-getDomainBreakdown(): Promise<DomainScore[]>
-getHistory(page?: number): Promise<PaginatedResponse<SessionHistoryItem>>
-getTrends(): Promise<TrendPoint[]>
-```
-
-### TypeScript Types (`types/analytics.ts`)
-
-```typescript
-interface AnalyticsSummary {
-  total_questions_answered: number
-  total_correct: number
-  accuracy_pct: number
-  total_sessions: number
-  current_streak_days: number
-  top_domains: DomainScore[]
-}
-
-interface DomainScore {
-  domain: string
-  domain_slug: string
-  questions_seen: number
-  correct_count: number
-  accuracy_pct: number
-}
-
-interface SessionHistoryItem {
-  id: string
-  mode: 'exam' | 'practice'
-  score_pct: number
-  passed: boolean | null
-  question_count: number
-  domain_name: string
-  started_at: string
-}
-
-interface TrendPoint {
-  session_index: number
-  score_pct: number
-  passed: boolean
-  date: string
-}
-```
-
-### Page Logic
-
-**`DashboardPage`**
-- Fetch `getSummary()` on mount
-- Render: 4 stat cards (answered, accuracy, sessions, streak)
-- Recent sessions mini-list (last 5 from summary or history)
-- CTA banner: "Start Exam" / "Practice by Domain"
-- Empty state: new user with zero sessions
-
-**`HistoryPage`**
-- Paginated list of `SessionHistoryItem`
-- Filter by mode (exam/practice)
-- Each row: date, mode badge, domain, score bar, pass/fail badge
-- Click row → navigate to `/exam/{sessionId}/result`
-
-**`AnalyticsPage`**
-- Domain breakdown: bar chart (Recharts `BarChart`) with accuracy_pct per domain
-- Score trend: line chart (Recharts `LineChart`) of last 30 sessions
-- Domain table: sortable, shows questions_seen + accuracy
-- Empty state when no sessions yet
-
-### Recharts Dependency
-
-Add to `package.json`:
-```
-"recharts": "^2.12.0"
-```
-Keep chart components isolated in `components/charts/` to avoid polluting page files.
-
-## Architecture
-
-```
-apps/frontend/src/
-├── lib/api/
-│   └── analytics.ts
-├── types/
-│   └── analytics.ts
-├── components/charts/
-│   ├── domain-bar-chart.tsx       # Recharts BarChart wrapper
-│   └── score-trend-chart.tsx      # Recharts LineChart wrapper
-└── pages/
-    ├── dashboard/
-    │   └── dashboard-page.tsx
-    ├── history/
-    │   └── history-page.tsx
-    └── analytics/
-        └── analytics-page.tsx
-```
+- **Priority**: P2 (User engagement — shows progress)
+- **Depends on**: P4 (Backend analytics endpoints)
+- **Blocks**: P9 (Integration Tests)
+- **Description**: Wire dashboard, analytics, and history pages to real analytics API. Display exam history, score trends, and weak domain analysis.
 
 ## Related Code Files
 
-**Modify:**
-- `src/pages/dashboard/dashboard-page.tsx`
-- `src/pages/history/history-page.tsx`
-- `src/pages/analytics/analytics-page.tsx`
+### Modify
+- `apps/frontend/src/pages/dashboard/dashboard-page.tsx` — recent attempts + stats
+- `apps/frontend/src/pages/analytics/analytics-page.tsx` — weak domains + trend chart
+- `apps/frontend/src/pages/history/history-page.tsx` — paginated exam list
 
-**Create:**
-- `src/lib/api/analytics.ts`
-- `src/types/analytics.ts`
-- `src/components/charts/domain-bar-chart.tsx`
-- `src/components/charts/score-trend-chart.tsx`
+### Create
+- `apps/frontend/src/services/analytics-api.ts` — API client for analytics endpoints
+- `apps/frontend/src/components/dashboard/score-card.tsx` — reusable stat card
+- `apps/frontend/src/components/dashboard/recent-attempts-list.tsx` — recent 5 attempts
+- `apps/frontend/src/components/analytics/weak-domains-chart.tsx` — bar chart
+- `apps/frontend/src/components/analytics/score-trend-chart.tsx` — line/area chart
+- `apps/frontend/src/components/shared/empty-state.tsx` — reusable empty state
+
+### Delete
+- None
 
 ## Implementation Steps
 
-1. Add `recharts` dependency
-2. Define types in `types/analytics.ts`
-3. Write `lib/api/analytics.ts`
-4. Write `components/charts/domain-bar-chart.tsx` (Recharts, Tailwind colors)
-5. Write `components/charts/score-trend-chart.tsx`
-6. Implement `DashboardPage`: fetch summary, render stat cards + recent sessions + CTA
-7. Implement `HistoryPage`: paginated list with filter
-8. Implement `AnalyticsPage`: charts + domain table
-9. Handle loading skeletons and empty states on all pages
+### Step 1: Create Analytics API Service
 
-## Success Criteria
+Create `services/analytics-api.ts`:
 
-- Dashboard loads real stats within 500ms (cached in Zustand or React Query if adopted)
-- History pagination works
-- Charts render with real data
-- Empty states shown for new users
-- No TypeScript errors
+```typescript
+export const analyticsApi = {
+  getOverview: () => GET('/api/v1/analytics/overview/'),
+  getWeakDomains: (certificationId: number) =>
+    GET(`/api/v1/analytics/weak-domains/?certification_id=${certificationId}`),
+  getHistory: (page?: number) =>
+    GET(`/api/v1/analytics/history/?page=${page || 1}`),
+}
+```
 
-## Risk Assessment
+Define TypeScript interfaces:
+- `OverviewResponse` — matches backend OverviewSerializer
+- `WeakDomainItem` — matches backend WeakDomainSerializer
+- `HistoryItem` — matches backend HistoryItemSerializer
 
-| Risk | Level | Mitigation |
-|------|-------|-----------|
-| Recharts bundle size | 🟡 Medium | Import only needed components (tree-shakeable) |
-| Chart re-renders on resize | 🟢 Low | Use `ResponsiveContainer` from Recharts |
-| Stale dashboard data | 🟢 Low | Refetch on navigation to dashboard |
+### Step 2: Create Shared Components
+
+**`components/shared/empty-state.tsx`:**
+- Props: `{ icon, title, description, actionLabel, actionHref }`
+- Centered layout with icon, message, and optional CTA button
+- Used across dashboard, analytics, history when no data
+
+**`components/dashboard/score-card.tsx`:**
+- Props: `{ label, value, suffix?, icon?, trend? }`
+- Card with large value, label below, optional trend arrow
+- Examples: "Avg Score: 74%", "Total Exams: 12", "Best Score: 89%"
+
+### Step 3: Create Chart Components
+
+**`components/analytics/weak-domains-chart.tsx`:**
+- Props: `{ domains: WeakDomainItem[] }`
+- Implementation options (pick one, simplest first):
+  1. **CSS bars** (no library): horizontal bars with percentage width, colored by accuracy
+  2. **Recharts** `<BarChart>`: if already in deps or needed for polish
+- Each bar shows: domain name, accuracy %, colored green (>70%), yellow (50-70%), red (<50%)
+- Sort weakest first (lowest accuracy at top)
+
+**`components/analytics/score-trend-chart.tsx`:**
+- Props: `{ trend: {date, score, certification_code}[] }`
+- Simple line chart showing last 7 attempt scores
+- X-axis: date, Y-axis: score percentage
+- Passing score reference line (72% default)
+- Implementation: CSS-only sparkline or Recharts `<LineChart>`
+
+### Step 4: Wire Dashboard Page
+
+Update `pages/dashboard/dashboard-page.tsx`:
+
+1. On mount: fetch `analyticsApi.getOverview()`
+2. Top section: 3 ScoreCards in a row
+   - Total Exams: `overview.total_attempts`
+   - Average Score: `overview.avg_score`%
+   - Best Score: `overview.best_score`%
+3. Middle section: "Start Exam" CTA button → navigates to `/exam/setup`
+4. Bottom section: Recent 5 attempts list (from `overview.recent_trend`)
+   - Each row: certification code, date, score badge (green if pass, red if fail)
+   - "View All History" link → `/history`
+5. Empty state: If `total_attempts === 0`, show EmptyState with "Take your first exam!" message
+
+### Step 5: Wire Analytics Page
+
+Update `pages/analytics/analytics-page.tsx`:
+
+1. Certification selector at top (fetch from `examApi.getCertifications()`)
+2. On cert selection: fetch `analyticsApi.getWeakDomains(certId)`
+3. Left panel: WeakDomainsChart showing domain accuracy bars
+4. Right panel: ScoreTrendChart showing last 7 attempts
+5. Below: summary text — "Focus on: {weakest domain name}"
+6. Empty state per section if no data
+
+### Step 6: Wire History Page
+
+Update `pages/history/history-page.tsx`:
+
+1. On mount: fetch `analyticsApi.getHistory(page=1)`
+2. Table/list layout:
+   - Columns: Certification, Date, Score, Status, Actions
+   - Score: colored badge (green ≥ pass %, red < pass %)
+   - Status: "Submitted" / "Expired" badge
+   - Actions: "Review" button → `/exam/{id}/result`
+3. Pagination: DRF returns `{count, next, previous, results}`
+   - Show page numbers or "Load More" button
+   - "Previous" / "Next" navigation
+4. Empty state: "No exam history yet"
+
+### Step 7: Loading States
+
+All pages should handle:
+- **Loading**: Skeleton loaders or spinner while fetching
+- **Error**: Error message with "Retry" button
+- **Empty**: EmptyState component with helpful CTA
+
+Use a simple `useQuery`-like pattern or `useState` + `useEffect` for data fetching.
+
+## Security Considerations
+
+- **User-scoped data**: Backend already filters by authenticated user. Frontend just displays.
+- **No sensitive data in analytics**: Scores and attempt IDs are user's own data.
+- **Pagination bounds**: Don't allow negative page numbers in URL manipulation.
+
+## Acceptance Criteria
+
+- Dashboard page shows recent 5 exam attempts with scores
+- Dashboard shows average score card and "Start Exam" CTA
+- Analytics page displays weak domains chart per certification
+- Analytics page shows score trend for last 7 attempts
+- History page shows paginated exam attempt list
+- Empty states display helpful messages with CTA to start first exam
+- All data fetched from /api/v1/analytics/ endpoints

@@ -1,13 +1,11 @@
 // Shared domain types used across the app
 
-export type UserRole = 'student' | 'admin'
-
 export interface User {
   id: number
   email: string
   username: string
-  full_name: string
-  role: UserRole
+  name: string         // matches API field from UserProfileSerializer
+  is_staff: boolean    // matches API field; use this to derive admin role
 }
 
 export type ExamMode = 'exam' | 'practice'

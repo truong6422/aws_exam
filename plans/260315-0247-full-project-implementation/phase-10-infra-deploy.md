@@ -1,194 +1,257 @@
 ---
 spec_id: phase-10-infra-deploy
 version: "1.0"
-status: pending
+status: in-progress
+blockedBy:
+  - phase-09-integration-tests
 agents:
   - fullstack-developer
 acceptance_criteria:
-  - Production docker-compose runs with all services healthy
-  - Nginx serves frontend static files + proxies /api/ to Django
-  - HTTPS via self-signed cert (or Let's Encrypt if domain available)
-  - Environment variables documented in .env.example
-  - Health check endpoint returns 200
-  - Makefile deploy targets added
+  - "docker-compose up builds and starts all services (django, postgres, redis, nginx)"
+  - "Nginx serves React SPA static files and proxies /api/ to Django"
+  - "GET /health/ returns 200 from Django health check"
+  - "Sentry captures Django errors (sentry-sdk[django] installed)"
+  - "Sentry captures React errors (@sentry/react installed)"
+  - "DEBUG=False in production settings"
+  - "ALLOWED_HOSTS, CORS settings configured for production"
+  - "All services have restart: always in docker-compose"
+  - "Environment variables documented in .env.example"
 ---
 
-# Phase 10 — Infra: Docker Production & Deploy
-
-**Priority:** Low
-**Depends on:** Phase 09 (all tests passing)
-**Blocks:** Nothing (final phase)
+# Phase 10 — Infrastructure & Production Deploy
 
 ## Overview
 
-Harden the existing Docker Compose setup for a real production deployment. The scaffolding already exists (`docker-compose.yml`, multi-stage Dockerfiles, Nginx). This phase fills gaps: production settings tuning, static file serving, SSL, environment validation, and deploy scripts.
-
-## Key Insights
-
-- `docker-compose.yml` (production) already exists but hasn't been battle-tested
-- Backend Dockerfile is multi-stage (base → dev → prod) — good
-- Frontend Dockerfile builds React → Nginx serves static files
-- Need: proper `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, static file collection
-- `collectstatic` must run before gunicorn starts
-- Celery worker needs same image as API (already the case)
-- Redis needs a persistent volume in production
-- No Kubernetes for now — single-host Docker Compose is sufficient (YAGNI)
-
-## Requirements
-
-### Production Checklist
-
-**Django settings (`config/settings/production.py`)**
-- `DEBUG = False`
-- `ALLOWED_HOSTS` from env
-- `SECURE_SSL_REDIRECT = True` (behind Nginx TLS)
-- `SESSION_COOKIE_SECURE = True`
-- `CSRF_COOKIE_SECURE = True`
-- `STATIC_ROOT = /app/staticfiles/`
-- Logging: JSON format to stdout (Docker picks up)
-- Sentry DSN from env (optional but wired)
-
-**Backend Dockerfile (prod stage)**
-```dockerfile
-# Ensure collectstatic runs at startup
-ENTRYPOINT ["/app/docker/entrypoint.sh"]
-```
-
-**`docker/entrypoint.sh`**
-```bash
-#!/bin/bash
-set -e
-python manage.py migrate --noinput
-python manage.py collectstatic --noinput
-exec "$@"
-```
-
-**Nginx config (`docker/nginx/nginx.conf`)**
-```nginx
-# Serve frontend static files
-location / {
-    root /usr/share/nginx/html;
-    try_files $uri /index.html;  # SPA fallback
-}
-
-# Proxy API to Django
-location /api/ {
-    proxy_pass http://api:8000;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-}
-
-# Proxy Django admin
-location /admin/ {
-    proxy_pass http://api:8000;
-}
-
-# Serve Django static/media
-location /static/ {
-    proxy_pass http://api:8000;
-}
-```
-
-**`docker-compose.yml` additions**
-- Redis: add named volume `redis_data:/data`
-- Postgres: verify named volume `postgres_data:/var/lib/postgresql/data`
-- API: add `depends_on` health checks for db + redis
-- Celery: `restart: unless-stopped`
-- Add `networks:` section for service isolation
-
-**`.env.example` updates**
-- Document all new vars added across phases:
-  - `EXAM_PASS_THRESHOLD` (default: 72)
-  - `CELERY_TASK_ALWAYS_EAGER` (True for dev, False for prod)
-  - `SENTRY_DSN` (optional)
-  - `DJANGO_SUPERUSER_EMAIL`, `DJANGO_SUPERUSER_PASSWORD` (for first deploy)
-
-### Makefile Targets
-
-```makefile
-deploy-up:       # docker compose -f docker-compose.yml up -d --build
-deploy-down:     # docker compose -f docker-compose.yml down
-deploy-logs:     # docker compose -f docker-compose.yml logs -f
-deploy-migrate:  # docker compose exec api python manage.py migrate
-deploy-static:   # docker compose exec api python manage.py collectstatic --noinput
-deploy-shell:    # docker compose exec api python manage.py shell
-```
-
-### Health Check
-
-Verify `GET /health/` returns 200 with all checks green:
-- Database connectivity
-- Redis connectivity
-- (Celery via `django-health-check` plugin if available)
-
-## Architecture
-
-```
-docker/
-├── backend/
-│   ├── Dockerfile          # Review prod stage
-│   └── entrypoint.sh       # migrate + collectstatic + exec
-├── frontend/
-│   └── Dockerfile          # Review (build → nginx copy)
-└── nginx/
-    ├── Dockerfile
-    └── nginx.conf          # Update SPA fallback + proxy rules
-
-docker-compose.yml           # Add volumes, health deps, restart policies
-.env.example                 # Update with all new vars
-Makefile                     # Add deploy targets
-```
+- **Priority**: P3 (Ship after all features tested)
+- **Depends on**: P9 (All tests must pass)
+- **Blocks**: Nothing (final phase)
+- **Description**: Production-ready Docker Compose with Nginx reverse proxy, Sentry error tracking, and deployment checklist. Verify all services start cleanly.
 
 ## Related Code Files
 
-**Modify:**
-- `apps/backend/config/settings/production.py`
-- `docker/nginx/nginx.conf`
-- `docker-compose.yml`
-- `.env.example`
-- `Makefile`
-- `docker/backend/Dockerfile`
+### Modify
+- `docker-compose.yml` (or `docker-compose.prod.yml`) — verify all services configured
+- `apps/backend/config/settings/base.py` — add Sentry SDK init
+- `apps/backend/config/settings/production.py` — production overrides (create if not exists)
+- `apps/backend/requirements/base.txt` — add `sentry-sdk[django]`
+- `apps/frontend/package.json` — add `@sentry/react`
+- `apps/frontend/src/main.tsx` — init Sentry
 
-**Create:**
-- `docker/backend/entrypoint.sh`
+### Create
+- `nginx/nginx.conf` — Nginx configuration for SPA + API proxy (if not exists)
+- `nginx/Dockerfile` — Nginx container (if not exists)
+- `.env.example` — documented environment variables template
+- `apps/backend/config/settings/production.py` — if not exists
+
+### Delete
+- None
 
 ## Implementation Steps
 
-1. Review and update `config/settings/production.py`
-2. Write `docker/backend/entrypoint.sh` (migrate + collectstatic + exec)
-3. Update backend `Dockerfile` prod stage to use entrypoint
-4. Update `docker/nginx/nginx.conf` with SPA fallback + all proxy rules
-5. Update `docker-compose.yml`: volumes, health checks, restart policies
-6. Update `.env.example` with all env vars from all phases
-7. Add Makefile deploy targets
-8. Test locally: `make deploy-up` → verify all services healthy
-9. Verify `GET /health/` returns 200
-10. Verify frontend loads at `http://localhost:80`
-11. Verify `/api/v1/auth/login/` reachable through Nginx
+### Step 1: Verify Docker Compose (Production)
 
-## Success Criteria
+Check existing `docker-compose.yml` or create `docker-compose.prod.yml`. Required services:
 
-- `make deploy-up` → all 6 containers healthy (postgres, redis, api, celery, frontend, nginx)
-- `GET /health/` → 200 with db + redis green
-- Frontend SPA loads, navigates correctly (no 404 on refresh)
-- API accessible via Nginx proxy
-- `collectstatic` runs on container start
-- All environment variables documented in `.env.example`
+1. **django** (backend):
+   - Build from `apps/backend/Dockerfile`
+   - Command: `gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3`
+   - Environment: load from `.env`
+   - Depends on: postgres, redis
+   - `restart: always`
+   - Expose port 8000 internally (not to host)
 
-## Risk Assessment
+2. **postgres**:
+   - Image: `postgres:16-alpine`
+   - Volume: `postgres_data:/var/lib/postgresql/data`
+   - Environment: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
+   - `restart: always`
+   - Health check: `pg_isready`
 
-| Risk | Level | Mitigation |
-|------|-------|-----------|
-| collectstatic fails (missing whitenoise) | 🟢 Low | Already in requirements/base.txt |
-| SPA 404 on direct URL refresh | 🟡 Medium | `try_files $uri /index.html` in Nginx |
-| Celery not connecting to Redis | 🟢 Low | `depends_on` + `CELERY_BROKER_URL` from env |
-| Postgres data loss on `down` | 🔴 High | Named volumes must persist; never use `down -v` in prod |
+3. **redis**:
+   - Image: `redis:7-alpine`
+   - Command: `redis-server --appendonly yes`
+   - Volume: `redis_data:/data`
+   - `restart: always`
+   - Health check: `redis-cli ping`
+
+4. **nginx**:
+   - Build from `nginx/Dockerfile` or image `nginx:alpine`
+   - Volumes: mount built React SPA files + nginx.conf
+   - Ports: `80:80`, `443:443` (if TLS)
+   - Depends on: django
+   - `restart: always`
+
+### Step 2: Configure Nginx
+
+Create `nginx/nginx.conf`:
+
+Key nginx locations:
+- `location /` → `root /usr/share/nginx/html; try_files $uri $uri/ /index.html;` (SPA fallback)
+- `location /api/` → `proxy_pass http://django:8000;` + standard proxy headers (Host, X-Real-IP, X-Forwarded-For, X-Forwarded-Proto)
+- `location /health/` → proxy to django:8000
+- `location /admin/` → proxy to django:8000
+- `location /static/` → `alias /usr/share/nginx/static/;` (Django collectstatic output)
+- `client_max_body_size 10M;` (for JSON imports)
+
+### Step 3: Setup Sentry — Backend
+
+Add `sentry-sdk[django]` to requirements.
+
+In `config/settings/base.py` (or `production.py`):
+
+```python
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+SENTRY_DSN = config("SENTRY_DSN", default="")
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.1,  # 10% of transactions
+        send_default_pii=False,   # Don't send user PII
+        environment=config("ENVIRONMENT", default="production"),
+    )
+```
+
+### Step 4: Setup Sentry — Frontend
+
+Install: `npm install @sentry/react`
+
+In `apps/frontend/src/main.tsx`:
+
+```typescript
+import * as Sentry from '@sentry/react'
+
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.VITE_ENVIRONMENT || 'production',
+    tracesSampleRate: 0.1,
+  })
+}
+```
+
+Wrap `<App>` with `Sentry.ErrorBoundary` for global error catching.
+
+### Step 5: Create Production Settings
+
+Create or update `config/settings/production.py`:
+
+```python
+from .base import *
+
+DEBUG = False
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+
+# Security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# CORS — restrict to frontend domain
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
+
+# Static files collected by collectstatic
+STATIC_ROOT = BASE_DIR / "staticfiles"
+```
+
+### Step 6: Create .env.example
+
+Document all required environment variables:
+
+```bash
+# Django
+SECRET_KEY=change-me-in-production
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+ENVIRONMENT=production
+DJANGO_SETTINGS_MODULE=config.settings.production
+
+# Database
+DB_NAME=aws_exam_app
+DB_USER=postgres
+DB_PASSWORD=change-me
+DB_HOST=postgres
+DB_PORT=5432
+
+# Redis
+REDIS_URL=redis://redis:6379/0
+
+# CORS
+CORS_ALLOWED_ORIGINS=https://yourdomain.com
+
+# Sentry
+SENTRY_DSN=https://xxx@sentry.io/xxx
+VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
+
+# Frontend
+VITE_API_URL=https://yourdomain.com
+VITE_ENVIRONMENT=production
+```
+
+### Step 7: Build & Deploy Script
+
+Create or update deployment workflow:
+
+```bash
+# Build frontend
+cd apps/frontend && npm run build
+# Copy build output to nginx serve directory
+
+# Collect Django static files
+cd apps/backend && python manage.py collectstatic --noinput
+
+# Run migrations
+python manage.py migrate --noinput
+
+# Start services
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+### Step 8: Production Checklist
+
+Verify before going live:
+
+- [ ] `DEBUG=False` in production settings
+- [ ] `SECRET_KEY` is unique and not committed to git
+- [ ] `ALLOWED_HOSTS` set to actual domain(s)
+- [ ] `CORS_ALLOWED_ORIGINS` matches frontend domain
+- [ ] PostgreSQL uses strong password
+- [ ] Redis not exposed to public network
+- [ ] Sentry DSN configured for both backend + frontend
+- [ ] `GET /health/` returns 200
+- [ ] Nginx serves SPA correctly (deep links work via try_files)
+- [ ] `/api/` endpoints proxied correctly
+- [ ] Django admin accessible at `/admin/`
+- [ ] Static files served (Django admin CSS loads)
+- [ ] SSL/TLS configured (if using HTTPS)
+- [ ] `client_max_body_size` allows JSON imports (10M)
+- [ ] All services restart on failure (`restart: always`)
+- [ ] Database backups configured (if RDS, automatic)
+- [ ] Log output accessible (docker logs or centralized)
 
 ## Security Considerations
 
-- `SECRET_KEY` must be long random string (not the dev default)
-- `DEBUG=False` in production (already enforced by settings module)
-- `ALLOWED_HOSTS` must be set to actual domain
-- CORS origins must match frontend domain only
-- Never commit `.env` (already in `.gitignore`)
-- Postgres + Redis ports NOT exposed to host in production compose
+- **SECRET_KEY**: Random, 50+ chars, never in git.
+- **No PII in Sentry**: `send_default_pii=False`.
+- **Redis not public**: Only accessible within Docker network — no host port mapping.
+- **HTTPS**: Use Let's Encrypt + certbot or AWS ACM.
+- **Security headers**: HSTS, XSS filter, Content-Type nosniff, X-Frame-Options DENY.
+- **.env not committed**: Must be in `.gitignore`.
+- **RDS note**: For production, consider managed RDS ($15-30/mo) for automated backups + failover. MVP can use Postgres container; migrate when user count grows. Update `DB_HOST` to RDS endpoint and remove postgres service.
+
+## Acceptance Criteria
+
+- docker-compose up builds and starts all services (django, postgres, redis, nginx)
+- Nginx serves React SPA static files and proxies /api/ to Django
+- GET /health/ returns 200 from Django health check
+- Sentry captures Django errors (sentry-sdk[django] installed)
+- Sentry captures React errors (@sentry/react installed)
+- DEBUG=False in production settings
+- ALLOWED_HOSTS, CORS settings configured for production
+- All services have restart: always in docker-compose
+- Environment variables documented in .env.example

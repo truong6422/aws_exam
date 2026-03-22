@@ -2,29 +2,67 @@
   "queueId": "aws-exam-app:auto:20260315",
   "project": "aws-exam-app",
   "workflow": "04",
-  "status": "completed",
-  "completedAt": "2026-03-16",
   "tasks": [
     {
-      "taskId": "login-home-ui-v3",
-      "description": "Làm lại UI login + homepage",
-      "status": "done",
+      "taskId": "backend-auth-v1",
+      "description": "Backend Auth + User Service với JWT (register/login/logout, model User, middleware auth)",
+      "status": "pending",
       "steps": {
-        "plan": "success",
-        "cook": "success",
-        "test": "success"
+        "plan": "pending",
+        "cook": "pending",
+        "test": "pending",
+        "code-review": "pending",
+        "git": "pending"
       }
     },
     {
-      "taskId": "theme-orange-v1",
-      "description": "Chuyển màu chủ đạo site từ trắng/xanh sang cam (brand mới)",
-      "status": "done",
+      "taskId": "question-engine-v1",
+      "description": "Question Engine: Certification / Domain / Question / Answer + API + import JSON",
+      "status": "pending",
       "steps": {
-        "plan": "success",
-        "cook": "success",
-        "test": "success"
+        "plan": "pending",
+        "cook": "pending",
+        "test": "pending",
+        "code-review": "pending",
+        "git": "pending"
+      }
+    },
+    {
+      "taskId": "exam-mode-engine-v1",
+      "description": "Exam Mode Engine: ExamAttempt + ExamAttemptAnswer + API exam start/submit/result",
+      "status": "pending",
+      "steps": {
+        "plan": "pending",
+        "cook": "pending",
+        "test": "pending",
+        "code-review": "pending",
+        "git": "pending"
+      }
+    },
+    {
+      "taskId": "practice-mode-engine-v1",
+      "description": "Practice Mode Engine: API practice + logic giải thích từng câu + lưu lịch sử",
+      "status": "pending",
+      "steps": {
+        "plan": "pending",
+        "cook": "pending",
+        "test": "pending",
+        "code-review": "pending",
+        "git": "pending"
+      }
+    },
+    {
+      "taskId": "ui-analytics-dashboard-v1",
+      "description": "UI & Analytics Dashboard: landing, login, exam/practice/result + weak domains/accuracy",
+      "status": "pending",
+      "steps": {
+        "plan": "pending",
+        "cook": "pending",
+        "test": "pending",
+        "code-review": "pending",
+        "git": "pending"
       }
     }
   ],
-  "currentTaskId": null
+  "currentTaskId": "backend-auth-v1"
 }

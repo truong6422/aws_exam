@@ -38,8 +38,8 @@ export const adminApi = {
     apiClient.post<ImportResult>('/imports/questions/', data),
 
   getCertifications: () =>
-    apiClient.get<Certification[]>('/questions/certifications/'),
+    apiClient.list<Certification>('/questions/certifications/'),
 
   getDomains: (certId: number) =>
-    apiClient.get<Domain[]>(`/questions/certifications/${certId}/domains/`),
+    apiClient.list<Domain>(`/questions/certifications/${certId}/domains/`),
 }

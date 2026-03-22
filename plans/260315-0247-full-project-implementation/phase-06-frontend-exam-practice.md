@@ -1,202 +1,241 @@
 ---
 spec_id: phase-06-frontend-exam-practice
 version: "1.0"
-status: pending
+status: completed
+blockedBy:
+  - phase-02-backend-exam-engine
 agents:
   - fullstack-developer
 acceptance_criteria:
-  - Exam setup → start session → answer questions → submit → view result flow works end-to-end
-  - Practice setup → question-by-question with instant feedback works
-  - Timer countdown in exam mode
-  - API calls wired to real backend (no mocks)
-  - Zustand exam store fully wired
-  - All new components under 200 lines
+  - "Exam setup page lists certifications from API and starts exam on button click"
+  - "Exam session page displays questions with single/multiple choice answers"
+  - "Question navigation grid shows color-coded status: gray=unanswered, green=answered, orange=flagged, yellow=answered+flagged"
+  - "Exam timer counts down from server-provided time_remaining_seconds"
+  - "Timer turns red at <5min, pulses at <1min, auto-submits at 0"
+  - "Autosave fires every 30s via PATCH /api/v1/exams/{id}/autosave/"
+  - "Zustand store persists answers to localStorage (survives refresh)"
+  - "Exam result page shows score, correct/total, and domain breakdown"
+  - "Practice mode shows explanation inline after each answer submission"
+  - "Page Visibility API pauses/resumes timer on tab switch"
 ---
 
-# Phase 06 — Frontend: Exam & Practice Flows (API-wired)
-
-**Priority:** High
-**Depends on:** Phase 00 (UI Redesign complete), Phase 02 (Exam Engine API)
-**Blocks:** Phase 09 (Integration Tests)
+# Phase 06 — Frontend: Exam & Practice Flows
 
 ## Overview
 
-Wire the exam and practice page stubs to the real backend API. The UI design comes from Phase 00 (P6 of the UI redesign plan). This phase is purely about API integration, state management, and business logic on the frontend.
-
-## Key Insights
-
-- UI components (sticky header/footer, question card, answer options) are built in Phase 00
-- This phase adds: API calls, state wiring, timer logic, routing between steps
-- Exam flow: `ExamSetupPage` → `ExamSessionPage` → `ExamResultPage`
-- Practice flow: `PracticeSetupPage` → `PracticeSessionPage` (no result page — inline feedback)
-- Zustand `examsStore` exists but is wired to nothing — needs real actions
-- Timer: client-side countdown, sync with `expires_at` from server
-- On tab close/refresh during exam: session persists on server; frontend resumes via session ID from localStorage
-
-## Requirements
-
-### API Client Functions (in `lib/api/`)
-
-```typescript
-// lib/api/exams.ts
-startSession(params: StartSessionParams): Promise<ExamSession>
-submitExam(sessionId, answers: AnswerPayload[]): Promise<ExamResult>
-submitPracticeAnswer(sessionId, questionId, choiceIds): Promise<PracticeAnswerResult>
-getSession(sessionId): Promise<ExamSession>
-getSessionResult(sessionId): Promise<ExamResult>
-```
-
-### TypeScript Types (in `types/`)
-
-```typescript
-// types/exam.ts
-type SessionMode = 'exam' | 'practice'
-type SessionStatus = 'in_progress' | 'submitted' | 'expired'
-
-interface StartSessionParams {
-  mode: SessionMode
-  question_count: number
-  domain?: string        // domain slug
-  tags?: string[]
-}
-
-interface ExamSession {
-  id: string
-  mode: SessionMode
-  status: SessionStatus
-  questions: Question[]  // without correct answers in exam mode
-  expires_at: string | null
-  question_count: number
-}
-
-interface Question {
-  id: number
-  stem: string
-  question_type: 'single' | 'multiple'
-  choices: Choice[]
-  domain: string
-}
-
-interface Choice {
-  id: number
-  text: string
-  order: number
-  // is_correct NOT included in exam mode response
-}
-
-interface ExamResult {
-  score_raw: number
-  score_pct: number
-  passed: boolean
-  answers: AnsweredQuestion[]
-}
-```
-
-### Zustand Store Updates (`stores/exam-store.ts`)
-
-```typescript
-interface ExamStore {
-  session: ExamSession | null
-  answers: Map<questionId, choiceId[]>   // user's current answers
-  currentIndex: number                   // which question is showing
-  timeRemaining: number | null           // seconds
-  practiceResults: Map<questionId, PracticeAnswerResult>
-
-  // Actions
-  startSession(params): Promise<void>
-  setAnswer(questionId, choiceIds): void
-  submitExam(): Promise<ExamResult>
-  submitPracticeAnswer(questionId, choiceIds): Promise<void>
-  nextQuestion(): void
-  prevQuestion(): void
-  clearSession(): void
-}
-```
-
-### Page Logic
-
-**`ExamSetupPage`**
-- Filter form: question count (10 / 25 / 65), domain, difficulty
-- On submit → call `startSession()` → navigate to `/exam/{sessionId}`
-
-**`ExamSessionPage`**
-- On mount: load session from store or fetch via `getSession()`
-- Resume guard: if session expired → redirect to `/dashboard`
-- Timer: interval ticking down from `timeRemaining`; auto-submit on 0
-- Navigation: prev/next question, jump-to-question sidebar panel
-- Submit button: confirm modal → `submitExam()` → navigate to result
-
-**`ExamResultPage`**
-- Fetch result via `getSessionResult(sessionId)`
-- Show: score badge (pass/fail), per-question breakdown, correct answers + explanations
-
-**`PracticeSetupPage`**
-- Same filter form as ExamSetup (no time limit option)
-
-**`PracticeSessionPage`**
-- One question at a time
-- On answer: call `submitPracticeAnswer()` → show inline feedback (correct/wrong + explanation)
-- Next question button after feedback shown
-- No result page: practice ends when last question answered
-
-## Architecture
-
-```
-apps/frontend/src/
-├── lib/api/
-│   └── exams.ts              # API call functions
-├── types/
-│   └── exam.ts               # TypeScript interfaces
-├── stores/
-│   └── exam-store.ts         # Expanded Zustand store
-└── pages/
-    ├── exam/
-    │   ├── exam-setup-page.tsx
-    │   ├── exam-session-page.tsx
-    │   └── exam-result-page.tsx
-    └── practice/
-        ├── practice-setup-page.tsx
-        └── practice-session-page.tsx
-```
+- **Priority**: P0 (Core user-facing feature)
+- **Depends on**: P2 (Backend exam endpoints must be live)
+- **Blocks**: P9 (Integration Tests)
+- **Description**: Wire exam and practice page stubs to real backend APIs. Implement Zustand exam store with localStorage persist, countdown timer with Page Visibility API, autosave every 30s, question navigation grid. This is Vite + React SPA with React Router v6 — NOT Next.js.
 
 ## Related Code Files
 
-**Modify:**
-- `src/stores/exam-store.ts` — wire real API calls
-- `src/pages/exam/exam-setup-page.tsx`
-- `src/pages/exam/exam-session-page.tsx`
-- `src/pages/exam/exam-result-page.tsx`
-- `src/pages/practice/practice-setup-page.tsx`
-- `src/pages/practice/practice-session-page.tsx`
+### Modify
+- `apps/frontend/src/stores/exam-store.ts` — rewrite with persist middleware, answers Map, autosave action
+- `apps/frontend/src/pages/exam/exam-setup-page.tsx` — certification picker + start button
+- `apps/frontend/src/pages/exam/exam-session-page.tsx` — full exam UI with timer, navigation, answers
+- `apps/frontend/src/pages/exam/exam-result-page.tsx` — score display + review link
+- `apps/frontend/src/pages/practice/practice-setup-page.tsx` — cert + domain filter
+- `apps/frontend/src/pages/practice/practice-session-page.tsx` — instant feedback mode
 
-**Create:**
-- `src/lib/api/exams.ts`
-- `src/types/exam.ts`
+### Create
+- `apps/frontend/src/services/exam-api.ts` — API client for exam endpoints
+- `apps/frontend/src/services/api-client.ts` — shared axios/fetch wrapper with auth headers (if not exists)
+- `apps/frontend/src/hooks/use-exam-timer.ts` — countdown + Page Visibility API
+- `apps/frontend/src/hooks/use-autosave.ts` — 30s interval autosave
+- `apps/frontend/src/components/exam/question-navigation-grid.tsx` — color-coded grid
+- `apps/frontend/src/components/exam/exam-timer.tsx` — countdown display
+- `apps/frontend/src/components/exam/answer-option.tsx` — single/multiple choice button
+
+### Delete
+- None (update stubs in place)
 
 ## Implementation Steps
 
-1. Define TypeScript types in `types/exam.ts`
-2. Write `lib/api/exams.ts` with all API call functions (using existing axios/fetch client)
-3. Expand `stores/exam-store.ts` with real actions
-4. Implement `ExamSetupPage`: filter form → `startSession()` → navigate
-5. Implement `ExamSessionPage`: timer, question navigation, submit
-6. Implement `ExamResultPage`: fetch + display result
-7. Implement `PracticeSetupPage`
-8. Implement `PracticeSessionPage`: inline feedback loop
-9. Handle edge cases: expired session, network error, empty question pool
+### Step 1: Create API Client
 
-## Success Criteria
+Create `services/api-client.ts`:
+- Export a configured fetch/axios instance
+- Read access token from `useAuthStore.getState().token`
+- Set `Authorization: Bearer {token}` header on all requests
+- Set `Content-Type: application/json`
+- Base URL from env var `VITE_API_URL` (default: `http://localhost:8000`)
+- Handle 401 responses: attempt token refresh, if fails → logout + redirect to /login
 
-- Full exam flow works against real backend
-- Timer counts down; auto-submits on expiry
-- Practice mode shows correct answer + explanation after each submission
-- Session survives page refresh (resume via sessionId in URL)
-- All pages handle loading/error states
+### Step 2: Create Exam API Service
 
-## Risk Assessment
+Create `services/exam-api.ts`:
 
-| Risk | Level | Mitigation |
-|------|-------|-----------|
-| Timer drift (client vs server) | 🟡 Medium | Use `expires_at` from server as source of truth |
-| Exposing answers in exam mode | 🔴 High | Backend handles; frontend must not render `is_correct` in exam mode |
-| Large question list re-renders | 🟡 Medium | Memoize question components, use index for navigation |
+```typescript
+export const examApi = {
+  getCertifications: () => GET('/api/v1/questions/certifications/'),
+  getDomains: (certId: number) => GET(`/api/v1/questions/certifications/${certId}/domains/`),
+  startExam: (certificationId: number) => POST('/api/v1/exams/start/', { certification_id: certificationId }),
+  autosaveExam: (attemptId: number, answers: PartialAnswer[]) => PATCH(`/api/v1/exams/${attemptId}/autosave/`, answers),
+  submitExam: (attemptId: number, answers: PartialAnswer[]) => POST(`/api/v1/exams/${attemptId}/submit/`, answers),
+  getExamReview: (attemptId: number) => GET(`/api/v1/exams/${attemptId}/review/`),
+  getExamList: (page?: number) => GET(`/api/v1/exams/?page=${page || 1}`),
+}
+```
+
+Define TypeScript interfaces for all API responses matching backend serializers.
+
+### Step 3: Rewrite Exam Store
+
+Rewrite `stores/exam-store.ts` with Zustand `persist` middleware:
+
+**State:**
+- `attemptId: number | null`
+- `mode: 'exam' | 'practice'`
+- `questions: Question[]`
+- `answers: Record<number, number[]>` — `{questionId: [selectedAnswerIds]}`
+- `flagged: Set<number>` (serialize as array in persist)
+- `currentIndex: number`
+- `timeRemaining: number`
+- `isSaving: boolean`
+
+**Actions:**
+- `initSession(attemptId, questions, timeRemaining, mode)` — set all fields
+- `updateAnswer(questionId, answerIds)` — update answers map
+- `toggleFlag(questionId)` — add/remove from flagged set
+- `goToQuestion(index)` — set currentIndex
+- `setTimeRemaining(seconds)` — update countdown
+- `syncToBackend()` — call PATCH autosave, set isSaving
+- `clearSession()` — reset all fields, clear localStorage
+
+**Persist config:**
+- `name: 'aws-exam-session'`
+- `partialize`: persist `attemptId, answers, flagged, currentIndex, mode` (NOT questions — re-fetch on reload)
+- Custom storage serializer for Set → Array conversion
+
+### Step 4: Create Timer Hook
+
+Create `hooks/use-exam-timer.ts`:
+
+```typescript
+function useExamTimer(initialSeconds: number, onTimeUp: () => void) {
+  // State: time (seconds), isVisible (Page Visibility)
+  // useEffect: decrement every 1s when visible
+  // useEffect: Page Visibility API listener
+  // useEffect: call onTimeUp when time hits 0
+  // Return: { minutes, seconds, isWarning, isCritical }
+}
+```
+
+- `isWarning`: time < 300 (5min) → red text
+- `isCritical`: time < 60 (1min) → pulse animation
+- Page Visibility: stop counting when `document.hidden`, resume on visible
+- On resume after hidden: re-sync time from store (which gets updated by autosave response)
+
+### Step 5: Create Autosave Hook
+
+Create `hooks/use-autosave.ts`:
+
+```typescript
+function useAutosave(attemptId: number | null, answers: Record<number, number[]>) {
+  // useEffect with 30s setInterval
+  // On each tick: call examApi.autosaveExam()
+  // Update timeRemaining from response
+  // Show saving indicator via isSaving state
+  // Cleanup interval on unmount or session end
+  // Return: { isSaving, lastSavedAt }
+}
+```
+
+### Step 6: Create Question Navigation Grid
+
+Create `components/exam/question-navigation-grid.tsx`:
+
+Props: `{ totalQuestions, answers, flagged, currentIndex, onSelectQuestion }`
+
+Color logic per question number button:
+- No answer + not flagged → `bg-gray-200` (unanswered)
+- Has answer + not flagged → `bg-green-400` (answered)
+- No answer + flagged → `bg-orange-400` (flagged for review)
+- Has answer + flagged → `bg-yellow-400` (answered + flagged)
+- Current question → `ring-2 ring-blue-600 ring-offset-1`
+
+Layout: `grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-10 gap-2`
+Add legend below grid showing color meanings.
+
+### Step 7: Create Exam Timer Component
+
+Create `components/exam/exam-timer.tsx`:
+
+- Display `MM:SS` format with monospace font
+- Normal: `text-gray-800`
+- Warning (<5min): `text-red-600 font-bold`
+- Critical (<1min): `text-red-600 animate-pulse font-bold`
+
+### Step 8: Create Answer Option Component
+
+Create `components/exam/answer-option.tsx`:
+
+Props: `{ answer, isSelected, questionType, onSelect }`
+
+- Single choice: radio button style — clicking deselects other answers
+- Multiple choice: checkbox style — toggle individual answers
+- Selected state: `bg-blue-50 border-blue-500 ring-1 ring-blue-500`
+- Default state: `bg-white border-gray-300 hover:bg-gray-50`
+
+### Step 9: Wire Exam Setup Page
+
+Update `pages/exam/exam-setup-page.tsx`:
+1. On mount: fetch certifications via `examApi.getCertifications()`
+2. Display certification cards with name, code, time_limit, total_questions, passing_score
+3. "Start Exam" button per cert → calls `examApi.startExam(certId)`
+4. On success: init exam store → navigate to `/exam/{attemptId}`
+
+### Step 10: Wire Exam Session Page
+
+Update `pages/exam/exam-session-page.tsx`:
+1. On mount: check exam store for existing session (localStorage recovery)
+2. If no session: redirect to `/exam/setup`
+3. Layout: sidebar (navigation grid + timer) + main (question + answers)
+4. Integrate: `useExamTimer`, `useAutosave`, exam store actions
+5. Navigation: Prev/Next buttons + grid click
+6. Flag button: toggle flag on current question
+7. Submit button: confirmation dialog → call `examApi.submitExam()` → navigate to result
+8. Auto-submit on timer expiry
+
+### Step 11: Wire Exam Result Page
+
+Update `pages/exam/exam-result-page.tsx`:
+1. Fetch result from URL param `:sessionId` — or read from navigation state
+2. Display: score percentage (large), correct/total, pass/fail badge
+3. "Review Answers" button → navigate to review view (or expand inline)
+4. "Back to Dashboard" button
+5. Clear exam store session
+
+### Step 12: Wire Practice Pages
+
+Update `pages/practice/practice-setup-page.tsx`:
+- Certification picker + domain filter (optional)
+- "Start Practice" button → start exam with mode='practice' (use same API but track mode in store)
+
+Update `pages/practice/practice-session-page.tsx`:
+- Same question display as exam mode
+- After answering: immediately show explanation + correct answer inline
+- Green/red highlight on answer options
+- "Next Question" button to proceed
+- No timer, no autosave, no navigation grid
+
+## Security Considerations
+
+- **Token in API requests**: Use auth store token. Never expose in URL params.
+- **localStorage exam data**: Contains question IDs and user answers. Acceptable risk — user's own data.
+- **No is_correct in exam store**: Backend ExamSerializer excludes it. Frontend has no way to cheat via localStorage.
+- **Auto-submit on expiry**: Prevents users from continuing past time limit (client-side enforcement + backend validation).
+
+## Acceptance Criteria
+
+- Exam setup page lists certifications from API and starts exam on button click
+- Exam session page displays questions with single/multiple choice answers
+- Question navigation grid shows color-coded status: gray=unanswered, green=answered, orange=flagged, yellow=answered+flagged
+- Exam timer counts down from server-provided time_remaining_seconds
+- Timer turns red at <5min, pulses at <1min, auto-submits at 0
+- Autosave fires every 30s via PATCH /api/v1/exams/{id}/autosave/
+- Zustand store persists answers to localStorage (survives refresh)
+- Exam result page shows score, correct/total, and domain breakdown
+- Practice mode shows explanation inline after each answer submission
+- Page Visibility API pauses/resumes timer on tab switch
