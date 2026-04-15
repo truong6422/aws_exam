@@ -1,19 +1,25 @@
-import clsx from 'clsx'
 import { useUiStore } from '@/stores/ui-store'
 import type { ToastMessage } from '@/types'
 
-const COLOUR: Record<ToastMessage['type'], string> = {
-  success: 'bg-green-600',
-  error: 'bg-red-600',
-  warning: 'bg-yellow-500',
-  info: 'bg-brand-600',
+const BORDER_COLOR: Record<ToastMessage['type'], string> = {
+  success: '#1d9b5e',
+  error:   '#e0453c',
+  warning: '#f5a623',
+  info:    '#0071e3',
 }
 
-const ICON: Record<ToastMessage['type'], string> = {
-  success: '✅',
-  error: '❌',
-  warning: '⚠️',
-  info: 'ℹ️',
+const TEXT_COLOR: Record<ToastMessage['type'], string> = {
+  success: '#1d9b5e',
+  error:   '#e0453c',
+  warning: '#f5a623',
+  info:    '#2997ff',
+}
+
+const LABEL: Record<ToastMessage['type'], string> = {
+  success: 'OK',
+  error:   'ERR',
+  warning: 'WARN',
+  info:    'INFO',
 }
 
 /** Fixed bottom-right toast stack driven by ui-store. */
@@ -24,23 +30,64 @@ export default function ToastContainer() {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '16px',
+        right: '16px',
+        zIndex: 50,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      }}
+    >
       {toasts.map((t) => (
         <div
           key={t.id}
-          className={clsx(
-            'flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-white shadow-lg',
-            COLOUR[t.type],
-          )}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            background: '#272729',
+            border: `1px solid rgba(255,255,255,0.1)`,
+            borderLeft: `3px solid ${BORDER_COLOR[t.type]}`,
+            borderRadius: '8px',
+            padding: '10px 14px',
+            fontSize: '14px',
+            letterSpacing: '-0.224px',
+            color: '#fff',
+            minWidth: '260px',
+            maxWidth: '380px',
+            boxShadow: 'rgba(0,0,0,0.22) 3px 5px 30px 0px',
+          }}
         >
-          <span>{ICON[t.type]}</span>
-          <span className="flex-1">{t.message}</span>
+          <span
+            style={{
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '-0.12px',
+              color: TEXT_COLOR[t.type],
+              flexShrink: 0,
+            }}
+          >
+            {LABEL[t.type]}
+          </span>
+          <span style={{ flex: 1, lineHeight: 1.4 }}>{t.message}</span>
           <button
             onClick={() => removeToast(t.id)}
-            className="ml-2 opacity-70 hover:opacity-100"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255,255,255,0.4)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              lineHeight: 1,
+              padding: '0 0 0 4px',
+              flexShrink: 0,
+            }}
             aria-label="Dismiss"
           >
-            ✕
+            x
           </button>
         </div>
       ))}

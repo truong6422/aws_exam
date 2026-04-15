@@ -1,0 +1,29 @@
+from autoslug import AutoSlugField
+from core.db.models.mixins import ModelMixin
+from django.db import models
+from django.db.models.indexes import Index
+from django.utils.translation import gettext as _
+
+from {{ app_name }}.constants import {{camel_case_model_name}}TypeChoices
+
+
+class {{camel_case_model_name}}(ModelMixin):
+    slug = AutoSlugField(verbose_name=_('Slug'), unique=True, populate_from='name', manager_name='all_objects')
+    name = models.CharField(verbose_name=_('Name'), max_length=255)
+    description = models.TextField(_('Content'), blank=True)
+    type = models.IntegerField(
+        choices={{camel_case_model_name}}TypeChoices.choices(),
+        default={{camel_case_model_name}}TypeChoices.ALL.value
+    )
+    extra_data = models.JSONField(verbose_name=_('Extra Data of Text'), default=dict)
+
+    class Meta:
+        ordering = ("-id",)
+        verbose_name = _('{{ model_name }}')
+        verbose_name_plural = _('{{ app_name }}')
+        indexes = [Index(fields=['-id'])]
+        permissions = ()
+        default_permissions = ()
+
+    def __str__(self):
+        return '{}'.format(self.name)

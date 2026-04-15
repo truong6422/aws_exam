@@ -1,0 +1,64 @@
+from core.filters.views import DjangoViewSearchFilter, DjangoViewFilterBackend, DjangoViewOrderingFilter
+from core.views import StandPaginatorListView, CreateView, DetailView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+from {{ app_name }}.filters import List{{camel_case_model_name}}APIViewFilter
+from {{app_name}}.models import {{camel_case_model_name}}
+from {{ app_name }}.serializers import {{camel_case_model_name}}Serializer
+
+
+class {{camel_case_model_name}}ListView(StandPaginatorListView):
+    filter_backends = (DjangoViewSearchFilter, DjangoViewFilterBackend, DjangoViewOrderingFilter,)
+
+    filterset_class = List{{camel_case_model_name}}APIViewFilter
+    search_fields = ('name', 'description')
+    ordering_fields = ('id', ''name', 'description', 'type')
+    ordering = ("-id",)
+
+    serializer_class = {{camel_case_model_name}}Serializer
+
+    def get_queryset(self):
+        queryset = {{camel_case_model_name}}.objects.all()
+        return self.filter_queryset(queryset)
+
+    def get_extend_context(self, **kwargs):
+        extend_context = super().get_extend_context(**kwargs)
+        extend_context.update({
+            'create_viewname': 'public:{{app_name}}:create-{{ model_name }}',
+            'detail_viewname': 'public:{{app_name}}:detail-{{model_name}}'
+        })
+        search = self.request.GET.get('search')
+        if search:
+            extend_context.update({'search': search})
+        return extend_context
+
+
+class {{camel_case_model_name}}CreateView(CreateView):
+    model = {{camel_case_model_name}}
+    fields = ['name', 'description', 'type', 'extra_data']
+    success_url = reverse_lazy("public:{{ app_name }}:list-{{ model_name }}s")
+
+
+class {{camel_case_model_name}}DetailView(DetailView):
+    model = {{camel_case_model_name}}
+    fields = ['name', 'description', 'type']
+    serializer_class = {{camel_case_model_name}}Serializer
+
+    def get_extend_context(self, **kwargs):
+        extend_context = super().get_extend_context(**kwargs)
+        extend_context.update({
+            'update_viewname': "public:{{ app_name }}:update-{{ model_name }}",
+            'delete_viewname': "public:{{ app_name }}:delete-{{ model_name }}"
+        })
+        return extend_context
+
+
+class {{camel_case_model_name}}UpdateView(UpdateView):
+    model = {{camel_case_model_name}}
+    fields = ['name', 'description', 'type', 'extra_data']
+    success_url = reverse_lazy("public:{{ app_name }}:list-{{ model_name }}s")
+
+
+class {{camel_case_model_name}}DeleteView(DeleteView):
+    model = {{camel_case_model_name}}
+    success_url = reverse_lazy("public:{{ app_name }}:list-{{ model_name }}s")

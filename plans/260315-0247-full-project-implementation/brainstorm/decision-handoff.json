@@ -1,0 +1,143 @@
+{
+  "topic": "AWS Exam App — Full Project Development Strategy",
+  "brainstorm_date": "2026-03-22",
+  "chosen_direction": "Sản phẩm thương mại. REST API /api/v1/ + Next.js App Router + JWT với Redis blacklist + server-side exam timer + strict 3NF PostgreSQL. Celery removed (YAGNI). difficulty field removed MVP v1.",
+  "requirements_summary": {
+    "WHO": "Sản phẩm thương mại nhỏ — end users ôn thi AWS certs. Single dev team.",
+    "WHAT": "Exam Mode (timed, scored) + Practice Mode (instant feedback). Admin import JSON. Dashboard analytics.",
+    "WHEN": "No hard deadline. Ship MVP first (Phases 1-6), analytics + deploy sau.",
+    "WHERE": "AWS EC2 + Docker. Public internet. PostgreSQL + Redis.",
+    "WHY": "Commercial product — cần data integrity, security, reliability cao hơn portfolio project.",
+    "HOW": "Full-stack parallel development. Django 5 + DRF backend. Next.js 14 App Router frontend."
+  },
+  "scope_flags": ["api", "db", "auth", "infra", "ui"],
+  "api_contract_draft": {
+    "style": "REST",
+    "versioning": "/api/v1/",
+    "auth_pattern": "Bearer JWT — access 15min + refresh 7d + Redis JTI blacklist on logout",
+    "pagination": "Offset-based (?page=1&limit=20)",
+    "key_endpoints": [
+      { "method": "POST", "path": "/api/v1/auth/login", "description": "Login, return access+refresh tokens" },
+      { "method": "POST", "path": "/api/v1/auth/logout", "description": "Blacklist JTI in Redis" },
+      { "method": "POST", "path": "/api/v1/exam/start", "description": "Create ExamAttempt, record started_at + time_limit" },
+      { "method": "PATCH", "path": "/api/v1/exam/{id}/autosave", "description": "Save partial answers — prevent state loss on refresh" },
+      { "method": "POST", "path": "/api/v1/exam/{id}/submit", "description": "Submit + validate server-side timer" },
+      { "method": "GET", "path": "/api/v1/practice/questions", "description": "Filter by cert, domain (no difficulty in MVP v1)" }
+    ],
+    "user_rationale": "REST simple, DRF built-in support, ship fastest."
+  },
+  "db_design_options": [
+    {
+      "name": "Strict 3NF PostgreSQL",
+      "schema_notes": "Per spec. No JSONB snapshot. Referential integrity via FK. Remove difficulty field in MVP v1. Add source field to Question for future community contribution.",
+      "pros": ["Simple schema", "DRF model serializers straightforward", "Less migration complexity"],
+      "cons": ["If question edited after exam, history may inconsistent", "No snapshot protection"],
+      "chosen": true
+    },
+    {
+      "name": "Hybrid 3NF + JSONB snapshot",
+      "schema_notes": "exam_attempts.snapshot JSONB stores full question state at time of exam",
+      "pros": ["History integrity", "Question edits don't affect old results"],
+      "cons": ["More complex", "Larger storage"],
+      "chosen": false
+    }
+  ],
+  "risk_matrix": [
+    {
+      "risk": "Exam state lost on page refresh (no autosave)",
+      "likelihood": 3, "impact": 3, "score": 9,
+      "mitigation": "PATCH /api/v1/exam/{id}/autosave + localStorage sync every 30s. Implement before Exam Mode ships."
+    },
+    {
+      "risk": "is_correct exposed in exam API response → trivial cheating",
+      "likelihood": 3, "impact": 3, "score": 9,
+      "mitigation": "Separate ExamSerializer (no is_correct/explanation) vs AdminSerializer. Mandatory test coverage for this."
+    },
+    {
+      "risk": "JWT not revocable — logout doesn't work truly",
+      "likelihood": 2, "impact": 3, "score": 6,
+      "mitigation": "Store JTI in Redis blacklist on logout. TTL = token expiry. Access token 15min only."
+    },
+    {
+      "risk": "Single EC2 SPOF — no HA",
+      "likelihood": 2, "impact": 3, "score": 6,
+      "mitigation": "Docker restart:always + RDS managed Postgres + Sentry error tracking + /api/v1/health/ endpoint."
+    },
+    {
+      "risk": "Exam timer client-only → cheatable via DevTools",
+      "likelihood": 3, "impact": 2, "score": 6,
+      "mitigation": "Store started_at + time_limit_minutes in ExamAttempt. Backend validates on submit: reject if past deadline."
+    }
+  ],
+  "persona_findings": {
+    "security": [
+      "JWT no blacklist — logout not truly enforced → MITIGATED: Redis JTI blacklist",
+      "is_correct exposed in API → MITIGATED: separate serializers",
+      "Admin JSON import lacks validation → Add JSON schema validation + HTML sanitize"
+    ],
+    "devops": [
+      "Single EC2 SPOF → restart:always + RDS + Sentry",
+      "No observability → structlog JSON + Sentry",
+      "Exam timer client-only → MITIGATED: server-side validation"
+    ],
+    "end_user": [
+      "Exam state loss on refresh → MITIGATED: autosave",
+      "Empty state onboarding missing → Add onboarding flow (pick certification)",
+      "Question navigation needs status grid → answered/unanswered/flagged colors like AWS real exam"
+    ],
+    "yagni": [
+      "AI Explanation (section 12.3) → skip MVP v1, explanation already in Answer.explanation",
+      "Celery → removed, Redis for caching+blacklist only",
+      "difficulty field → removed MVP v1, add later when analytics need it"
+    ],
+    "competitor": [
+      "Add to Practice List from Review screen → high value, low effort",
+      "Question.source field for future community contribution → add now (cheap)",
+      "Optional timer in Practice Mode → nice-to-have v2"
+    ]
+  },
+  "contradictions_resolved": [
+    {
+      "personas": ["devops", "yagni"],
+      "conflict": "Server-side timer validation adds complexity",
+      "resolution": "User chose server-side timer",
+      "rationale": "Commercial product — cannot allow cheating"
+    },
+    {
+      "personas": ["competitor", "yagni"],
+      "conflict": "difficulty field — competitor says common, YAGNI says skip",
+      "resolution": "User chose YAGNI — remove from MVP v1",
+      "rationale": "No filter/analytics feature using it yet"
+    }
+  ],
+  "acceptance_criteria": [
+    "Exam Mode: 65 questions, 130min timer enforced server-side",
+    "Exam Mode: autosave every 30s — state survives refresh",
+    "Practice Mode: instant feedback after each answer",
+    "API: is_correct never exposed outside admin endpoints",
+    "Auth: logout invalidates token via Redis blacklist",
+    "Admin: JSON import with schema validation",
+    "Dashboard: recent exams + weak domains",
+    "Docker: all services start with docker-compose up"
+  ],
+  "architecture_decisions": [
+    "JWT: short-lived access (15m) + refresh (7d) + Redis JTI blacklist",
+    "Exam timer: started_at + time_limit_minutes stored in ExamAttempt, validated on submit",
+    "Serializer strategy: separate ExamSerializer (safe) vs AdminSerializer (full)",
+    "No Celery: Redis used for caching + JWT blacklist only",
+    "No difficulty field in MVP v1",
+    "Question.source field added for future extensibility",
+    "Next.js App Router (not React SPA) for SEO + SSR"
+  ],
+  "dependencies": [
+    "Django 5 + DRF",
+    "djangorestframework-simplejwt",
+    "redis-py",
+    "django-redis",
+    "Next.js 14 App Router",
+    "TailwindCSS",
+    "Zustand",
+    "Sentry SDK (django + nextjs)"
+  ],
+  "test_strategy": "Unit tests for serializer field exclusion (is_correct). Integration test for timer validation. E2E test for exam submit flow. Auth blacklist test."
+}

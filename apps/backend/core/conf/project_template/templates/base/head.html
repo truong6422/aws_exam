@@ -1,0 +1,47 @@
+{% load i18n static pipeline compress cache %}
+{% cache None head %}
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<link href="{% static 'favicon.ico' %}" rel="icon" />
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="keywords" content="" />
+
+<meta name="twitter:card" content="" />
+<meta name="twitter:site" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:image" content="" />
+
+<meta property="og:description" content="" itemprop="description" />
+<meta property="og:locale" content="">
+<meta property="og:type" content="" />
+<meta property="og:url" content="" />
+<meta property="og:title" content="" itemprop="name" />
+<meta property="og:image" content="" />
+<meta property="og:image:width" content="">
+<meta property="og:image:height" content="">
+<meta property="og:site_name" content="" />
+
+<link rel="canonical" href="">
+<meta name="robots" content="max-image-preview:large,index,follow"/>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- jquery -->
+<script type="text/javascript" src="//code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+<!-- bootstrap -->
+<link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+{% block extrameta %}{% endblock %}
+{% compress css %}
+    {% stylesheet 'css_files' %}
+{% endcompress %}
+{% compress js %}
+{% endcompress %}
+    <!-- Google tag (gtag.js) -->
+    <!-- Firebase -->
+{% endcache %}

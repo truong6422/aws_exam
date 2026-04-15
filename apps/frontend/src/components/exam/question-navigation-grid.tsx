@@ -1,7 +1,7 @@
 /**
  * Color-coded question navigation grid for the exam sidebar.
- * Gray=unanswered, Green=answered, Orange=flagged, Yellow=answered+flagged.
- * Current question gets a blue ring.
+ * Unanswered: subtle dark | Answered: green tint | Flagged: red tint | Answered+Flagged: orange tint.
+ * Current question gets a white ring.
  */
 interface Props {
   totalQuestions: number
@@ -20,29 +20,46 @@ export function QuestionNavigationGrid({
   questionIds,
   onSelectQuestion,
 }: Props) {
-  const getButtonClass = (index: number): string => {
+  const getButtonStyle = (index: number): React.CSSProperties => {
     const qId = questionIds[index]
     const hasAnswer = (answers[qId]?.length ?? 0) > 0
     const isFlagged = flagged.includes(qId)
     const isCurrent = index === currentIndex
 
-    let bg: string
-    if (hasAnswer && isFlagged) bg = 'bg-yellow-400 hover:bg-yellow-500'
-    else if (hasAnswer) bg = 'bg-green-400 hover:bg-green-500'
-    else if (isFlagged) bg = 'bg-orange-400 hover:bg-orange-500'
-    else bg = 'bg-gray-200 hover:bg-gray-300'
+    let background = 'rgba(255,255,255,0.08)'
+    let color = 'rgba(255,255,255,0.4)'
+    if (hasAnswer && isFlagged) { background = 'rgba(245,166,35,0.15)'; color = '#f5a623' }
+    else if (hasAnswer) { background = 'rgba(29,155,94,0.15)'; color = '#1d9b5e' }
+    else if (isFlagged) { background = 'rgba(224,69,60,0.15)'; color = '#e0453c' }
 
-    const ring = isCurrent ? ' ring-2 ring-blue-600 ring-offset-1' : ''
-    return `w-9 h-9 text-xs font-medium rounded transition-colors${ring} ${bg}`
+    return {
+      width: '36px',
+      height: '36px',
+      fontSize: '11px',
+      fontWeight: 600,
+      borderRadius: '6px',
+      border: isCurrent ? '1px solid rgba(255,255,255,0.6)' : '1px solid transparent',
+      background,
+      color,
+      cursor: 'pointer',
+      transition: 'border-color 0.15s',
+    }
   }
 
+  const legendItems = [
+    { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', label: 'Unanswered' },
+    { bg: 'rgba(29,155,94,0.15)', color: '#1d9b5e', label: 'Answered' },
+    { bg: 'rgba(224,69,60,0.15)', color: '#e0453c', label: 'Flagged' },
+    { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', label: 'Answered + Flagged' },
+  ]
+
   return (
-    <div className="p-2">
-      <div className="grid grid-cols-5 gap-1.5">
+    <div style={{ padding: '8px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 36px)', gap: '6px' }}>
         {Array.from({ length: totalQuestions }, (_, i) => (
           <button
             key={i}
-            className={getButtonClass(i)}
+            style={getButtonStyle(i)}
             onClick={() => onSelectQuestion(i)}
             aria-label={`Go to question ${i + 1}`}
           >
@@ -52,23 +69,13 @@ export function QuestionNavigationGrid({
       </div>
 
       {/* Legend */}
-      <div className="mt-3 flex flex-col gap-1 text-xs text-gray-600">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-gray-200" />
-          Unanswered
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-green-400" />
-          Answered
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-orange-400" />
-          Flagged
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-yellow-400" />
-          Answered + Flagged
-        </span>
+      <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {legendItems.map((item) => (
+          <span key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>
+            <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '3px', background: item.bg, border: `1px solid ${item.color}` }} />
+            {item.label}
+          </span>
+        ))}
       </div>
     </div>
   )

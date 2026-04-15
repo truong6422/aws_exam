@@ -39,48 +39,82 @@ export default function AdminQuestionsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
         <PageHeader title="Questions" subtitle="Browse the question bank by certification" />
         <button
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+          className="btn-primary"
+          style={{ flexShrink: 0, marginTop: '4px' }}
           onClick={() => navigate('/admin/import')}
         >
-          + Import Questions
+          + Import
         </button>
       </div>
 
       <QuestionFilters onFilterChange={handleFilterChange} />
 
-      {loading && <p className="text-sm text-gray-400 italic">Loading…</p>}
+      {loading && (
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Loading...</p>
+      )}
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+          style={{
+            background: 'rgba(224,69,60,0.1)',
+            border: '1px solid rgba(224,69,60,0.4)',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            fontSize: '13px',
+            color: '#e0453c',
+            letterSpacing: '-0.224px',
+          }}
+        >
           {error}
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <p className="text-sm text-gray-400 italic">No certifications found.</p>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No certifications found.</p>
       )}
 
       {!loading && !error && (
-        <div className="space-y-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {filtered.map((cert) => (
             <div
               key={cert.id}
-              className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+              style={{
+                background: '#272729',
+                borderRadius: '12px',
+                padding: '20px',
+              }}
             >
-              <h3 className="font-semibold text-gray-800">
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', letterSpacing: '-0.224px' }}>
                 {cert.code} — {cert.name}
               </h3>
               {cert.description && (
-                <p className="mt-1 text-sm text-gray-500">{cert.description}</p>
+                <p style={{ marginTop: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>{cert.description}</p>
               )}
-              <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-400">
-                <span>{cert.total_questions} questions</span>
-                <span>{cert.time_limit_minutes} min</span>
-                <span>{cert.passing_score}% to pass</span>
+              <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {[
+                  `${cert.total_questions} questions`,
+                  `${cert.time_limit_minutes} min`,
+                  `${cert.passing_score}% to pass`,
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      fontSize: '11px',
+                      color: 'rgba(255,255,255,0.5)',
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      borderRadius: '6px',
+                      padding: '2px 8px',
+                      letterSpacing: '-0.12px',
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
           ))}

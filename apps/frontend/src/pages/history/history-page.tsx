@@ -24,32 +24,49 @@ export default function HistoryPage() {
 
   useEffect(() => { load(1) }, [])
 
-  const statusClass = (status: string) => {
-    if (status === 'submitted') return 'text-green-600'
-    if (status === 'expired') return 'text-orange-500'
-    return 'text-gray-400'
+  const statusColor = (status: string) => {
+    if (status === 'submitted') return '#1d9b5e'
+    if (status === 'expired') return '#f5a623'
+    return 'rgba(255,255,255,0.4)'
   }
 
   if (loading) {
-    return <div className="text-gray-400 text-sm">Loading...</div>
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <PageHeader title="History" subtitle="All your past exam sessions" />
-        <p className="text-red-500 text-sm mb-2">{error}</p>
-        <button className="text-blue-600 text-sm hover:underline" onClick={() => load(1)}>Retry</button>
+        <p style={{ color: '#e0453c', fontSize: '13px' }}>{error}</p>
+        <button
+          className="btn-ghost"
+          style={{ alignSelf: 'flex-start' }}
+          onClick={() => load(1)}
+        >
+          Retry
+        </button>
       </div>
     )
   }
 
   if (!data || data.count === 0) {
     return (
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <PageHeader title="History" subtitle="All your past exam sessions" />
         <EmptyState
-          icon="📋"
           title="No exam history"
           description="Your completed exams will appear here."
           actionLabel="Start Exam"
@@ -62,50 +79,96 @@ export default function HistoryPage() {
   const totalPages = Math.ceil(data.count / 10)
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader title="History" subtitle="All your past exam sessions" />
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-gray-200 bg-gray-50">
-            <tr>
+      <div
+        style={{
+          background: '#272729',
+          borderRadius: '12px',
+          overflow: 'hidden',
+        }}
+      >
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
               {['Certification', 'Date', 'Score', 'Status', ''].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                <th
+                  key={h}
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'left',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '-0.12px',
+                    color: 'rgba(255,255,255,0.5)',
+                  }}
+                >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {data.results.map((item: HistoryItem) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">
-                  <span className="font-medium text-gray-900">{item.certification_code}</span>
-                  <span className="block text-xs text-gray-400">{item.certification_name}</span>
+          <tbody>
+            {data.results.map((item: HistoryItem, idx: number) => (
+              <tr
+                key={item.id}
+                style={{
+                  borderBottom: idx < data.results.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                }}
+              >
+                <td style={{ padding: '12px 16px' }}>
+                  <span style={{ fontWeight: 600, color: '#fff' }}>{item.certification_code}</span>
+                  <span style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>
+                    {item.certification_name}
+                  </span>
                 </td>
-                <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.4)', fontSize: '12px', whiteSpace: 'nowrap' }}>
                   {new Date(item.started_at).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-3">
+                <td style={{ padding: '12px 16px' }}>
                   {item.score_percentage !== null ? (
-                    <span className={`font-bold text-xs px-2 py-1 rounded-full ${
-                      item.score_percentage >= PASSING_SCORE
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        border: `1px solid ${item.score_percentage >= PASSING_SCORE ? '#1d9b5e' : '#e0453c'}`,
+                        color: item.score_percentage >= PASSING_SCORE ? '#1d9b5e' : '#e0453c',
+                        letterSpacing: '-0.12px',
+                      }}
+                    >
                       {Number(item.score_percentage).toFixed(1)}%
                     </span>
                   ) : (
-                    <span className="text-gray-400 text-xs">—</span>
+                    <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>—</span>
                   )}
                 </td>
-                <td className={`px-4 py-3 text-xs capitalize font-medium ${statusClass(item.status)}`}>
+                <td
+                  style={{
+                    padding: '12px 16px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    letterSpacing: '-0.12px',
+                    textTransform: 'capitalize',
+                    color: statusColor(item.status),
+                  }}
+                >
                   {item.status.replace('_', ' ')}
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                   {item.status === 'submitted' && (
                     <button
-                      className="text-blue-600 text-xs hover:underline"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#2997ff',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontWeight: 500,
+                      }}
                       onClick={() => navigate(`/exam/${item.id}/result`)}
                     >
                       Review
@@ -120,21 +183,25 @@ export default function HistoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
           <button
-            className="px-3 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-50"
+            className="btn-ghost"
             disabled={page === 1}
             onClick={() => load(page - 1)}
+            style={{ opacity: page === 1 ? 0.4 : 1 }}
           >
-            ← Prev
+            Prev
           </button>
-          <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
+          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
+            {page} / {totalPages}
+          </span>
           <button
-            className="px-3 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-50"
+            className="btn-ghost"
             disabled={!data.next}
             onClick={() => load(page + 1)}
+            style={{ opacity: !data.next ? 0.4 : 1 }}
           >
-            Next →
+            Next
           </button>
         </div>
       )}

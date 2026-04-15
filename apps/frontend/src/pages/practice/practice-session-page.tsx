@@ -54,11 +54,8 @@ export default function PracticeSessionPage() {
       addToast({ type: 'warning', message: 'Please select an answer first.' })
       return
     }
-    // Fetch explanation from review endpoint (single question via submit + review)
-    // For practice, we submit the current answer and fetch the review inline
     if (attemptId) {
       try {
-        // Autosave current answers before reveal
         await examApi.autosaveExam(attemptId, getAnswersAsPartial())
       } catch {
         // Non-blocking
@@ -73,7 +70,6 @@ export default function PracticeSessionPage() {
       setReviewQuestion(null)
       goToQuestion(currentIndex + 1)
     } else {
-      // Last question — submit the practice session
       if (!attemptId) { navigate('/practice/setup'); return }
       setSubmitting(true)
       try {
@@ -95,7 +91,6 @@ export default function PracticeSessionPage() {
     navigate('/practice/setup')
   }
 
-  // Determine which answers are correct from review data (if available)
   const getIsCorrect = (answerId: number): boolean => {
     if (reviewQuestion) {
       return reviewQuestion.answers.find((a) => a.id === answerId)?.is_correct ?? false
@@ -103,41 +98,78 @@ export default function PracticeSessionPage() {
     return false
   }
 
+  const progress = ((currentIndex + 1) / questions.length) * 100
+
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
-      <div className="flex items-center justify-between">
+    <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
         <PageHeader
           title="Practice Session"
           subtitle={`Question ${currentIndex + 1} of ${questions.length}`}
         />
         <button
           onClick={handleEnd}
-          className="rounded-lg border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+          className="btn-ghost"
+          style={{ flexShrink: 0, marginTop: '4px' }}
         >
           End Session
         </button>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1.5 w-full rounded-full bg-gray-200">
+      <div
+        style={{
+          height: '3px',
+          width: '100%',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '2px',
+          overflow: 'hidden',
+        }}
+      >
         <div
-          className="h-1.5 rounded-full bg-brand-600 transition-all"
-          style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+          style={{
+            height: '3px',
+            width: `${progress}%`,
+            background: '#0071e3',
+            transition: 'width 0.3s ease',
+          }}
         />
       </div>
 
       {/* Question card */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div
+        style={{
+          background: '#272729',
+          borderRadius: '12px',
+          padding: '24px',
+        }}
+      >
         {question.question_type === 'multiple' && (
-          <span className="mb-2 inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: '10px',
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '-0.12px',
+              color: '#2997ff',
+              background: 'rgba(0,113,227,0.1)',
+              border: '1px solid rgba(0,113,227,0.4)',
+              borderRadius: '6px',
+              padding: '2px 8px',
+            }}
+          >
             Select all that apply
           </span>
         )}
-        <p className="text-base font-medium text-gray-800">{question.text}</p>
+        <p style={{ fontSize: '17px', fontWeight: 400, color: '#fff', lineHeight: 1.47, letterSpacing: '-0.374px' }}>
+          {question.text}
+        </p>
       </div>
 
       {/* Answer options */}
-      <div className="space-y-2">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {question.answers.map((answer) => (
           <AnswerOption
             key={answer.id}
@@ -153,27 +185,38 @@ export default function PracticeSessionPage() {
 
       {/* Explanation panel — visible after reveal */}
       {revealed && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <div
+          style={{
+            background: 'rgba(0,113,227,0.1)',
+            border: '1px solid rgba(0,113,227,0.4)',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            fontSize: '13px',
+            color: '#2997ff',
+            lineHeight: 1.5,
+          }}
+        >
           {reviewQuestion?.explanation ? (
-            <p className="text-sm text-blue-800">
-              <span className="font-semibold">💡 Explanation: </span>
+            <>
+              <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '-0.12px' }}>
+                Explanation:{' '}
+              </span>
               {reviewQuestion.explanation}
-            </p>
+            </>
           ) : (
-            <p className="text-sm text-blue-700">
-              Answer submitted. Continue to the next question.
-            </p>
+            'Answer submitted. Continue to the next question.'
           )}
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex justify-end gap-3">
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
         {!revealed ? (
           <button
             onClick={handleReveal}
             disabled={selectedAnswers.length === 0}
-            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+            className="btn-primary"
+            style={{ opacity: selectedAnswers.length === 0 ? 0.5 : 1 }}
           >
             Submit Answer
           </button>
@@ -181,9 +224,10 @@ export default function PracticeSessionPage() {
           <button
             onClick={handleNext}
             disabled={submitting}
-            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+            className="btn-primary"
+            style={{ opacity: submitting ? 0.6 : 1 }}
           >
-            {submitting ? 'Finishing…' : isLast ? 'Finish Session' : 'Next Question →'}
+            {submitting ? 'Finishing...' : isLast ? 'Finish Session' : 'Next Question'}
           </button>
         )}
       </div>

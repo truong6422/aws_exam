@@ -1,0 +1,15 @@
+from django.urls import path
+
+from {{ app_name }}.views import (
+    {{camel_case_model_name}}ListView, {{camel_case_model_name}}CreateView, {{camel_case_model_name}}DetailView, {{camel_case_model_name}}UpdateView, {{camel_case_model_name}}DeleteView
+)
+
+app_name = '{{ app_name }}'
+
+urlpatterns = [
+    path('{{model_name}}s', {{camel_case_model_name}}ListView.as_view(), name='list-{{model_name}}s'),
+    path('{{model_name}}s/create', {{camel_case_model_name}}CreateView.as_view(), name='create-{{model_name}}'),
+    path('{{model_name}}/<str:slug>', {{camel_case_model_name}}DetailView.as_view(), name='detail-{{model_name}}'),
+    path('{{model_name}}/<str:slug>/update', {{camel_case_model_name}}UpdateView.as_view(), name='update-{{model_name}}'),
+    path('{{model_name}}/<str:slug>/delete', {{camel_case_model_name}}DeleteView.as_view(), name='delete-{{model_name}}'),
+]

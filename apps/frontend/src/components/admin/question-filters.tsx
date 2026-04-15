@@ -12,6 +12,28 @@ interface Props {
   onFilterChange: (filters: QuestionFilters) => void
 }
 
+const selectStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '8px',
+  padding: '8px 12px',
+  fontSize: '13px',
+  color: '#fff',
+  outline: 'none',
+}
+
+const inputStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '8px',
+  padding: '8px 12px',
+  fontSize: '13px',
+  color: '#fff',
+  outline: 'none',
+  flex: 1,
+  minWidth: '192px',
+}
+
 export function QuestionFilters({ onFilterChange }: Props) {
   const [certs, setCerts] = useState<Certification[]>([])
   const [domains, setDomains] = useState<Domain[]>([])
@@ -51,9 +73,9 @@ export function QuestionFilters({ onFilterChange }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap gap-3 mb-4">
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
       <select
-        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+        style={selectStyle}
         value={filters.certificationId ?? ''}
         onChange={handleCertChange}
       >
@@ -66,7 +88,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
       </select>
 
       <select
-        className="rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-50"
+        style={{ ...selectStyle, opacity: !filters.certificationId ? 0.5 : 1 }}
         value={filters.domainId ?? ''}
         onChange={(e) => update({ domainId: e.target.value ? Number(e.target.value) : null })}
         disabled={!filters.certificationId}
@@ -81,15 +103,15 @@ export function QuestionFilters({ onFilterChange }: Props) {
 
       <input
         type="text"
-        placeholder="Search certifications…"
-        className="flex-1 min-w-48 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+        placeholder="Search certifications..."
+        style={inputStyle}
         value={filters.search}
         onChange={(e) => update({ search: e.target.value })}
       />
 
       {(filters.certificationId || filters.domainId || filters.search) && (
         <button
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:border-gray-400"
+          className="btn-ghost"
           onClick={handleClear}
         >
           Clear

@@ -1,0 +1,122 @@
+[
+  {
+    "route": "login",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "login-desktop.png"
+  },
+  {
+    "route": "login",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "login-mobile.png"
+  },
+  {
+    "route": "register",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "register-desktop.png"
+  },
+  {
+    "route": "register",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "register-mobile.png"
+  },
+  {
+    "route": "dashboard",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "dashboard-desktop.png"
+  },
+  {
+    "route": "dashboard",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "dashboard-mobile.png"
+  },
+  {
+    "route": "exam-setup",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "exam-setup-desktop.png"
+  },
+  {
+    "route": "exam-setup",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "exam-setup-mobile.png"
+  },
+  {
+    "route": "practice-setup",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "practice-setup-desktop.png"
+  },
+  {
+    "route": "practice-setup",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "practice-setup-mobile.png"
+  },
+  {
+    "route": "history",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "history-desktop.png"
+  },
+  {
+    "route": "history",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "history-mobile.png"
+  },
+  {
+    "route": "analytics",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "analytics-desktop.png"
+  },
+  {
+    "route": "analytics",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "analytics-mobile.png"
+  },
+  {
+    "route": "admin-dashboard",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "admin-dashboard-desktop.png"
+  },
+  {
+    "route": "admin-dashboard",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "admin-dashboard-mobile.png"
+  },
+  {
+    "route": "admin-questions",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "admin-questions-desktop.png"
+  },
+  {
+    "route": "admin-questions",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "admin-questions-mobile.png"
+  },
+  {
+    "route": "admin-import",
+    "viewport": "desktop",
+    "status": "success",
+    "file": "admin-import-desktop.png"
+  },
+  {
+    "route": "admin-import",
+    "viewport": "mobile",
+    "status": "success",
+    "file": "admin-import-mobile.png"
+  }
+]

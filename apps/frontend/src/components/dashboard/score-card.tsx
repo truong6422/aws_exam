@@ -3,20 +3,40 @@ interface Props {
   value: string | number
   suffix?: string
   trend?: 'up' | 'down' | 'neutral'
-  colorClass?: string
 }
 
-/** Stat card showing a single metric with optional trend indicator. */
-export function ScoreCard({ label, value, suffix = '', trend, colorClass = 'text-blue-600' }: Props) {
+/** Stat card — Apple dark surface style. */
+export function ScoreCard({ label, value, suffix = '', trend }: Props) {
   const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : ''
-  const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-400'
+  const trendColor =
+    trend === 'up' ? '#1d9b5e' : trend === 'down' ? '#e0453c' : 'rgba(255,255,255,0.4)'
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className={`text-3xl font-bold ${colorClass}`}>
+    <div
+      style={{
+        background: '#272729',
+        borderRadius: '12px',
+        padding: '20px',
+      }}
+    >
+      <p
+        style={{
+          fontSize: '12px',
+          fontWeight: 400,
+          letterSpacing: '-0.12px',
+          color: 'rgba(255,255,255,0.5)',
+          marginBottom: '8px',
+        }}
+      >
+        {label}
+      </p>
+      <p style={{ fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif", fontSize: '36px', fontWeight: 700, color: '#fff', lineHeight: 1, letterSpacing: '-0.5px' }}>
         {value}{suffix}
-        {trendIcon && <span className={`text-lg ml-1 ${trendColor}`}>{trendIcon}</span>}
+        {trendIcon && (
+          <span style={{ fontSize: '1rem', marginLeft: '4px', color: trendColor }}>
+            {trendIcon}
+          </span>
+        )}
       </p>
     </div>
   )

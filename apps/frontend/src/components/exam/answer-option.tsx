@@ -26,35 +26,59 @@ export function AnswerOption({
   isRevealed = false,
   isCorrect = false,
 }: Props) {
-  let cls =
-    'w-full text-left p-3 rounded-lg border-2 transition-all cursor-pointer text-sm flex items-start gap-2 '
+  let borderColor = 'rgba(255,255,255,0.15)'
+  let background = 'rgba(255,255,255,0.04)'
+  let color = 'rgba(255,255,255,0.85)'
 
   if (isRevealed && isCorrect) {
-    cls += 'bg-green-50 border-green-500 text-green-900'
+    borderColor = '#1d9b5e'
+    background = 'rgba(29,155,94,0.12)'
+    color = '#1d9b5e'
   } else if (isRevealed && isSelected && !isCorrect) {
-    cls += 'bg-red-50 border-red-500 text-red-900'
+    borderColor = '#e0453c'
+    background = 'rgba(224,69,60,0.12)'
+    color = '#e0453c'
   } else if (isSelected) {
-    cls += 'bg-blue-50 border-blue-500 ring-1 ring-blue-500 text-blue-900'
-  } else {
-    cls += 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-800'
+    borderColor = '#0071e3'
+    background = 'rgba(0,113,227,0.1)'
+    color = '#fff'
   }
 
-  const icon =
-    questionType === 'multiple'
-      ? isSelected
-        ? '☑'
-        : '☐'
-      : isSelected
-        ? '●'
-        : '○'
+  const indicatorStyle: React.CSSProperties = {
+    width: '14px',
+    height: '14px',
+    borderRadius: questionType === 'multiple' ? '3px' : '50%',
+    border: `1.5px solid ${isSelected || (isRevealed && isCorrect) ? borderColor : 'rgba(255,255,255,0.25)'}`,
+    background: isSelected || (isRevealed && isCorrect) ? borderColor : 'transparent',
+    flexShrink: 0,
+    marginTop: '2px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
 
   return (
     <button
-      className={cls}
+      style={{
+        width: '100%',
+        textAlign: 'left',
+        padding: '12px 14px',
+        borderRadius: '8px',
+        border: `1px solid ${borderColor}`,
+        background,
+        color,
+        cursor: 'pointer',
+        fontSize: '14px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '10px',
+        transition: 'border-color 0.15s, background 0.15s',
+        letterSpacing: '-0.224px',
+      }}
       onClick={() => onSelect(answer.id)}
       aria-pressed={isSelected}
     >
-      <span className="mt-0.5 shrink-0 text-base leading-none">{icon}</span>
+      <span style={indicatorStyle} />
       <span>{answer.text}</span>
     </button>
   )

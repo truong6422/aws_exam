@@ -8,21 +8,30 @@ interface Props {
 /** CSS sparkline bar chart showing score trend across recent exam attempts. */
 export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
   if (!trend.length) {
-    return <p className="text-gray-400 text-sm italic">No trend data yet.</p>
+    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No trend data yet.</p>
   }
 
   const maxScore = 100
   const height = 80 // px
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-2 relative" style={{ height: `${height + 24}px` }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', position: 'relative', height: `${height + 24}px` }}>
         {/* Passing score reference line */}
         <div
-          className="absolute inset-x-0 border-t border-dashed border-orange-400 opacity-60 pointer-events-none"
-          style={{ bottom: `${24 + (passingScore / maxScore) * height}px` }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: `${24 + (passingScore / maxScore) * height}px`,
+            borderTop: '1px dashed rgba(255,255,255,0.3)',
+            opacity: 0.7,
+            pointerEvents: 'none',
+          }}
         >
-          <span className="absolute right-0 -top-5 text-xs text-orange-400">{passingScore}%</span>
+          <span style={{ position: 'absolute', right: 0, top: '-18px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>
+            {passingScore}%
+          </span>
         </div>
 
         {trend.map((item, i) => {
@@ -31,15 +40,18 @@ export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
           return (
             <div
               key={i}
-              className="flex-1 flex flex-col items-center justify-end gap-1"
-              style={{ height: `${height + 24}px` }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', height: `${height + 24}px` }}
               title={`${item.score}% — ${item.certification_code}`}
             >
               <div
-                className={`w-full rounded-t ${isPassing ? 'bg-green-400' : 'bg-red-400'}`}
-                style={{ height: `${barHeight}px` }}
+                style={{
+                  width: '100%',
+                  height: `${barHeight}px`,
+                  background: isPassing ? '#1d9b5e' : '#e0453c',
+                  borderRadius: '2px 2px 0 0',
+                }}
               />
-              <span className="text-xs text-gray-400 truncate w-full text-center leading-none">
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', textAlign: 'center', lineHeight: 1, letterSpacing: '-0.12px' }}>
                 {new Date(item.date).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
               </span>
             </div>
@@ -47,7 +59,7 @@ export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
         })}
       </div>
 
-      <div className="flex justify-between text-xs text-gray-400">
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
         <span>Last {trend.length} exams</span>
         <span>Score trend</span>
       </div>

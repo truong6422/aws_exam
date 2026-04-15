@@ -40,10 +40,11 @@ THIRD_PARTY_APPS = [
     "health_check",
     "health_check.db",
     "health_check.cache",
-    "health_check.storage",
+    # health_check.storage excluded — incompatible with Django 5 (uses deprecated DEFAULT_FILE_STORAGE)
 ]
 
 LOCAL_APPS = [
+    "core",        # vendored django-core (base models, mixins, pagination, auth)
     "apps.core",
     "apps.accounts",
     "apps.questions",
@@ -173,7 +174,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "core.pagination.CustomPageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -187,7 +188,15 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "login": "5/minute",
     },
+    "EXCEPTION_HANDLER": "core.exceptions.handlers.custom_exception_handler",
 }
+
+# ---------------------------------------------------------------------------
+# Django Core — vendored package settings
+# ---------------------------------------------------------------------------
+
+PAGE_SIZE_QUERY_PARAM = "page_size"
+MAX_PAGE_SIZE = 100
 
 # ---------------------------------------------------------------------------
 # SimpleJWT

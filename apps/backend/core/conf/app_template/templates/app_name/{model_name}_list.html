@@ -1,0 +1,37 @@
+{% extends 'block/_list.html' %}
+{% load i18n static %}
+{% block list_content %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Des</th>
+            <th scope="col">Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if object_list %}
+            {% for object in serializer_object_list %}
+                <tr>
+                    <th scope="row">{{ object.id }}</th>
+                    <td>
+                        <a href="{% url detail_viewname object.slug %}">
+                            <span class="news-block__ttl">{{ object.name }}</span>
+                        </a>
+                    </td>
+                    <td>{{ object.description }}</td>
+                    <td>{{ object.type }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">
+                    <p>{% translate "Sorry, we couldn't find any matching results." %}<br> {% translate "Please try again." %}
+                    </p>
+                </td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

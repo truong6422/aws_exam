@@ -2,13 +2,50 @@ import { Link } from 'react-router-dom'
 
 export default function NotFoundPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 text-center">
-      <span className="text-6xl">☁️</span>
-      <h1 className="text-4xl font-bold text-gray-900">404</h1>
-      <p className="text-gray-500">This page doesn't exist.</p>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        textAlign: 'center',
+        padding: '24px',
+      }}
+    >
+      <svg
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        fill="none"
+        aria-hidden="true"
+        style={{ marginBottom: '8px' }}
+      >
+        <rect x="4" y="4" width="56" height="56" rx="1" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" fill="none" />
+        <path d="M20 32h24M32 20v24" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="square" />
+        <path d="M22 22l20 20M42 22L22 42" stroke="#e0453c" strokeWidth="1.5" strokeLinecap="square" />
+      </svg>
+      <h1
+        style={{
+          fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+          fontSize: '72px',
+          fontWeight: 700,
+          color: '#fff',
+          lineHeight: 1,
+          letterSpacing: '-0.5px',
+        }}
+      >
+        404
+      </h1>
+      <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>
+        This page doesn't exist.
+      </p>
       <Link
         to="/dashboard"
-        className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+        className="btn-primary"
+        style={{ textDecoration: 'none', marginTop: '8px' }}
       >
         Back to Dashboard
       </Link>

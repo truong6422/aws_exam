@@ -1,0 +1,1 @@
+from .{{ model_name }} import List{{camel_case_model_name}}APIViewFilter  # noqa

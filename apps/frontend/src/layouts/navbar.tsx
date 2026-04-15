@@ -1,29 +1,62 @@
 import { useUiStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 
-/** Top navigation bar with sidebar toggle and user info. */
+/** Top navigation bar — Apple glass effect. */
 export default function Navbar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const user = useAuthStore((s) => s.user)
+  const initial = (user?.name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 shadow-sm">
+    <header
+      className="flex h-12 shrink-0 items-center justify-between px-6"
+      style={{
+        background: 'rgba(0, 0, 0, 0.8)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
+      }}
+    >
+      {/* Hamburger */}
       <button
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
-        className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: '8px',
+          borderRadius: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        className="transition-opacity hover:opacity-70"
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       </button>
 
+      {/* User info */}
       <div className="flex items-center gap-3">
-        <span className="text-sm text-gray-600">
+        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}>
           {user?.name ?? user?.email ?? 'Guest'}
         </span>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white">
-          {(user?.name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()}
+        <div
+          className="flex h-7 w-7 items-center justify-center text-white"
+          style={{
+            background: '#0071e3',
+            borderRadius: '50%',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '-0.12px',
+          }}
+        >
+          {initial}
         </div>
       </div>
     </header>

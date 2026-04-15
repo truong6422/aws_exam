@@ -7,18 +7,51 @@ interface Props {
   onAction?: () => void
 }
 
+const EmptyIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+    <rect x="4" y="4" width="32" height="32" rx="1" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" fill="none" />
+    <path d="M13 20h14M20 13v14" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="square" />
+  </svg>
+)
+
 /** Reusable empty state with optional CTA — used across dashboard, analytics, history. */
-export function EmptyState({ icon = '📋', title, description, actionLabel, actionHref, onAction }: Props) {
+export function EmptyState({ title, description, actionLabel, actionHref, onAction }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <span className="text-5xl mb-4">{icon}</span>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-      {description && <p className="text-gray-500 text-sm mb-6 max-w-sm">{description}</p>}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '64px 24px',
+        textAlign: 'center',
+        background: '#272729',
+        borderRadius: '12px',
+      }}
+    >
+      <span style={{ marginBottom: '16px', opacity: 0.4 }}><EmptyIcon /></span>
+      <h3
+        style={{
+          fontSize: '14px',
+          fontWeight: 500,
+          letterSpacing: '-0.224px',
+          color: '#fff',
+          marginBottom: '8px',
+        }}
+      >
+        {title}
+      </h3>
+      {description && (
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', letterSpacing: '-0.224px', marginBottom: '24px', maxWidth: '360px' }}>
+          {description}
+        </p>
+      )}
       {actionLabel && (actionHref || onAction) && (
         <a
           href={actionHref ?? '#'}
           onClick={onAction ? (e) => { e.preventDefault(); onAction() } : undefined}
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+          className="btn-primary"
+          style={{ textDecoration: 'none', display: 'inline-block' }}
         >
           {actionLabel}
         </a>

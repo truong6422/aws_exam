@@ -1,0 +1,8 @@
+import django_filters
+
+from {{ app_name }}.models import {{camel_case_model_name}}
+
+class List{{camel_case_model_name}}APIViewFilter(django_filters.FilterSet):
+    class Meta:
+        model = {{camel_case_model_name}}
+        fields = ('type',)

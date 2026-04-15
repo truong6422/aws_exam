@@ -1,0 +1,17 @@
+from django.urls import path
+
+from {{ app_name }}.api.{{ model_name }} import List{{camel_case_model_name}}APIView, RetrieveUpdateDestroy{{camel_case_model_name}}APIView
+
+app_name = 'api-{{ app_name }}'
+
+urlpatterns = [
+    path('{{ model_name }}s/', view=List{{camel_case_model_name}}APIView.as_view({
+        'get': 'list',
+        'post': 'create'
+    }), name='list-{{ model_name }}s'),
+    path('{{ model_name }}/<int:pk>/', view=RetrieveUpdateDestroy{{camel_case_model_name}}APIView.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'delete': 'delete',
+    }), name='retrieve-update-destroy-{{ model_name }}'),
+]

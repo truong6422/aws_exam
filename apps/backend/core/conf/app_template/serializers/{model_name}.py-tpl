@@ -1,0 +1,24 @@
+from rest_framework import serializers
+
+from {{ app_name }}.models import {{camel_case_model_name}}
+
+
+class {{camel_case_model_name}}Serializer(serializers.ModelSerializer):
+    type = serializers.CharField(source='get_type_display')
+
+    class Meta:
+        model = {{camel_case_model_name}}
+        fields = ('id', 'slug', 'name', 'description', 'type')
+        read_only_fields = ('id', 'slug', 'name', 'description', 'type')
+
+
+class Create{{camel_case_model_name}}Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = {{camel_case_model_name}}
+        fields = ('name', 'description', 'type')
+
+
+class Update{{camel_case_model_name}}Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = {{camel_case_model_name}}
+        fields = ('name', 'description', 'type')

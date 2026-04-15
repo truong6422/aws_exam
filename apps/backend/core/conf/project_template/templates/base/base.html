@@ -1,0 +1,25 @@
+{% load i18n static compress %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" xml:lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>{% block title %}Sample project{% endblock %}</title>
+        {% include "base/head.html" %}
+        {% block extrastyle %}{% endblock %}
+        {% block extrahead %}{% endblock %}
+    </head>
+    <body>
+        {% block header %}
+        {% endblock %}
+        {% block main %}
+            <main class="{% block main_class %}container{% endblock %}">
+                {% block content %}{% endblock %}
+            </main>
+        {% endblock %}
+        {% block footer_scripts %}
+            {% compress js %}
+            {% endcompress %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,14 +1,11 @@
 """
 Shared abstract base models used across all apps.
+Uses ModelMixin from vendored django-core for soft delete + audit tracking.
 """
-from django.db import models
+from core.db.models.mixins import ModelMixin
 
+# Alias for backward compatibility — all existing models that import
+# TimestampedModel continue to work without change.
+TimestampedModel = ModelMixin
 
-class TimestampedModel(models.Model):
-    """Abstract base that adds created_at / updated_at to every subclass."""
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+__all__ = ["ModelMixin", "TimestampedModel"]

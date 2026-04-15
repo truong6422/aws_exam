@@ -1,0 +1,11 @@
+{% extends 'base/base.html' %}
+{% load i18n static compress %}
+{% block content %}
+    {% block object-tools-items %}
+        <div class="float-end">
+            <a href="{% url create_viewname %}" class="btn btn-primary my-2">{% translate "+ Create" %}</a>
+        </div>
+    {% endblock %}
+    {% block list_content %}{% endblock %}
+    {% block pagination %}{% include 'block/pagination.html' %}{% endblock %}
+{% endblock %}

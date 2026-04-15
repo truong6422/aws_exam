@@ -7,32 +7,41 @@ interface Props {
 /** CSS bar chart showing domain accuracy — sorted weakest first. */
 export function WeakDomainsChart({ domains }: Props) {
   if (!domains.length) {
-    return <p className="text-gray-400 text-sm italic">No domain data yet. Complete more exams.</p>
+    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No domain data yet. Complete more exams.</p>
   }
 
   const sorted = [...domains].sort((a, b) => a.accuracy_percentage - b.accuracy_percentage)
 
-  const getBarColor = (accuracy: number) => {
-    if (accuracy >= 70) return 'bg-green-500'
-    if (accuracy >= 50) return 'bg-yellow-500'
-    return 'bg-red-500'
+  const getBarColor = (accuracy: number): string => {
+    if (accuracy >= 70) return '#1d9b5e'
+    if (accuracy >= 50) return '#f5a623'
+    return '#e0453c'
   }
 
   return (
-    <div className="space-y-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {sorted.map((d) => (
         <div key={d.domain_id}>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-700 truncate max-w-xs">{d.domain_name}</span>
-            <span className="font-medium ml-2 tabular-nums">{d.accuracy_percentage.toFixed(1)}%</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '260px', letterSpacing: '-0.224px' }}>
+              {d.domain_name}
+            </span>
+            <span style={{ fontSize: '13px', fontWeight: 600, marginLeft: '8px', fontVariantNumeric: 'tabular-nums', color: '#fff', letterSpacing: '-0.224px' }}>
+              {d.accuracy_percentage.toFixed(1)}%
+            </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
+          <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', height: '8px' }}>
             <div
-              className={`h-3 rounded-full transition-all ${getBarColor(d.accuracy_percentage)}`}
-              style={{ width: `${Math.min(d.accuracy_percentage, 100)}%` }}
+              style={{
+                height: '8px',
+                borderRadius: '2px',
+                background: getBarColor(d.accuracy_percentage),
+                width: `${Math.min(d.accuracy_percentage, 100)}%`,
+                transition: 'width 0.3s ease',
+              }}
             />
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">{d.correct_count}/{d.total_questions} correct</p>
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', letterSpacing: '-0.12px' }}>{d.correct_count}/{d.total_questions} correct</p>
         </div>
       ))}
     </div>

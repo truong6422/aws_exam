@@ -1,0 +1,32 @@
+from core.mixins import APIMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework import generics
+
+from {{ app_name }}.filters import List{{camel_case_model_name}}APIViewFilter
+from {{ app_name }}.models import {{camel_case_model_name}}
+from {{ app_name }}.serializers import {{camel_case_model_name}}Serializer, Create{{camel_case_model_name}}Serializer, Update{{camel_case_model_name}}Serializer
+
+
+class List{{camel_case_model_name}}APIView(APIMixin, CreateModelMixin, generics.ListAPIView):
+    filterset_class = List{{camel_case_model_name}}APIViewFilter
+
+    search_fields = ('name', 'description')
+    ordering_fields = ('id', 'name', 'description', 'type')
+    ordering = ("-id",)
+
+    def get_queryset(self):
+        return {{camel_case_model_name}}.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return Create{{camel_case_model_name}}Serializer
+        return {{camel_case_model_name}}Serializer
+
+
+class RetrieveUpdateDestroy{{camel_case_model_name}}APIView(APIMixin, UpdateModelMixin, generics.RetrieveDestroyAPIView):
+    def get_queryset(self):
+        return {{camel_case_model_name}}.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'update':
+            return Update{{camel_case_model_name}}Serializer
+        return {{camel_case_model_name}}Serializer

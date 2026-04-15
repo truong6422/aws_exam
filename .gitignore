@@ -50,3 +50,5 @@ Thumbs.db
 *.swo
 .vscode/
 # .idea/ kept for shared run configs if desired; add back to ignore if not
+lbtruong6422@gmail.com
+.credentials

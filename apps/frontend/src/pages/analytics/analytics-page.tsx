@@ -7,6 +7,12 @@ import { ScoreTrendChart } from '@/components/analytics/score-trend-chart'
 import { EmptyState } from '@/components/shared/empty-state'
 import PageHeader from '@/components/ui/page-header'
 
+const panelStyle: React.CSSProperties = {
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '20px',
+}
+
 /** Analytics page — weak domains chart + score trend, filterable by certification. */
 export default function AnalyticsPage() {
   const navigate = useNavigate()
@@ -35,15 +41,31 @@ export default function AnalyticsPage() {
   }, [selectedCertId])
 
   if (loading) {
-    return <div className="text-gray-400 text-sm">Loading...</div>
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <PageHeader title="Analytics" subtitle="Track your performance over time" />
-        <p className="text-red-500 text-sm mb-2">{error}</p>
-        <button className="text-blue-600 text-sm hover:underline" onClick={() => window.location.reload()}>
+        <p style={{ color: '#e0453c', fontSize: '13px', letterSpacing: '-0.224px' }}>{error}</p>
+        <button
+          className="btn-ghost"
+          style={{ alignSelf: 'flex-start' }}
+          onClick={() => window.location.reload()}
+        >
           Retry
         </button>
       </div>
@@ -52,10 +74,9 @@ export default function AnalyticsPage() {
 
   if (!overview || overview.total_submitted === 0) {
     return (
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <PageHeader title="Analytics" subtitle="Track your performance over time" />
         <EmptyState
-          icon="📊"
           title="No analytics yet"
           description="Complete at least one exam to see your weak domains and score trends."
           actionLabel="Take an Exam"
@@ -68,12 +89,22 @@ export default function AnalyticsPage() {
   const weakestDomain = [...domains].sort((a, b) => a.accuracy_percentage - b.accuracy_percentage)[0]
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader title="Analytics" subtitle="Track your performance over time" />
 
       {/* Certification filter */}
       <select
-        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+        style={{
+          background: '#242426',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '8px',
+          padding: '8px 12px',
+          fontSize: '13px',
+          color: '#fff',
+          outline: 'none',
+          alignSelf: 'flex-start',
+          minWidth: '220px',
+        }}
         value={selectedCertId ?? ''}
         onChange={(e) => setSelectedCertId(e.target.value ? Number(e.target.value) : null)}
       >
@@ -83,21 +114,48 @@ export default function AnalyticsPage() {
         ))}
       </select>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '20px',
+        }}
+      >
         {/* Weak domains */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Weak Domains</h2>
+        <div style={panelStyle}>
+          <h2
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '-0.12px',
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: '16px',
+            }}
+          >
+            Weak Domains
+          </h2>
           <WeakDomainsChart domains={domains} />
           {weakestDomain && (
-            <p className="text-sm text-gray-500 mt-4">
-              Focus on: <strong className="text-red-600">{weakestDomain.domain_name}</strong>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '16px', letterSpacing: '-0.12px' }}>
+              Focus on:{' '}
+              <strong style={{ color: '#e0453c' }}>{weakestDomain.domain_name}</strong>
             </p>
           )}
         </div>
 
         {/* Score trend */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Score Trend</h2>
+        <div style={panelStyle}>
+          <h2
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '-0.12px',
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: '16px',
+            }}
+          >
+            Score Trend
+          </h2>
           <ScoreTrendChart trend={overview.recent_trend} />
         </div>
       </div>

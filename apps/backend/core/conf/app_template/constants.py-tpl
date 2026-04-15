@@ -1,0 +1,13 @@
+from enum import Enum
+
+from django.utils.translation import gettext as _
+
+
+class {{camel_case_model_name}}TypeChoices(Enum):
+    ALL = 0
+
+    @classmethod
+    def choices(cls):
+        return (
+            (cls.ALL.value, _('All')),
+        )

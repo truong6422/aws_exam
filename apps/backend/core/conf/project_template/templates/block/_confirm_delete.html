@@ -1,0 +1,8 @@
+{% extends 'base/base.html' %}
+{% load i18n static compress %}
+{% block content %}
+    <form method="post">
+        <button type="submit">{% translate "Deleted." %}</button>
+        {% csrf_token %}
+    </form>
+{% endblock %}

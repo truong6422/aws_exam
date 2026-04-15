@@ -36,41 +36,71 @@ export default function AdminImportPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
+    <div style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
         title="Import Questions"
         subtitle="Upload a JSON file to bulk-import questions into a certification domain"
       />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+      <div
+        style={{
+          background: '#272729',
+          borderRadius: '12px',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
         <ImportDropzone onFileLoaded={handleFileLoaded} isLoading={isLoading} />
 
         {parsedData && (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm space-y-1">
-            <p className="font-medium text-gray-700 mb-2">Preview</p>
-            <p>
-              <span className="text-gray-500">Certification: </span>
-              <strong>{parsedData.certification_code}</strong>
+          <div
+            style={{
+              borderRadius: '8px',
+              background: 'rgba(255,255,255,0.06)',
+              padding: '16px',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '-0.12px',
+                color: 'rgba(255,255,255,0.5)',
+                marginBottom: '8px',
+              }}
+            >
+              Preview
             </p>
             <p>
-              <span className="text-gray-500">Domain: </span>
-              <strong>{parsedData.domain_name}</strong>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Certification: </span>
+              <strong style={{ color: '#fff' }}>{parsedData.certification_code}</strong>
             </p>
             <p>
-              <span className="text-gray-500">Questions: </span>
-              <strong>{parsedData.questions?.length ?? 0}</strong>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Domain: </span>
+              <strong style={{ color: '#fff' }}>{parsedData.domain_name}</strong>
+            </p>
+            <p>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Questions: </span>
+              <strong style={{ color: '#fff' }}>{parsedData.questions?.length ?? 0}</strong>
             </p>
           </div>
         )}
 
         {parsedData && (
           <button
-            className="w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+            className="btn-primary"
+            style={{ width: '100%', opacity: isLoading ? 0.6 : 1 }}
             onClick={handleImport}
             disabled={isLoading}
           >
             {isLoading
-              ? 'Importing…'
+              ? 'Importing...'
               : `Import ${parsedData.questions?.length ?? 0} Question${parsedData.questions?.length !== 1 ? 's' : ''}`}
           </button>
         )}
@@ -83,7 +113,15 @@ export default function AdminImportPage() {
 
         {result && !result.errors?.length && (
           <button
-            className="text-sm text-brand-600 hover:underline"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontSize: '13px',
+              color: '#2997ff',
+              cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
             onClick={handleReset}
           >
             Import another file

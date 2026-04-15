@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+{% load i18n static compress template_utils %}
+{% block content %}
+    {% block object-tools-items %}
+        {% if update_viewname or delete_viewname %}
+            {% if update_viewname %}
+                <a href="{% url update_viewname object.slug %}">{% translate "Updated." %}</a>
+            {% endif %}
+            {% if delete_viewname %}
+                <a href="{% url delete_viewname object.slug %}">{% translate "Deleted." %}</a>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+    {% block field_sets %}
+        <table class="table">
+            <tbody>
+                {% for field in fields %}
+                    <tr>
+                        <td>{{ object|field_model_verbose_name:field }}</td>
+                        <td>
+                            {% if serializer_object %}
+                                {{ serializer_object|get_item:field }}
+                            {% else %}
+                                {{ object|obj_lookup_field_value:field }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endblock %}

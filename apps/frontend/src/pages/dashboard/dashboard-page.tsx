@@ -5,6 +5,12 @@ import { ScoreCard } from '@/components/dashboard/score-card'
 import { EmptyState } from '@/components/shared/empty-state'
 import PageHeader from '@/components/ui/page-header'
 
+const panelStyle: React.CSSProperties = {
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '20px',
+}
+
 /** Dashboard overview — recent attempts, score cards, start exam CTA. */
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -20,15 +26,19 @@ export default function DashboardPage() {
   }, [])
 
   if (loading) {
-    return <div className="p-6 text-gray-400 text-sm">Loading...</div>
+    return (
+      <div style={{ padding: '24px', fontSize: '14px', letterSpacing: '-0.224px', color: 'rgba(255,255,255,0.5)' }}>
+        Loading...
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="p-6">
-        <p className="text-red-500 text-sm mb-3">{error}</p>
+      <div style={{ padding: '24px' }}>
+        <p style={{ color: '#e0453c', fontSize: '13px', marginBottom: '12px' }}>{error}</p>
         <button
-          className="text-blue-600 text-sm hover:underline"
+          style={{ color: '#fff', fontSize: '13px', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           onClick={() => window.location.reload()}
         >
           Retry
@@ -39,18 +49,17 @@ export default function DashboardPage() {
 
   if (!overview || overview.total_attempts === 0) {
     return (
-      <div className="p-6 space-y-6">
-        <PageHeader title="Dashboard" subtitle="Welcome back! Ready to practice?" />
-        <div className="flex gap-3">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <PageHeader title="Dashboard" subtitle="Welcome back" />
           <button
-            className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+            className="btn-primary"
             onClick={() => navigate('/exam/setup')}
           >
-            📝 Start Exam
+            Start Exam
           </button>
         </div>
         <EmptyState
-          icon="🎯"
           title="No exams yet"
           description="Take your first AWS certification practice exam to see your progress here."
           actionLabel="Start Your First Exam"
@@ -64,50 +73,73 @@ export default function DashboardPage() {
   const bestScore = Number(overview.best_score) || 0
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader title="Dashboard" subtitle="Welcome back! Ready to practice?" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <PageHeader title="Dashboard" subtitle="Welcome back" />
         <button
-          className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+          className="btn-primary"
           onClick={() => navigate('/exam/setup')}
         >
-          📝 Start Exam
+          Start Exam
         </button>
       </div>
 
       {/* Score cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <ScoreCard label="Total Exams" value={overview.total_attempts} colorClass="text-gray-900" />
-        <ScoreCard label="Average Score" value={avgScore.toFixed(1)} suffix="%" colorClass="text-blue-600" />
-        <ScoreCard label="Best Score" value={bestScore.toFixed(1)} suffix="%" colorClass="text-green-600" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+        <ScoreCard label="Total Exams"    value={overview.total_attempts} />
+        <ScoreCard label="Average Score"  value={avgScore.toFixed(1)} suffix="%" />
+        <ScoreCard label="Best Score"     value={bestScore.toFixed(1)} suffix="%" />
       </div>
 
       {/* Recent attempts */}
       {overview.recent_trend.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="text-sm font-semibold text-gray-700">Recent Activity</h2>
+        <div style={panelStyle}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <span
+              style={{ fontSize: '12px', fontWeight: 400, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}
+            >
+              Recent Activity
+            </span>
             <button
-              className="text-sm text-blue-600 hover:underline"
+              style={{ fontSize: '13px', color: '#2997ff', background: 'none', border: 'none', cursor: 'pointer' }}
               onClick={() => navigate('/history')}
             >
-              View all →
+              View all
             </button>
           </div>
-          <div className="space-y-2">
+          <div>
             {overview.recent_trend.slice(0, 5).map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 0',
+                  borderBottom: i < Math.min(overview.recent_trend.length, 5) - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                }}
+              >
                 <div>
-                  <span className="font-medium text-sm text-gray-800">{item.certification_code}</span>
-                  <span className="text-xs text-gray-400 ml-2">
+                  <span style={{ fontWeight: 500, fontSize: '14px', color: '#fff' }}>
+                    {item.certification_code}
+                  </span>
+                  <span
+                    style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginLeft: '10px', letterSpacing: '-0.12px' }}
+                  >
                     {new Date(item.date).toLocaleDateString()}
                   </span>
                 </div>
-                <span className={`font-bold text-xs px-2 py-1 rounded-full ${
-                  Number(item.score) >= 72
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                }`}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    letterSpacing: '-0.12px',
+                    padding: '3px 10px',
+                    borderRadius: '6px',
+                    border: `1px solid ${Number(item.score) >= 72 ? '#1d9b5e' : '#e0453c'}`,
+                    color: Number(item.score) >= 72 ? '#1d9b5e' : '#e0453c',
+                  }}
+                >
                   {Number(item.score).toFixed(1)}%
                 </span>
               </div>

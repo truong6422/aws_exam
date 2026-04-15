@@ -9,6 +9,12 @@ interface Stats {
   questions: number
 }
 
+const statPanelStyle: React.CSSProperties = {
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '20px 24px',
+}
+
 export default function AdminDashboardPage() {
   const navigate = useNavigate()
   const [stats, setStats] = useState<Stats>({ certs: 0, domains: 0, questions: 0 })
@@ -38,37 +44,57 @@ export default function AdminDashboardPage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader title="Admin Dashboard" subtitle="System overview" />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
         {statCards.map(({ label, value }) => (
-          <div key={label} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">{label}</p>
-            <p className="mt-1 text-3xl font-bold text-gray-900">
-              {loading ? '…' : value}
+          <div key={label} style={statPanelStyle}>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '-0.12px',
+                color: 'rgba(255,255,255,0.5)',
+                marginBottom: '8px',
+              }}
+            >
+              {label}
+            </p>
+            <p style={{ fontSize: '36px', fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+              {loading ? '—' : value}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-gray-700">Quick Actions</h2>
-        <div className="flex flex-wrap gap-3">
+      <div style={{ background: '#272729', borderRadius: '12px', padding: '20px 24px' }}>
+        <h2
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '-0.12px',
+            color: 'rgba(255,255,255,0.5)',
+            marginBottom: '14px',
+          }}
+        >
+          Quick Actions
+        </h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           <button
-            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+            className="btn-primary"
             onClick={() => navigate('/admin/import')}
           >
             Import Questions
           </button>
           <button
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="btn-ghost"
             onClick={() => navigate('/admin/questions')}
           >
             View Questions
           </button>
           <button
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="btn-ghost"
             onClick={() => navigate('/admin/users')}
           >
             Manage Users

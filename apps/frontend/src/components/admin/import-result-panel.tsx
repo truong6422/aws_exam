@@ -13,11 +13,29 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
 
   if (hasErrors) {
     return (
-      <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
-        <h3 className="font-semibold text-red-800 mb-2">Import Failed</h3>
-        <ul className="list-disc list-inside space-y-1">
+      <div
+        style={{
+          marginTop: '16px',
+          borderRadius: '8px',
+          border: '1px solid rgba(224,69,60,0.4)',
+          background: 'rgba(224,69,60,0.1)',
+          padding: '16px',
+        }}
+      >
+        <h3
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '-0.12px',
+            color: '#e0453c',
+            marginBottom: '8px',
+          }}
+        >
+          Import Failed
+        </h3>
+        <ul style={{ paddingLeft: '16px', margin: 0 }}>
           {result.errors.map((err, i) => (
-            <li key={i} className="text-sm text-red-700">{err}</li>
+            <li key={i} style={{ fontSize: '13px', color: '#e0453c', marginBottom: '4px' }}>{err}</li>
           ))}
         </ul>
       </div>
@@ -25,9 +43,27 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-      <h3 className="font-semibold text-green-800">✓ Import Successful</h3>
-      <p className="mt-1 text-sm text-green-700">
+    <div
+      style={{
+        marginTop: '16px',
+        borderRadius: '8px',
+        border: '1px solid rgba(29,155,94,0.4)',
+        background: 'rgba(29,155,94,0.1)',
+        padding: '16px',
+      }}
+    >
+      <h3
+        style={{
+          fontSize: '12px',
+          fontWeight: 600,
+          letterSpacing: '-0.12px',
+          color: '#1d9b5e',
+          marginBottom: '6px',
+        }}
+      >
+        Import Successful
+      </h3>
+      <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', letterSpacing: '-0.224px' }}>
         Imported <strong>{result.imported}</strong> question{result.imported !== 1 ? 's' : ''}
         {certCode && <> to <strong>{certCode}</strong></>}
         {domainName && <> / <strong>{domainName}</strong></>}

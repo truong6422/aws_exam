@@ -2,18 +2,212 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles */
-body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+/* Apple design system — CSS variables */
+:root {
+  /* Backgrounds */
+  --ap-black:         #000000;
+  --ap-light-gray:    #f5f5f7;
+  --ap-near-black:    #1d1d1f;
+
+  /* Interactive — Apple Blue (ONLY accent) */
+  --ap-blue:          #0071e3;
+  --ap-blue-bright:   #2997ff;
+  --ap-link-light:    #0066cc;
+  --ap-link-dark:     #2997ff;
+
+  /* Text */
+  --ap-text-dark:     #1d1d1f;
+  --ap-text-body:     rgba(0, 0, 0, 0.8);
+  --ap-text-tertiary: rgba(0, 0, 0, 0.48);
+  --ap-text-light:    #ffffff;
+
+  /* Dark surfaces */
+  --ap-surface-1:     #272729;
+  --ap-surface-2:     #262628;
+  --ap-surface-3:     #28282a;
+  --ap-surface-4:     #2a2a2d;
+  --ap-surface-5:     #242426;
+
+  /* Semantic — kept minimal */
+  --ap-success:       #1d9b5e;
+  --ap-error:         #e0453c;
+  --ap-warning:       #f5a623;
+
+  /* Shadow */
+  --ap-shadow:        rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 }
 
-/* Scrollbar */
+/* Base */
+body {
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  @apply bg-black text-white antialiased;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.374px;
+  color: #fff;
+}
+
+/* Display font for headings ≥ 20px */
+h1, h2, h3 {
+  font-family: 'SF Pro Display', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Scrollbar — dark Apple style */
 ::-webkit-scrollbar {
   @apply w-1.5;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: #000;
 }
 ::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-gray-300;
+  background: #272729;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3c;
+}
+
+/* Keyframes */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Apple Utility Classes ── */
+
+/* Caption label */
+.label-caption {
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.12px;
+  line-height: 1.33;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Primary CTA — Apple Blue solid */
+.btn-primary {
+  background: var(--ap-blue);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.374px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background: #0077ed;
+}
+.btn-primary:active {
+  background: #006edb;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary — dark fill */
+.btn-secondary {
+  background: var(--ap-near-black);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.374px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: #2c2c2e;
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pill link — "Learn more" / "Shop" style */
+.btn-pill {
+  background: transparent;
+  color: var(--ap-link-dark);
+  border-radius: 980px;
+  padding: 6px 16px;
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.224px;
+  border: 1px solid var(--ap-link-dark);
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-pill:hover {
+  text-decoration: underline;
+}
+
+/* Pill on light backgrounds */
+.btn-pill-light {
+  background: transparent;
+  color: var(--ap-link-light);
+  border-radius: 980px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.224px;
+  border: 1px solid var(--ap-link-light);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-pill-light:hover {
+  text-decoration: underline;
+}
+
+/* Ghost outline — white border on dark bg */
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  border-radius: 980px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.224px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-ghost:hover {
+  border-color: #fff;
+}
+.btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus ring — Apple Blue */
+*:focus-visible {
+  outline: 2px solid var(--ap-blue);
+  outline-offset: 2px;
 }

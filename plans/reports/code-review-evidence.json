@@ -1,0 +1,9 @@
+{
+  "type": "code-review",
+  "phase_file": null,
+  "score": 7.5,
+  "critical_issues": 0,
+  "reviewer": "code-reviewer",
+  "timestamp": "2026-04-12T05:29:06.908Z",
+  "generated_by": "mark-evidence.cjs"
+}

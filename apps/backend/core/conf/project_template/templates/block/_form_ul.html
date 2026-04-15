@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+{% load i18n static compress %}
+{% block content %}
+    <form action="{% block form_action %}{% endblock %}" method="{% block form_method %}{% endblock %}">
+        <ul>
+            {{ form.as_ul }}
+        </ul>
+        {% block submit %}
+            <button type="submit">
+                {% if form.instance %}
+                    {% translate 'Updated' %}
+                {% else %}
+                    {% translate 'Created' %}
+                {% endif %}
+            </button>
+        {% endblock %}
+        {% csrf_token %}
+    </form>
+{% endblock %}

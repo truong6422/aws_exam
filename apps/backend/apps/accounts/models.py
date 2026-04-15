@@ -1,14 +1,19 @@
 """
 Custom User model for the accounts app.
 Extends AbstractUser so all built-in auth machinery is preserved.
+Uses ModelMixin for soft delete + audit fields (created_by, updated_by, etc).
+
+Note: AbstractUser already has date_joined / last_login.
+ModelMixin adds: created_by, updated_by, deleted_by, created_at, updated_at,
+                 deleted_at, is_deleted + SoftDeleteManager.
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from apps.core.models import TimestampedModel
+from apps.core.models import ModelMixin
 
 
-class User(AbstractUser, TimestampedModel):
+class User(AbstractUser, ModelMixin):
     """
     Project-wide user model.
     AUTH_USER_MODEL = 'accounts.User'

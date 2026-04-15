@@ -1,0 +1,70 @@
+version: '3.9'
+services:
+  be:
+    build: .
+    volumes:
+      - '.:/BE'
+    ports:
+      - '8000:8000'
+      - '5555:5555'
+    env_file:
+      - .env
+    restart: always
+    container_name: be
+    depends_on:
+      - db
+      - redis
+      - memcached
+    expose:
+      - '8000'
+
+  db:
+    image: 'postgres:14.5'
+    command: postgres -c shared_buffers=256MB -c max_connections=200
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - 'postgresql:/var/lib/postgresql'
+      - 'postgresql_data:/var/lib/postgresql/data'
+    restart: on-failure
+    container_name: db
+    ports:
+      - '5433:5432'
+
+  redis:
+    image: redis:6.2.5-alpine
+    container_name: redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    restart: always
+    volumes:
+      - cache:/var/lib/redis/data
+
+  memcached:
+    image: bitnami/memcached
+    container_name: memcached
+    ports:
+      - "11211:11211"
+    entrypoint:
+    - memcached
+    - -m 64
+    restart: always
+    volumes:
+      - cache:/var/lib/memcached/data
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ".:/BE/"
+    ports:
+      - "8080:80"
+    depends_on:
+      - be
+
+volumes:
+  postgresql: null
+  postgresql_data: null
+  cache: null
+

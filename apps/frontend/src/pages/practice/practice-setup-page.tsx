@@ -9,6 +9,26 @@ import { examApi, type Certification, type Domain } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
 import { useUiStore } from '@/stores/ui-store'
 
+const selectStyle: React.CSSProperties = {
+  width: '100%',
+  background: '#242426',
+  border: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '8px',
+  padding: '8px 12px',
+  fontSize: '14px',
+  color: '#fff',
+  outline: 'none',
+}
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '12px',
+  fontWeight: 400,
+  letterSpacing: '-0.12px',
+  color: 'rgba(255,255,255,0.5)',
+  marginBottom: '6px',
+}
+
 export default function PracticeSetupPage() {
   const navigate = useNavigate()
   const initSession = useExamStore((s) => s.initSession)
@@ -57,14 +77,22 @@ export default function PracticeSetupPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
         title="Practice Mode"
         subtitle="Learn at your own pace with instant feedback"
@@ -72,20 +100,25 @@ export default function PracticeSetupPage() {
 
       <form
         onSubmit={handleStart}
-        className="space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        style={{
+          background: '#272729',
+          borderRadius: '12px',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
       >
         {/* Certification picker */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Certification
-          </label>
+          <label style={labelStyle}>Certification</label>
           <select
             value={selectedCertId}
             onChange={(e) => { setSelectedCertId(Number(e.target.value)); setSelectedDomainId('') }}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            style={selectStyle}
             required
           >
-            <option value="">Select a certification…</option>
+            <option value="">Select a certification...</option>
             {certifications.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.code} — {c.name}
@@ -97,13 +130,11 @@ export default function PracticeSetupPage() {
         {/* Domain filter */}
         {domains.length > 0 && (
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Domain (optional)
-            </label>
+            <label style={labelStyle}>Domain (optional)</label>
             <select
               value={selectedDomainId}
               onChange={(e) => setSelectedDomainId(e.target.value ? Number(e.target.value) : '')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+              style={selectStyle}
             >
               <option value="">All Domains</option>
               {domains.map((d) => (
@@ -116,16 +147,27 @@ export default function PracticeSetupPage() {
         )}
 
         {/* Info banner */}
-        <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-700">
-          ✓ Explanations shown after each answer · No time limit · No score tracking
+        <div
+          style={{
+            background: 'rgba(0,113,227,0.1)',
+            border: '1px solid rgba(0,113,227,0.4)',
+            borderRadius: '8px',
+            padding: '10px 12px',
+            fontSize: '12px',
+            color: '#2997ff',
+            letterSpacing: '-0.12px',
+          }}
+        >
+          Explanations shown after each answer · No time limit · No score tracking
         </div>
 
         <button
           type="submit"
           disabled={starting || !selectedCertId}
-          className="w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+          className="btn-primary"
+          style={{ width: '100%', opacity: starting || !selectedCertId ? 0.6 : 1 }}
         >
-          {starting ? 'Starting…' : 'Start Practice →'}
+          {starting ? 'Starting...' : 'Start Practice'}
         </button>
       </form>
     </div>

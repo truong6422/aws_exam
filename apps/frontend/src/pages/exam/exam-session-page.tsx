@@ -16,6 +16,18 @@ import { ExamTimer } from '@/components/exam/exam-timer'
 import { QuestionNavigationGrid } from '@/components/exam/question-navigation-grid'
 import { AnswerOption } from '@/components/exam/answer-option'
 
+const panelStyle: React.CSSProperties = {
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '16px',
+}
+
+const sidebarPanelStyle: React.CSSProperties = {
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '16px',
+}
+
 export default function ExamSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
@@ -84,8 +96,16 @@ export default function ExamSessionPage() {
 
   if (!question) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
       </div>
     )
   }
@@ -94,18 +114,18 @@ export default function ExamSessionPage() {
   const selectedAnswers = answers[question.id] ?? []
 
   return (
-    <div className="flex h-full gap-4">
+    <div style={{ display: 'flex', height: '100%', gap: '16px' }}>
       {/* Sidebar */}
-      <aside className="hidden w-52 shrink-0 flex-col gap-4 lg:flex">
-        <div className="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+      <aside style={{ width: '200px', flexShrink: 0, flexDirection: 'column', gap: '12px' }} className="hidden lg:flex">
+        <div style={{ ...sidebarPanelStyle, textAlign: 'center' }}>
           <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
           {isSaving && (
-            <p className="mt-1 text-xs text-gray-400">Saving…</p>
+            <p style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>Saving...</p>
           )}
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-y-auto">
-          <div className="border-b border-gray-100 px-3 py-2 text-xs font-semibold text-gray-600">
+        <div style={{ ...sidebarPanelStyle, padding: 0, overflow: 'hidden' }}>
+          <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', fontSize: '11px', fontWeight: 600, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
             {answeredCount} / {questions.length} answered
           </div>
           <QuestionNavigationGrid
@@ -121,44 +141,74 @@ export default function ExamSessionPage() {
         <button
           onClick={() => setConfirmSubmit(true)}
           disabled={submitting}
-          className="w-full rounded-lg bg-brand-600 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+          className="btn-primary"
+          style={{ width: '100%', opacity: submitting ? 0.6 : 1 }}
         >
           Submit Exam
         </button>
       </aside>
 
       {/* Main */}
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
         {/* Mobile timer bar */}
-        <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm lg:hidden">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            ...sidebarPanelStyle,
+          }}
+          className="lg:hidden"
+        >
           <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
-          <span className="text-xs text-gray-500">{answeredCount}/{questions.length} answered</span>
+          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>{answeredCount}/{questions.length} answered</span>
         </div>
 
         {/* Question card */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="mb-3 flex items-start justify-between gap-2">
-            <span className="text-xs font-medium text-gray-500">
+        <div style={{ ...panelStyle, padding: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '12px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
               Question {currentIndex + 1} of {questions.length}
               {question.question_type === 'multiple' && (
-                <span className="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-blue-700">
+                <span
+                  style={{
+                    marginLeft: '8px',
+                    fontSize: '11px',
+                    background: 'rgba(0,113,227,0.1)',
+                    color: '#2997ff',
+                    border: '1px solid rgba(0,113,227,0.4)',
+                    borderRadius: '6px',
+                    padding: '2px 6px',
+                    letterSpacing: '-0.12px',
+                  }}
+                >
                   Select all that apply
                 </span>
               )}
             </span>
             <button
               onClick={() => toggleFlag(question.id)}
-              className={`text-sm ${isFlagged ? 'text-orange-500' : 'text-gray-400 hover:text-orange-400'}`}
+              style={{
+                background: 'none',
+                border: isFlagged ? '1px solid #e0453c' : '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '6px',
+                padding: '3px 8px',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '-0.12px',
+                color: isFlagged ? '#e0453c' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+              }}
               title={isFlagged ? 'Unflag question' : 'Flag for review'}
             >
-              {isFlagged ? '🚩 Flagged' : '🏳 Flag'}
+              {isFlagged ? 'Flagged' : 'Flag'}
             </button>
           </div>
-          <p className="text-base font-medium text-gray-800">{question.text}</p>
+          <p style={{ fontSize: '17px', fontWeight: 400, color: '#fff', lineHeight: 1.47, letterSpacing: '-0.374px' }}>{question.text}</p>
         </div>
 
         {/* Answers */}
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {question.answers.map((answer) => (
             <AnswerOption
               key={answer.id}
@@ -171,26 +221,28 @@ export default function ExamSessionPage() {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
             onClick={() => goToQuestion(currentIndex - 1)}
             disabled={currentIndex === 0}
-            className="rounded-lg border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+            className="btn-ghost"
+            style={{ opacity: currentIndex === 0 ? 0.4 : 1 }}
           >
-            ← Previous
+            Previous
           </button>
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goToQuestion(currentIndex + 1)}
-              className="rounded-lg border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              className="btn-ghost"
             >
-              Next →
+              Next
             </button>
           ) : (
             <button
               onClick={() => setConfirmSubmit(true)}
               disabled={submitting}
-              className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+              className="btn-primary"
+              style={{ opacity: submitting ? 0.6 : 1 }}
             >
               Submit Exam
             </button>
@@ -200,30 +252,39 @@ export default function ExamSessionPage() {
 
       {/* Confirm submit dialog */}
       {confirmSubmit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-gray-800">Submit Exam?</h3>
-            <p className="mt-2 text-sm text-gray-600">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }}>
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              background: '#272729',
+              borderRadius: '12px',
+              padding: '24px',
+            }}
+          >
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>Submit Exam?</h3>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px', marginBottom: '16px' }}>
               You have answered {answeredCount} of {questions.length} questions.
               {answeredCount < questions.length && (
-                <span className="font-medium text-orange-600">
+                <span style={{ fontWeight: 600, color: '#e0453c' }}>
                   {' '}{questions.length - answeredCount} unanswered.
                 </span>
               )}
             </p>
-            <div className="mt-4 flex justify-end gap-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
                 onClick={() => setConfirmSubmit(false)}
-                className="rounded-lg border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                className="btn-ghost"
               >
                 Cancel
               </button>
               <button
                 onClick={() => { setConfirmSubmit(false); handleSubmit() }}
                 disabled={submitting}
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+                className="btn-primary"
+                style={{ opacity: submitting ? 0.6 : 1 }}
               >
-                {submitting ? 'Submitting…' : 'Confirm Submit'}
+                {submitting ? 'Submitting...' : 'Confirm Submit'}
               </button>
             </div>
           </div>

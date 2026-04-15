@@ -1,0 +1,9 @@
+.idea/
+.fleet/
+htmlcov/
+*.pyc
+.env
+.coverage
+/static/
+*.sqlite3
+.scannerwork/

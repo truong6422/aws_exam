@@ -2,20 +2,36 @@ import PageHeader from '@/components/ui/page-header'
 
 export default function AdminUsersPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
         <PageHeader title="Users" subtitle="Manage registered accounts" />
-        <button className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+        <button className="btn-primary" style={{ flexShrink: 0, marginTop: '4px' }}>
           + Invite User
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-gray-200 bg-gray-50">
-            <tr>
+      <div
+        style={{
+          background: '#272729',
+          borderRadius: '12px',
+          overflow: 'hidden',
+        }}
+      >
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
               {['Name', 'Email', 'Role', 'Joined', 'Actions'].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                <th
+                  key={h}
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'left',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '-0.12px',
+                    color: 'rgba(255,255,255,0.5)',
+                  }}
+                >
                   {h}
                 </th>
               ))}
@@ -23,7 +39,16 @@ export default function AdminUsersPage() {
           </thead>
           <tbody>
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400 italic">
+              <td
+                colSpan={5}
+                style={{
+                  padding: '32px 16px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  color: 'rgba(255,255,255,0.5)',
+                  fontStyle: 'italic',
+                }}
+              >
                 User list loads in Phase 2.
               </td>
             </tr>

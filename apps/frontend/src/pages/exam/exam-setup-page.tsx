@@ -9,6 +9,15 @@ import { examApi, type Certification } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
 import { useUiStore } from '@/stores/ui-store'
 
+const cardStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  background: '#272729',
+  borderRadius: '12px',
+  padding: '20px',
+}
+
 export default function ExamSetupPage() {
   const navigate = useNavigate()
   const initSession = useExamStore((s) => s.initSession)
@@ -41,56 +50,89 @@ export default function ExamSetupPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader title="New Exam" subtitle="Select a certification to start your timed exam" />
 
       {certifications.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <p className="text-sm text-gray-500">No certifications available yet.</p>
+        <div style={cardStyle}>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '-0.224px' }}>No certifications available yet.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
           {certifications.map((cert) => (
-            <div
-              key={cert.id}
-              className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-            >
-              <div className="space-y-1">
-                <span className="inline-block rounded bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-700">
+            <div key={cert.id} style={cardStyle}>
+              <div style={{ marginBottom: '16px' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    background: '#0071e3',
+                    color: '#fff',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '-0.12px',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    marginBottom: '8px',
+                  }}
+                >
                   {cert.code}
                 </span>
-                <h3 className="font-semibold text-gray-800">{cert.name}</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px', letterSpacing: '-0.224px' }}>
+                  {cert.name}
+                </h3>
                 {cert.description && (
-                  <p className="text-xs text-gray-500 line-clamp-2">{cert.description}</p>
+                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', letterSpacing: '-0.12px' }}>
+                    {cert.description}
+                  </p>
                 )}
               </div>
 
-              <div className="mt-4 space-y-3">
-                <div className="flex flex-wrap gap-2 text-xs text-gray-600">
-                  <span className="rounded bg-gray-100 px-2 py-0.5">
-                    ⏱ {cert.time_limit_minutes} min
-                  </span>
-                  <span className="rounded bg-gray-100 px-2 py-0.5">
-                    📝 {cert.total_questions} questions
-                  </span>
-                  <span className="rounded bg-gray-100 px-2 py-0.5">
-                    ✅ {cert.passing_score}% to pass
-                  </span>
+              <div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+                  {[
+                    `${cert.time_limit_minutes} min`,
+                    `${cert.total_questions} questions`,
+                    `${cert.passing_score}% to pass`,
+                  ].map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontSize: '11px',
+                        color: 'rgba(255,255,255,0.5)',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: '6px',
+                        padding: '2px 8px',
+                        letterSpacing: '-0.12px',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
 
                 <button
                   onClick={() => handleStart(cert)}
                   disabled={startingId !== null}
-                  className="w-full rounded-lg bg-brand-600 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+                  className="btn-primary"
+                  style={{ width: '100%', opacity: startingId !== null ? 0.6 : 1 }}
                 >
-                  {startingId === cert.id ? 'Starting…' : 'Start Exam →'}
+                  {startingId === cert.id ? 'Starting...' : 'Start Exam'}
                 </button>
               </div>
             </div>

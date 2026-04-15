@@ -1,0 +1,24 @@
+{% load template_utils %}
+{% if is_paginated %}
+    <ul class="pagination justify-content-end">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-prev page-link" href="?{% param_replace page=page_obj.previous_page_number %}" data-page="{{ page_obj.previous_page_number }}">&laquo;</a></li>
+        {% endif %}
+        {% for page_number in page_obj.adjusted_elided_pages %}
+            <li class="page-item{% if page_obj.number == page_number %} active{% endif %}">
+                {% if page_number == page_obj.paginator.ELLIPSIS %}
+                    <span class="page-link">{{page_number}}</span>
+                {% else %}
+                    <a class="page-link"
+                       href="{% if page_obj.number == page_number %}javascript:void(0){% else %}?{% param_replace page=page_number %}{% endif %}"
+                       data-page="{{ page_number }}"{% if page_obj.number == page_number %} rel="nofollow"{% endif %}>
+                        {{ page_number }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-next page-link" href="?{% param_replace page=page_obj.next_page_number %}" data-page="{{ page_obj.next_page_number }}">&raquo;</a></li>
+        {% endif %}
+    </ul>
+{% endif %}

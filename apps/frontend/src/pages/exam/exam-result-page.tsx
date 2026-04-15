@@ -48,8 +48,16 @@ export default function ExamResultPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div
+          style={{
+            width: '32px', height: '32px',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#0071e3',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
       </div>
     )
   }
@@ -59,29 +67,65 @@ export default function ExamResultPage() {
   const total = navState.result?.total_questions ?? review?.total_questions ?? 0
   // Approximate pass threshold at 72% if no review data
   const passed = score >= 72
-  const scoreColor = passed ? 'text-green-600' : 'text-red-600'
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div style={{ maxWidth: '680px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
         title="Exam Results"
         subtitle={review ? `${review.certification.code} — ${review.certification.name}` : `Attempt #${sessionId}`}
       />
 
-      {/* Score card */}
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <p className={`text-6xl font-bold ${scoreColor}`}>{Math.round(score)}%</p>
-        <p className="mt-1 text-sm text-gray-500">Your Score</p>
+      {/* Score hero */}
+      <div
+        style={{
+          background: passed ? 'rgba(29,155,94,0.12)' : 'rgba(224,69,60,0.12)',
+          borderRadius: '12px',
+          border: `1px solid ${passed ? 'rgba(29,155,94,0.4)' : 'rgba(224,69,60,0.4)'}`,
+          padding: '40px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+            fontSize: '72px',
+            fontWeight: 700,
+            color: passed ? '#1d9b5e' : '#e0453c',
+            lineHeight: 1,
+            letterSpacing: '-0.5px',
+            marginBottom: '8px',
+          }}
+        >
+          {Math.round(score)}%
+        </p>
+        <p style={{ fontSize: '12px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
+          Your Score
+        </p>
 
-        <div className="mt-4 flex justify-center gap-3">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
           <span
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-              passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-            }`}
+            style={{
+              padding: '6px 20px',
+              borderRadius: '6px',
+              border: `1px solid ${passed ? 'rgba(29,155,94,0.5)' : 'rgba(224,69,60,0.5)'}`,
+              color: passed ? '#1d9b5e' : '#e0453c',
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '-0.12px',
+            }}
           >
-            {passed ? '✓ PASS' : '✗ FAIL'}
+            {passed ? 'PASS' : 'FAIL'}
           </span>
-          <span className="rounded-full bg-gray-100 px-4 py-1.5 text-sm text-gray-600">
+          <span
+            style={{
+              padding: '6px 20px',
+              borderRadius: '6px',
+              border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.5)',
+              fontSize: '12px',
+              letterSpacing: '-0.12px',
+            }}
+          >
             {correct} / {total} correct
           </span>
         </div>
@@ -89,34 +133,57 @@ export default function ExamResultPage() {
 
       {/* Review section — only if review data is available */}
       {review && review.questions.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-sm font-semibold text-gray-700">Answer Review</h2>
-          <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+        <div
+          style={{
+            background: '#272729',
+            borderRadius: '12px',
+            padding: '24px',
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '-0.12px',
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: '16px',
+            }}
+          >
+            Answer Review
+          </h2>
+          <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {review.questions.map((q, idx) => {
               const userAnswerIds = review.user_answers[q.id] ?? []
               return (
-                <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0">
-                  <p className="text-sm font-medium text-gray-800">
+                <div key={q.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '16px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#fff', marginBottom: '8px' }}>
                     {idx + 1}. {q.text}
                   </p>
-                  <div className="mt-2 space-y-1">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {q.answers.map((a) => {
                       const isUserAnswer = userAnswerIds.includes(a.id)
-                      const cls = a.is_correct
-                        ? 'text-green-700 font-medium'
-                        : isUserAnswer
-                          ? 'text-red-600'
-                          : 'text-gray-500'
+                      const color = a.is_correct ? '#1d9b5e' : isUserAnswer ? '#e0453c' : 'rgba(255,255,255,0.4)'
                       return (
-                        <p key={a.id} className={`text-xs ${cls}`}>
-                          {a.is_correct ? '✓' : isUserAnswer ? '✗' : ' '} {a.text}
+                        <p key={a.id} style={{ fontSize: '12px', color, fontWeight: a.is_correct ? 600 : 400 }}>
+                          {a.is_correct ? '+ ' : isUserAnswer ? '- ' : '  '}{a.text}
                         </p>
                       )
                     })}
                   </div>
                   {q.explanation && (
-                    <p className="mt-2 rounded bg-blue-50 px-3 py-2 text-xs text-blue-800">
-                      💡 {q.explanation}
+                    <p
+                      style={{
+                        marginTop: '8px',
+                        background: 'rgba(0,113,227,0.1)',
+                        border: '1px solid rgba(0,113,227,0.4)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        color: '#2997ff',
+                        letterSpacing: '-0.12px',
+                      }}
+                    >
+                      {q.explanation}
                     </p>
                   )}
                 </div>
@@ -127,30 +194,34 @@ export default function ExamResultPage() {
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-3">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
         {sessionId && !review && (
           <Link
             to={`/exam/${sessionId}/review`}
-            className="rounded-lg border border-brand-600 px-5 py-2.5 text-sm font-semibold text-brand-600 hover:bg-brand-50"
+            className="btn-ghost"
+            style={{ textDecoration: 'none' }}
           >
             Review Answers
           </Link>
         )}
         <Link
           to="/exam/setup"
-          className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+          className="btn-primary"
+          style={{ textDecoration: 'none' }}
         >
           New Exam
         </Link>
         <Link
           to="/history"
-          className="rounded-lg border px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+          className="btn-ghost"
+          style={{ textDecoration: 'none' }}
         >
           View History
         </Link>
         <Link
           to="/dashboard"
-          className="rounded-lg border px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+          className="btn-ghost"
+          style={{ textDecoration: 'none' }}
         >
           Dashboard
         </Link>

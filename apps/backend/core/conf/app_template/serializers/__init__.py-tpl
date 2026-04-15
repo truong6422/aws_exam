@@ -1,0 +1,1 @@
+from .{{ model_name }} import {{camel_case_model_name}}Serializer, Create{{camel_case_model_name}}Serializer, Update{{camel_case_model_name}}Serializer  # noqa
