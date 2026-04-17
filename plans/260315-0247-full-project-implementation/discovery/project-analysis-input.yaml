@@ -1,0 +1,847 @@
+generated_at: '2026-04-16T13:12:06+00:00'
+root_path: /home/truong/project/aws-exam-app
+scan_mode: deep
+heuristic_summary:
+  project_purpose_guess: Purpose is unclear from static signals. Run deeper discovery
+    and inspect business modules.
+  purpose_confidence: 0.45
+  architecture_guess: Architecture appears mixed or monolithic; deeper scan may be
+    required for precise boundaries.
+  detected_stacks:
+  - Node.js
+  - Containerized
+  dominant_languages:
+  - language: Python
+    files: 192
+  - language: TypeScript
+    files: 56
+  - language: JavaScript
+    files: 2
+  serious_findings:
+  - severity: high
+    message: Missing README. Onboarding and architecture comprehension will be slow.
+    path: null
+  - severity: low
+    message: No CI workflow directory detected (.github/workflows).
+    path: .github/workflows
+scan_stats:
+  files_scanned: 557
+  new_files_scanned: 454
+  directories_scanned: 142
+  top_level_dirs:
+  - apple
+  - apps
+  - automation
+  - data
+  - docker
+  - docs
+  - exam-data
+  - nginx
+  - plans
+  - scripts
+  - skills
+repository_index:
+- path: apps/backend
+  files: 348
+  example: apps/backend/conftest.py
+  role_guess: backend-or-api-surface
+  confidence: 0.74
+- path: plans/reports
+  files: 73
+  example: plans/reports/Explore-260322-1704-pagination-scan.md
+  role_guess: unknown
+  confidence: 0.55
+- path: apps/frontend
+  files: 64
+  example: apps/frontend/index.html
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: plans/260315-0247-full-project-implementation
+  files: 23
+  example: plans/260315-0247-full-project-implementation/phase-01-backend-question-bank.md
+  role_guess: unknown
+  confidence: 0.55
+- path: data/raw
+  files: 4
+  example: data/raw/devcloudly_saa_c03_courses.html
+  role_guess: unknown
+  confidence: 0.55
+- path: docker/frontend
+  files: 2
+  example: docker/frontend/Dockerfile
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: docker/nginx
+  files: 2
+  example: docker/nginx/Dockerfile
+  role_guess: deployment-or-infrastructure
+  confidence: 0.74
+- path: AGENTS.md
+  files: 1
+  example: AGENTS.md
+  role_guess: unknown
+  confidence: 0.55
+- path: CLAUDE.md
+  files: 1
+  example: CLAUDE.md
+  role_guess: unknown
+  confidence: 0.55
+- path: DESIGN.md
+  files: 1
+  example: DESIGN.md
+  role_guess: unknown
+  confidence: 0.55
+- path: ENVIRONMENT-SETUP.md
+  files: 1
+  example: ENVIRONMENT-SETUP.md
+  role_guess: unknown
+  confidence: 0.55
+- path: HEARTBEAT.md
+  files: 1
+  example: HEARTBEAT.md
+  role_guess: unknown
+  confidence: 0.55
+- path: Makefile
+  files: 1
+  example: Makefile
+  role_guess: unknown
+  confidence: 0.55
+- path: docker-compose.dev.yml
+  files: 1
+  example: docker-compose.dev.yml
+  role_guess: deployment-or-infrastructure
+  confidence: 0.74
+- path: docker-compose.prod.yml
+  files: 1
+  example: docker-compose.prod.yml
+  role_guess: deployment-or-infrastructure
+  confidence: 0.74
+- path: docker-compose.test.yml
+  files: 1
+  example: docker-compose.test.yml
+  role_guess: deployment-or-infrastructure
+  confidence: 0.74
+- path: docker-compose.uitest.yml
+  files: 1
+  example: docker-compose.uitest.yml
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: docker-compose.yml
+  files: 1
+  example: docker-compose.yml
+  role_guess: deployment-or-infrastructure
+  confidence: 0.74
+- path: package-lock.json
+  files: 1
+  example: package-lock.json
+  role_guess: unknown
+  confidence: 0.55
+- path: package.json
+  files: 1
+  example: package.json
+  role_guess: unknown
+  confidence: 0.55
+- path: apple/DESIGN.md
+  files: 1
+  example: apple/DESIGN.md
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: automation/aws-exam-app:auto:20260315.json
+  files: 1
+  example: automation/aws-exam-app:auto:20260315.json
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: automation/aws-exam-app:auto:test.json
+  files: 1
+  example: automation/aws-exam-app:auto:test.json
+  role_guess: frontend-or-client-surface
+  confidence: 0.74
+- path: docker/backend
+  files: 1
+  example: docker/backend/Dockerfile
+  role_guess: backend-or-api-surface
+  confidence: 0.74
+- path: docs/PROJECT_SPEC.md
+  files: 1
+  example: docs/PROJECT_SPEC.md
+  role_guess: test-surface
+  confidence: 0.74
+- path: docs/project-context.md
+  files: 1
+  example: docs/project-context.md
+  role_guess: unknown
+  confidence: 0.55
+- path: docs/project-structure-map.md
+  files: 1
+  example: docs/project-structure-map.md
+  role_guess: unknown
+  confidence: 0.55
+- path: docs/repo-map.md
+  files: 1
+  example: docs/repo-map.md
+  role_guess: unknown
+  confidence: 0.55
+- path: docs/sharded
+  files: 1
+  example: docs/sharded/index.md
+  role_guess: unknown
+  confidence: 0.55
+- path: exam-data/CLF-C02
+  files: 1
+  example: exam-data/CLF-C02/questions.json
+  role_guess: unknown
+  confidence: 0.55
+startup_hints:
+- scenario: docker-compose:up
+  command: docker-compose up -d
+  source: docker-compose.yml
+  confidence: 0.84
+- scenario: make:dev
+  command: make dev
+  source: Makefile
+  confidence: 0.82
+key_file_snippets:
+- path: CLAUDE.md
+  snippet: '# CLAUDE.md
+
+
+    ## Project Workflow Context
+
+
+    - Generated at: `2026-04-16T13:12:06+00:00`
+
+    - Workflow project type: `maintenance`
+
+    - Workflow track: `default`
+
+
+    ## Project Context
+
+
+    - Full context: `docs/project-context.md`
+
+    - Architecture: `docs/project-architecture.md`
+
+    - Spec & acceptance criteria: `docs/project-spec.md`
+
+
+    ## Working Agreements
+
+
+    1. Run `/workflow-status --sync` before major work.
+
+    2. Run major steps in fresh sessions: `/plan`, `/cook`, `/fix`, `/debug`, `/test`,
+    `/code-review`, `/git`.
+
+    3. For brownfield discovery, run `/document-project` before planning.
+
+    4. For medium/large/hotfix work, run `/check-readiness` before `/cook`.
+
+
+    ## Non-Negotiable Engineering Guardrails
+
+
+    <!-- WORKFLOW-GUARDRAILS-START -->
+
+    1. No hard-coded secrets/config:
+
+    - Never hard-code API keys, tokens, passwords, DSN, or env-specific endpoints.
+
+    - Use environment variables or secure config providers.
+
+    2. Lint and conventions are mandatory:
+
+    - Do not mark work done unless lint/style/convention checks pass.
+
+    3. Typecheck and build are mandatory when applicable:
+
+    - Changes that affect typed/buildable code must pass typecheck and build.
+
+    4. Tests are mandatory when applicable:
+
+    - New code and changed behavior require passing tests for impacted scope.
+
+    5. Security baseline is mandatory:
+
+    - Run secret scan and dependency audit before release/review sign-off.
+
+    6. Evidence before completion claim:
+
+    - Never claim \"done\" without command outputs showing pass status.
+
+    <!-- WORKFLOW-GUARDRAILS-END -->
+
+
+    ## Notes
+
+
+    - Keep this file concise and project-specific.
+
+    - Add architecture and build/test conventions below this section.
+
+
+    <!-- WORKFLOW-INJECT-START -->
+
+    ## Workflow Inject (Auto)
+
+    - Updated at: `2026-04-16T13:12:06+00:00`
+
+    - Project type: `maintenance`
+
+    - Track: `default`
+
+    - Session guidance: start a fresh session for major workflow steps.
+
+    <!-- WORKFLOW-INJECT-END -->'
+- path: AGENTS.md
+  snippet: '# AGENTS.md
+
+
+    ## Project Workflow Context
+
+
+    - Generated at: `2026-04-16T13:12:06+00:00`
+
+    - Workflow project type: `maintenance`
+
+    - Workflow track: `default`
+
+
+    ## Project Context
+
+
+    - Full context: `docs/project-context.md`
+
+    - Architecture: `docs/project-architecture.md`
+
+    - Spec & acceptance criteria: `docs/project-spec.md`
+
+
+    ## Working Agreements
+
+
+    1. Run `/workflow-status --sync` before major work.
+
+    2. Run major steps in fresh sessions: `/plan`, `/cook`, `/fix`, `/debug`, `/test`,
+    `/code-review`, `/git`.
+
+    3. For brownfield discovery, run `/document-project` before planning.
+
+    4. For medium/large/hotfix work, run `/check-readiness` before `/cook`.
+
+
+    ## Non-Negotiable Engineering Guardrails
+
+
+    <!-- WORKFLOW-GUARDRAILS-START -->
+
+    1. No hard-coded secrets/config:
+
+    - Never hard-code API keys, tokens, passwords, DSN, or env-specific endpoints.
+
+    - Use environment variables or secure config providers.
+
+    2. Lint and conventions are mandatory:
+
+    - Do not mark work done unless lint/style/convention checks pass.
+
+    3. Typecheck and build are mandatory when applicable:
+
+    - Changes that affect typed/buildable code must pass typecheck and build.
+
+    4. Tests are mandatory when applicable:
+
+    - New code and changed behavior require passing tests for impacted scope.
+
+    5. Security baseline is mandatory:
+
+    - Run secret scan and dependency audit before release/review sign-off.
+
+    6. Evidence before completion claim:
+
+    - Never claim "done" without command outputs showing pass status.
+
+    <!-- WORKFLOW-GUARDRAILS-END -->
+
+
+    ## Notes
+
+
+    - Keep this file concise and project-specific.
+
+    - Add architecture and build/test conventions below this section.
+
+
+    <!-- WORKFLOW-INJECT-START -->
+
+    ## Workflow Inject (Auto)
+
+    - Updated at: `2026-04-16T13:12:06+00:00`
+
+    - Project type: `maintenance`
+
+    - Track: `default`
+
+    - Session guidance: start a fresh session for major workflow steps.
+
+    <!-- WORKFLOW-INJECT-END -->'
+- path: package.json
+  snippet: "{\n  \"devDependencies\": {\n    \"playwright\": \"^1.58.2\"\n  }\n}"
+- path: docker-compose.yml
+  snippet: "# Production compose — all services behind nginx reverse proxy.\n# Requires\
+    \ a fully populated .env at the repo root.\n\nservices:\n  db:\n    image: postgres:16-alpine\n\
+    \    restart: unless-stopped\n    environment:\n      POSTGRES_DB: ${POSTGRES_DB}\n\
+    \      POSTGRES_USER: ${POSTGRES_USER}\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}\n\
+    \    volumes:\n      - postgres_data:/var/lib/postgresql/data\n    networks:\n\
+    \      - backend_net\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready\
+    \ -U ${POSTGRES_USER} -d ${POSTGRES_DB}\"]\n      interval: 10s\n      timeout:\
+    \ 5s\n      retries: 5\n\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n\
+    \    command: redis-server --appendonly yes\n    volumes:\n      - redis_data:/data\n\
+    \    networks:\n      - backend_net\n    healthcheck:\n      test: [\"CMD\", \"\
+    redis-cli\", \"ping\"]\n      interval: 10s\n      timeout: 5s\n      retries:\
+    \ 5\n\n  api:\n    build:\n      context: .\n      dockerfile: docker/backend/Dockerfile\n\
+    \      target: production\n    restart: unless-stopped\n    env_file: .env\n \
+    \   environment:\n      DJANGO_SETTINGS_MODULE: config.settings.production\n \
+    \     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}\n\
+    \      REDIS_URL: redis://redis:6379/0\n    depends_on:\n      db:\n        condition:\
+    \ service_healthy\n      redis:\n        condition: service_healthy\n    networks:\n\
+    \      - backend_net\n    expose:\n      - \"8000\"\n    # WhiteNoise serves static\
+    \ files — no shared volume required.\n    # Migrations run inside CMD in the Dockerfile.\n\
+    \n  celery:\n    build:\n      context: .\n      dockerfile: docker/backend/Dockerfile\n\
+    \      target: production\n    restart: unless-stopped\n    env_file: .env\n \
+    \   environment:\n      DJANGO_SETTINGS_MODULE: config.settings.production\n \
+    \     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}\n\
+    \      REDIS_URL: redis://redis:6379/0\n    depends_on:\n      db:\n        condition:\
+    \ service_healthy\n      redis:\n        condition: service_healthy\n    networks:\n\
+    \      - backend_net\n    command: celery -A config worker --loglevel=info --concurrency=4\n\
+    \n  frontend:\n    build:\n      context: .\n      dockerfile: docker/frontend/Dockerfile\n\
+    \      target: production\n      args:\n        VITE_API_BASE_URL: /api\n    restart:\
+    \ unless-stopped\n    networks:\n      - frontend_net\n    expose:\n      - \"\
+    80\"\n\n  nginx:\n    build:\n      context: .\n      dockerfile: docker/nginx/Dockerfile\n\
+    \    restart: unless-stopped\n    ports:\n      - \"${NGINX_HTTP_PORT:-80}:80\"\
+    \n      - \"${NGINX_HTTPS_PORT:-443}:443\"\n    depends_on:\n      - api\n   \
+    \   - frontend\n    networks:\n      - backend_net\n      - frontend_net\n   \
+    \ volumes:\n      - ./docker/nginx/ssl:/etc/nginx/ssl:ro  # mount TLS certs in\
+    \ production\n\nvolumes:\n  postgres_data:\n  redis_data:\n\nnetworks:\n  # api,\
+    \ celery, db, redis share this internal network\n  backend_net:\n  # nginx and\
+    \ frontend share this internal network\n  frontend_net:"
+- path: package-lock.json
+  snippet: "{\n  \"name\": \"aws-exam-app\",\n  \"lockfileVersion\": 3,\n  \"requires\"\
+    : true,\n  \"packages\": {\n    \"\": {\n      \"devDependencies\": {\n      \
+    \  \"playwright\": \"^1.58.2\"\n      }\n    },\n    \"node_modules/fsevents\"\
+    : {\n      \"version\": \"2.3.2\",\n      \"resolved\": \"https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz\"\
+    ,\n      \"integrity\": \"sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==\"\
+    ,\n      \"dev\": true,\n      \"hasInstallScript\": true,\n      \"license\"\
+    : \"MIT\",\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n \
+    \     ],\n      \"engines\": {\n        \"node\": \"^8.16.0 || ^10.6.0 || >=11.0.0\"\
+    \n      }\n    },\n    \"node_modules/playwright\": {\n      \"version\": \"1.58.2\"\
+    ,\n      \"resolved\": \"https://registry.npmjs.org/playwright/-/playwright-1.58.2.tgz\"\
+    ,\n      \"integrity\": \"sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"Apache-2.0\",\n      \"dependencies\"\
+    : {\n        \"playwright-core\": \"1.58.2\"\n      },\n      \"bin\": {\n   \
+    \     \"playwright\": \"cli.js\"\n      },\n      \"engines\": {\n        \"node\"\
+    : \">=18\"\n      },\n      \"optionalDependencies\": {\n        \"fsevents\"\
+    : \"2.3.2\"\n      }\n    },\n    \"node_modules/playwright-core\": {\n      \"\
+    version\": \"1.58.2\",\n      \"resolved\": \"https://registry.npmjs.org/playwright-core/-/playwright-core-1.58.2.tgz\"\
+    ,\n      \"integrity\": \"sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"Apache-2.0\",\n      \"bin\": {\n\
+    \        \"playwright-core\": \"cli.js\"\n      },\n      \"engines\": {\n   \
+    \     \"node\": \">=18\"\n      }\n    }\n  }\n}"
+- path: apps/frontend/package-lock.json
+  snippet: "{\n  \"name\": \"aws-exam-app-frontend\",\n  \"version\": \"0.1.0\",\n\
+    \  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\"\
+    : {\n      \"name\": \"aws-exam-app-frontend\",\n      \"version\": \"0.1.0\"\
+    ,\n      \"dependencies\": {\n        \"@sentry/react\": \"^8.55.0\",\n      \
+    \  \"@sentry/tracing\": \"^7.120.4\",\n        \"clsx\": \"^2.1.1\",\n       \
+    \ \"react\": \"^18.3.1\",\n        \"react-dom\": \"^18.3.1\",\n        \"react-router-dom\"\
+    : \"^6.26.2\",\n        \"zustand\": \"^4.5.5\"\n      },\n      \"devDependencies\"\
+    : {\n        \"@testing-library/jest-dom\": \"^6.9.1\",\n        \"@testing-library/react\"\
+    : \"^16.3.2\",\n        \"@testing-library/user-event\": \"^14.6.1\",\n      \
+    \  \"@types/react\": \"^18.3.5\",\n        \"@types/react-dom\": \"^18.3.0\",\n\
+    \        \"@vitejs/plugin-react\": \"^4.3.1\",\n        \"autoprefixer\": \"^10.4.20\"\
+    ,\n        \"eslint\": \"^9.9.0\",\n        \"jsdom\": \"^29.0.1\",\n        \"\
+    postcss\": \"^8.4.44\",\n        \"tailwindcss\": \"^3.4.11\",\n        \"typescript\"\
+    : \"^5.5.3\",\n        \"vite\": \"^5.4.2\",\n        \"vitest\": \"^4.1.0\"\n\
+    \      }\n    },\n    \"node_modules/@adobe/css-tools\": {\n      \"version\"\
+    : \"4.4.4\",\n      \"resolved\": \"https://registry.npmjs.org/@adobe/css-tools/-/css-tools-4.4.4.tgz\"\
+    ,\n      \"integrity\": \"sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\"\n    },\n    \"node_modules/@alloc/quick-lru\"\
+    : {\n      \"version\": \"5.2.0\",\n      \"resolved\": \"https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz\"\
+    ,\n      \"integrity\": \"sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\",\n      \"engines\": {\n \
+    \       \"node\": \">=10\"\n      },\n      \"funding\": {\n        \"url\": \"\
+    https://github.com/sponsors/sindresorhus\"\n      }\n    },\n    \"node_modules/@asamuzakjp/css-color\"\
+    : {\n      \"version\": \"5.0.1\",\n      \"resolved\": \"https://registry.npmjs.org/@asamuzakjp/css-color/-/css-color-5.0.1.tgz\"\
+    ,\n      \"integrity\": \"sha512-2SZFvqMyvboVV1d15lMf7XiI3m7SDqXUuKaTymJYLN6dSGadqp+fVojqJlVoMlbZnlTmu3S0TLwLTJpvBMO1Aw==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\",\n      \"dependencies\":\
+    \ {\n        \"@csstools/css-calc\": \"^3.1.1\",\n        \"@csstools/css-color-parser\"\
+    : \"^4.0.2\",\n        \"@csstools/css-parser-algorithms\": \"^4.0.0\",\n    \
+    \    \"@csstools/css-tokenizer\": \"^4.0.0\",\n        \"lru-cache\": \"^11.2.6\"\
+    \n      },\n      \"engines\": {\n        \"node\": \"^20.19.0 || ^22.12.0 ||\
+    \ >=24.0.0\"\n      }\n    },\n    \"node_modules/@asamuzakjp/css-color/node_modules/lru-cache\"\
+    : {\n      \"version\": \"11.2.7\",\n      \"resolved\": \"https://registry.npmjs.org/lru-cache/-/lru-cache-11.2.7.tgz\"\
+    ,\n      \"integrity\": \"sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"BlueOak-1.0.0\",\n      \"engines\"\
+    : {\n        \"node\": \"20 || >=22\"\n      }\n    },\n    \"node_modules/@asamuzakjp/dom-selector\"\
+    : {\n      \"version\": \"7.0.4\",\n      \"resolved\": \"https://registry.npmjs.org/@asamuzakjp/dom-selector/-/dom-selector-7.0.4.tgz\"\
+    ,\n      \"integrity\": \"sha512-jXR6x4AcT3eIrS2fSNAwJpwirOkGcd+E7F7CP3zjdTqz9B/2huHOL8YJZBgekKwLML+u7qB/6P1LXQuMScsx0w==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\",\n      \"dependencies\":\
+    \ {\n        \"@asamuzakjp/nwsapi\": \"^2.3.9\",\n        \"bidi-js\": \"^1.0.3\"\
+    ,\n        \"css-tree\": \"^3.2.1\",\n        \"is-potential-custom-element-name\"\
+    : \"^1.0.1\",\n        \"lru-cache\": \"^11.2.7\"\n      },\n      \"engines\"\
+    : {\n        \"node\": \"^20.19.0 || ^22.12.0 || >=24.0.0\"\n      }\n    },\n\
+    \    \"node_modules/@asamuzakjp/dom-selector/node_modules/lru-cache\": {\n   \
+    \   \"version\": \"11.2.7\",\n      \"resolved\": \"https://registry.npmjs.org/lru-cache/-/lru-cache-11.2.7.tgz\"\
+    ,\n      \"integrity\": \"sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"BlueOak-1.0.0\",\n      \"engines\"\
+    : {\n        \"node\": \"20 || >=22\"\n      }\n    },\n    \"node_modules/@asamuzakjp/nwsapi\"\
+    : {\n      \"version\": \"2.3.9\",\n      \"resolved\": \"https://registry.npmjs.org/@asamuzakjp/nwsapi/-/nwsapi-2.3.9.tgz\"\
+    ,\n      \"integrity\": \"sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\"\n    },\n    \"node_modules/@babel/code-frame\"\
+    : {\n      \"version\": \"7.29.0\",\n      \"resolved\": \"https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.29.0.tgz\"\
+    ,\n      \"integrity\": \"sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==\"\
+    ,\n      \"dev\": true,\n      \"license\": \"MIT\",\n      \"dependencies\":\
+    \ {\n        \"@babel/helper-validator-identifier\": \"^7.28.5\",\n        \"\
+    js-tokens\": \"^4.0.0\",\n        \"picocolors\": \"^1.1.1\"\n      },\n     \
+    \ \"engines\": {\n        \"node\": \">=6.9.0\"\n      }\n    },\n    \"node_modules/@babel/compat-data\"\
+    : {\n      \"version\": \"7.29.0\",\n      \"resolved\": \"https://registry.npmjs.org/@babel/compat-data/-/compat-data-7.29.0.tgz\"\
+    ,\n      \"integrity\": \"sha512-T1NCJqT/j9+cn8fvkt7jtwbLBfLC/1y1c7NtCeXFRgzGTsafi68MRv8yzkYSapBnFA6L3U2VSc02ciD"
+- path: apps/frontend/package.json
+  snippet: "{\n  \"name\": \"aws-exam-app-frontend\",\n  \"private\": true,\n  \"\
+    version\": \"0.1.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\"\
+    : \"vite\",\n    \"build\": \"tsc -b && vite build\",\n    \"lint\": \"eslint\
+    \ . --ext ts,tsx --report-unused-disable-directives --max-warnings 0\",\n    \"\
+    preview\": \"vite preview\",\n    \"typecheck\": \"tsc --noEmit\",\n    \"test\"\
+    : \"vitest run\",\n    \"test:watch\": \"vitest\"\n  },\n  \"dependencies\": {\n\
+    \    \"@sentry/react\": \"^8.55.0\",\n    \"@sentry/tracing\": \"^7.120.4\",\n\
+    \    \"clsx\": \"^2.1.1\",\n    \"react\": \"^18.3.1\",\n    \"react-dom\": \"\
+    ^18.3.1\",\n    \"react-router-dom\": \"^6.26.2\",\n    \"zustand\": \"^4.5.5\"\
+    \n  },\n  \"devDependencies\": {\n    \"@testing-library/jest-dom\": \"^6.9.1\"\
+    ,\n    \"@testing-library/react\": \"^16.3.2\",\n    \"@testing-library/user-event\"\
+    : \"^14.6.1\",\n    \"@types/react\": \"^18.3.5\",\n    \"@types/react-dom\":\
+    \ \"^18.3.0\",\n    \"@vitejs/plugin-react\": \"^4.3.1\",\n    \"autoprefixer\"\
+    : \"^10.4.20\",\n    \"eslint\": \"^9.9.0\",\n    \"jsdom\": \"^29.0.1\",\n  \
+    \  \"postcss\": \"^8.4.44\",\n    \"tailwindcss\": \"^3.4.11\",\n    \"typescript\"\
+    : \"^5.5.3\",\n    \"vite\": \"^5.4.2\",\n    \"vitest\": \"^4.1.0\"\n  }\n}"
+- path: docker/backend/Dockerfile
+  snippet: "# Backend Dockerfile — multi-stage build\n# Stages:\n#   base        →\
+    \ shared OS deps + Python env\n#   development → base + dev/test tools, no source\
+    \ copy (bind-mounted at runtime)\n#   production  → base + source copy + prod\
+    \ deps, lean final image\n\n# ── base ──────────────────────────────────────────────────────────────────────\n\
+    FROM python:3.12-slim AS base\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\
+    \ \\\n    PIP_NO_CACHE_DIR=1 \\\n    PIP_DISABLE_PIP_VERSION_CHECK=1\n\n# System\
+    \ packages required by psycopg2, Pillow, and Channels\nRUN apt-get update && apt-get\
+    \ install -y --no-install-recommends \\\n        build-essential \\\n        libpq-dev\
+    \ \\\n        curl \\\n    && rm -rf /var/lib/apt/lists/*\n\nWORKDIR /app\n\n\
+    # ── development ───────────────────────────────────────────────────────────────\n\
+    FROM base AS development\n\n# Install base + dev deps (includes pytest, ruff,\
+    \ debug-toolbar, etc.)\nCOPY apps/backend/requirements/base.txt requirements/base.txt\n\
+    COPY apps/backend/requirements/dev.txt  requirements/dev.txt\nRUN pip install\
+    \ --upgrade pip && pip install -r requirements/dev.txt\n\n# Source is bind-mounted\
+    \ at runtime — no COPY needed here.\nEXPOSE 8000\nCMD [\"python\", \"manage.py\"\
+    , \"runserver\", \"0.0.0.0:8000\"]\n\n# ── production ────────────────────────────────────────────────────────────────\n\
+    FROM base AS production\n\n# Install base + prod deps (gunicorn, whitenoise, sentry-sdk)\n\
+    COPY apps/backend/requirements/base.txt requirements/base.txt\nCOPY apps/backend/requirements/prod.txt\
+    \ requirements/prod.txt\nRUN pip install --upgrade pip && pip install -r requirements/prod.txt\n\
+    \n# Copy application source after deps so source changes don't bust the pip layer\n\
+    COPY apps/backend/ .\n\n# Non-root user for security\nRUN groupadd --gid 1001\
+    \ appuser && \\\n    useradd  --uid 1001 --gid appuser --shell /bin/bash --create-home\
+    \ appuser && \\\n    chown -R appuser:appuser /app\n\nUSER appuser\n\nEXPOSE 8000\n\
+    # WhiteNoise serves static files directly from the app — no collectstatic volume\
+    \ needed.\n# Migrations run here so the container is self-contained on first start.\n\
+    CMD [\"sh\", \"-c\", \"python manage.py migrate --noinput && gunicorn config.wsgi:application\
+    \ --bind 0.0.0.0:8000 --workers 4 --timeout 120\"]"
+- path: docker/frontend/Dockerfile
+  snippet: '# Frontend Dockerfile — multi-stage build
+
+    # Stages:
+
+    #   deps        → install node_modules (layer-cached)
+
+    #   development → deps stage, source bind-mounted at runtime, Vite HMR
+
+    #   builder     → full build producing /app/dist
+
+    #   production  → nginx:alpine serving the static /dist bundle
+
+
+    # ── deps ──────────────────────────────────────────────────────────────────────
+
+    FROM node:20-alpine AS deps
+
+
+    WORKDIR /app
+
+
+    # Copy only the manifest — no package-lock.json in this project
+
+    COPY apps/frontend/package.json ./
+
+    # npm install instead of npm ci (no lockfile present)
+
+    RUN npm install
+
+
+    # ── development ───────────────────────────────────────────────────────────────
+
+    FROM deps AS development
+
+
+    # Source is bind-mounted at runtime; no full COPY here.
+
+    EXPOSE 5173
+
+    CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+
+
+    # ── builder ───────────────────────────────────────────────────────────────────
+
+    FROM deps AS builder
+
+
+    COPY apps/frontend/ .
+
+
+    # Accept build-time env vars (e.g. VITE_API_BASE_URL)
+
+    ARG VITE_API_BASE_URL=/api
+
+    ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
+
+    RUN npm run build
+
+
+    # ── production ────────────────────────────────────────────────────────────────
+
+    FROM nginx:1.27-alpine AS production
+
+
+    # Remove default nginx site; main proxy config lives in the nginx service
+
+    RUN rm /etc/nginx/conf.d/default.conf
+
+
+    # Copy built static assets
+
+    COPY --from=builder /app/dist /usr/share/nginx/html
+
+
+    # Lightweight config: serve /usr/share/nginx/html, defer API proxying to
+
+    # the dedicated nginx reverse-proxy container.
+
+    COPY docker/frontend/nginx-spa.conf /etc/nginx/conf.d/default.conf
+
+
+    EXPOSE 80
+
+    CMD ["nginx", "-g", "daemon off;"]'
+- path: docker/nginx/Dockerfile
+  snippet: '# Nginx reverse-proxy Dockerfile
+
+    # Copies nginx.conf into a lean nginx:alpine image.
+
+    # SSL certs are mounted at runtime via a volume (see docker-compose.yml).
+
+
+    FROM nginx:1.27-alpine
+
+
+    # Remove default config
+
+    RUN rm /etc/nginx/conf.d/default.conf
+
+
+    COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+
+    EXPOSE 80 443
+
+    CMD ["nginx", "-g", "daemon off;"]'
+- path: nginx/Dockerfile
+  snippet: '# nginx/Dockerfile — multi-stage build
+
+    # Stage 1: build the React SPA
+
+    # Stage 2: nginx:alpine serving the SPA + proxying /api/ to Django
+
+    #
+
+    # Used by docker-compose.prod.yml.
+
+    # The full production nginx (TLS + separate frontend container) lives in
+
+    # docker/nginx/Dockerfile — this is the simplified single-container variant.
+
+
+    # ── frontend-build ────────────────────────────────────────────────────────────
+
+    FROM node:20-alpine AS frontend-build
+
+
+    WORKDIR /app
+
+
+    # Copy manifests first for layer caching
+
+    COPY apps/frontend/package*.json ./
+
+    RUN npm install
+
+
+    # Copy source and build
+
+    COPY apps/frontend/ ./
+
+    RUN npm run build
+
+
+    # ── nginx ─────────────────────────────────────────────────────────────────────
+
+    FROM nginx:alpine
+
+
+    # Remove default nginx config
+
+    RUN rm /etc/nginx/conf.d/default.conf
+
+
+    # Copy built React SPA
+
+    COPY --from=frontend-build /app/dist /usr/share/nginx/html
+
+
+    # Copy nginx site config
+
+    COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+
+    EXPOSE 80
+
+    CMD ["nginx", "-g", "daemon off;"]'
+- path: apps/backend/core/authentication/README.md
+  snippet: "JWTAuthentication\n================\nOverride djangorestframework-simplejwt\
+    \ library\nAdd signal auto add created_by, updated_by, deleted_by\n\n```python\n\
+    poetry add djangorestframework-simplejwt\n```\n```python\n'DEFAULT_AUTHENTICATION_CLASSES':\
+    \ [\n    'core.authentication.ApiJWTAuthentication',\n],\n```"
+- path: apps/backend/core/autoslug/README.md
+  snippet: 'Django AutoSlug
+
+    ================
+
+    Override django-autoslug library
+
+
+    Convert non-latin languages to latin then using as slug
+
+
+    Add to django settings file
+
+    ```python
+
+    AUTOSLUG_SLUGIFY_FUNCTION = ''core.autoslug.utils.slugify''
+
+    ```'
+- path: apps/backend/core/conf/project_template/Dockerfile
+  snippet: "# Define base image as python slim-buster.\nFROM python:3.10-slim-buster\
+    \ AS base\n\nENV PYTHONUNBUFFERED=1\nENV PYTHONDONTWRITEBYTECODE=1\nENV DJANGO_SETTINGS_MODULE={{\
+    \ project_name }}.settings\n\n# This is the first stage of the build.\n# It will\
+    \ install all requirements.\nRUN apt-get update && \\\n    apt-get install libpq-dev\
+    \ python3-dev -y && \\\n    apt-get install -y xvfb gnupg wget curl unzip g++\
+    \ build-essential --no-install-recommends && \\\n    apt-get clean\n\n# Install\
+    \ poetry\nRUN pip install --no-cache-dir setuptools poetry\n\n# Copy in the config\
+    \ files\nCOPY pyproject.toml poetry.lock ./\n\n# Define the base directory\nWORKDIR\
+    \ /BE\nCOPY . .\n\n# Install only dependencies\nRUN poetry install --no-root --only\
+    \ main\n\nEXPOSE 8000\n\nCMD [\"chmod\", \"+x\", \"/BE/start.sh\"]\nENTRYPOINT\
+    \ [\"sh\", \"/BE/start.sh\"]"
+- path: apps/backend/core/conf/project_template/docker-compose.yml
+  snippet: "version: '3.9'\nservices:\n  be:\n    build: .\n    volumes:\n      -\
+    \ '.:/BE'\n    ports:\n      - '8000:8000'\n      - '5555:5555'\n    env_file:\n\
+    \      - .env\n    restart: always\n    container_name: be\n    depends_on:\n\
+    \      - db\n      - redis\n      - memcached\n    expose:\n      - '8000'\n\n\
+    \  db:\n    image: 'postgres:14.5'\n    command: postgres -c shared_buffers=256MB\
+    \ -c max_connections=200\n    environment:\n      POSTGRES_USER: postgres\n  \
+    \    POSTGRES_PASSWORD: postgres\n    volumes:\n      - 'postgresql:/var/lib/postgresql'\n\
+    \      - 'postgresql_data:/var/lib/postgresql/data'\n    restart: on-failure\n\
+    \    container_name: db\n    ports:\n      - '5433:5432'\n\n  redis:\n    image:\
+    \ redis:6.2.5-alpine\n    container_name: redis\n    ports:\n      - \"6380:6379\"\
+    \n    command: redis-server --appendonly yes\n    restart: always\n    volumes:\n\
+    \      - cache:/var/lib/redis/data\n\n  memcached:\n    image: bitnami/memcached\n\
+    \    container_name: memcached\n    ports:\n      - \"11211:11211\"\n    entrypoint:\n\
+    \    - memcached\n    - -m 64\n    restart: always\n    volumes:\n      - cache:/var/lib/memcached/data\n\
+    \n  nginx:\n    build: ./nginx\n    volumes:\n      - \".:/BE/\"\n    ports:\n\
+    \      - \"8080:80\"\n    depends_on:\n      - be\n\nvolumes:\n  postgresql: null\n\
+    \  postgresql_data: null\n  cache: null"
+- path: apps/backend/core/conf/project_template/nginx/Dockerfile
+  snippet: 'FROM nginx:1.21-alpine
+
+
+    RUN rm /etc/nginx/conf.d/default.conf
+
+    COPY nginx.conf /etc/nginx/conf.d
+
+    COPY .htpasswd /etc/nginx'
+- path: apps/backend/core/extra_fields/README.md
+  snippet: "Extra Fields for Django Rest Framework\n================\n\nFields:\n\
+    ----------------\n\n\n## Base64ImageField\n\nAn image representation for Base64ImageField\n\
+    \nInherited from `ImageField`\n\n\n**Signature:** `Base64ImageField()`\n\n - It\
+    \ takes a base64 image as a string.\n - A base64 image:  `data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7`\n\
+    \ - Base64ImageField accepts the entire string or just the part after base64,\
+    \ `R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7`\n - It takes the\
+    \ optional parameter `represent_in_base64` (`False` by default), if set to `True`\
+    \ it will allow for base64-encoded downloads of an `ImageField`.\n - You can inherit\
+    \ the `Base64ImageField` class and set allowed extensions (`ALLOWED_TYPES` list),\
+    \ or customize the validation messages (`INVALID_FILE_MESSAGE`, `INVALID_TYPE_MESSAGE`)\n\
+    \n\n**Example:**\n\n```python\n# serializer\n\nfrom core.extra_fields import Base64ImageField\n\
+    \nclass UploadedBase64ImageSerializer(serializers.Serializer):\n    file = Base64ImageField(required=False)\n\
+    \    created = serializers.DateTimeField()\n\n# use the serializer\nfile = 'R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='\n\
+    serializer = UploadedBase64ImageSerializer(data={'created': now, 'file': file})\n\
+    ```\n\n\n## Base64FileField\n\nA file representation for Base64FileField\n\nInherited\
+    \ from `FileField`\n\n\n**Signature:** `Base64FileField()`\n\n - It takes a base64\
+    \ file as a string.\n - Other options like for `Base64ImageField`\n - You have\
+    \ to provide your own full implementation of this class. You have to implement\
+    \ file validation in `get_file_extension` method and set `ALLOWED_TYPES` list.\n\
+    \n\n**Example:**\n\n```python\nclass PDFBase64File(Base64FileField):\n    ALLOWED_TYPES\
+    \ = ['pdf']\n\n    def get_file_extension(self, filename, decoded_file):\n   \
+    \     try:\n            PyPDF2.PdfFileReader(io.BytesIO(decoded_file))\n     \
+    \   except PyPDF2.utils.PdfReadError as e:\n            logger.warning(e)\n  \
+    \      else:\n            return 'pdf'\n```\n\n\n## PointField\n\nPoint field\
+    \ for GeoDjango\n\n\n**Signature:** `PointField()`\n\n - It takes a dictionary\
+    \ contains latitude and longitude keys like below\n\n    {\n     \"latitude\"\
+    : 49.8782482189424,\n     \"longitude\": 24.452545489\n    }\n - It takes the\
+    \ optional parameter `str_points` (False by default), if set to True it serializes\
+    \ the longitude/latitude\n values as strings\n - It takes the optional parameter\
+    \ `srid` (None by default), if set the Point created object will have its srid\
+    \ attribute set to the same value.\n\n**Example:**\n\n```python\n# serializer\n\
+    \nfrom from core.extra_fields import PointField\n\nclass PointFieldSerializer(serializers.Serializer):\n\
+    \    point = PointField(required=False)\n    created = serializers.DateTimeField()\n\
+    \n# use the serializer\npoint = {\n    \"latitude\": 49.8782482189424,\n    \"\
+    longitude\": 24.452545489\n    }\nserializer = PointFieldSerializer(data={'created':\
+    \ now, 'point': point})\n```\n\n\n# RangeField\n\nThe Range Fields map to Django's\
+    \ PostgreSQL specific [Range Fields](https://docs.djangoproject.com/en/stable/ref/contrib/postgres/fields/#range-fields).\n\
+    \nEach accepts an optional parameter `child_attrs`, which allows passing parameters\
+    \ to the child field.\n\nFor example, calling `IntegerRangeField(child_attrs={\"\
+    allow_null\": True})` allows deserializing data with a null value for `lower`\
+    \ and/or `upper`:\n\n```python\nfrom rest_framework import serializers\nfrom core.extra_fields\
+    \ import IntegerRangeField\n\n\nclass RangeSerializer(serializers.Serializer):\n\
+    \    ranges = IntegerRangeField(child_attrs={\"allow_null\": True})\n\n\nserializer\
+    \ = RangeSerializer(data={'ranges': {'lower': 0, 'upper': None}})\n\n```\n\n##\
+    \ IntegerRangeField\n\n```python\nfrom rest_framework import serializers\nfrom\
+    \ core.extra_fields import IntegerRangeField\n\n\nclass RangeSerializer(serializers.Serializer):\n\
+    \    ranges = IntegerRangeField()\n\n\nserializer = RangeSerializer(data={'ranges':\
+    \ {'lower': 0, 'upper': 1}})\n\n```\n\n## FloatRangeField\n\n```python\nfrom rest_framework\
+    \ import serializers\nfrom core.extra_fields import FloatRangeField\n\n\nclass\
+    \ RangeSerializer(serializers.Serializer):\n    ranges = FloatRangeField()\n\n\
+    \nserializer = RangeSerializer(data={'ranges': {'lower': 0., 'upper': 1.}})\n\n\
+    ```\n\n## DecimalRangeField\n\n```python\nfrom rest_framework import serializers\n\
+    from core.extra_fields import DecimalRangeField\n\n\nclass RangeSerializer(serializers.Serializer):\n\
+    \    ranges = DecimalRangeField()\n\n\nserializer = RangeSerializer(data={'ranges':\
+    \ {'lower': 0., 'upper': 1.}}, )\n\n```\n\n## DateRangeField\n\n```python\nimport\
+    \ datetime\n\nfrom rest_framework import serializers\nfrom drf_extra_fields.fields\
+    \ import DateRangeField\n\n\nclass RangeSerializer(serializers.Serializer):\n\
+    \    ranges = DateRangeField()\n\n\nserializer = RangeSerializer(data={'ranges':\
+    \ {'lower': datetime.date(2015, 1, 1), 'upper': datetime.date(2015, 2, 1)}})\n\
+    \n```\n\n## DateTimeRangeField\n\n```python\nimport datetime\n\nfrom rest_framework\
+    \ import serializers\nfrom core.extra_fields import DateTimeRangeField\n\n\nclass\
+    \ RangeSerializer(serializers.Serializer):\n    ranges = DateTimeRangeFie"

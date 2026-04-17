@@ -82,18 +82,18 @@ const LogoutIcon = () => (
 )
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',  to: '/dashboard',     icon: <DashIcon /> },
-  { label: 'Take Exam',  to: '/exam/setup',    icon: <ExamIcon /> },
-  { label: 'Practice',   to: '/practice/setup',icon: <PracticeIcon /> },
-  { label: 'History',    to: '/history',        icon: <HistoryIcon /> },
-  { label: 'Analytics',  to: '/analytics',      icon: <AnalyticsIcon /> },
+  { label: 'Bảng điều khiển', to: '/dashboard',     icon: <DashIcon /> },
+  { label: 'Thi thử',         to: '/exam/setup',    icon: <ExamIcon /> },
+  { label: 'Luyện tập',       to: '/practice/setup',icon: <PracticeIcon /> },
+  { label: 'Lịch sử',         to: '/history',        icon: <HistoryIcon /> },
+  { label: 'Thống kê',        to: '/analytics',      icon: <AnalyticsIcon /> },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: 'Admin',     to: '/admin/dashboard', icon: <AdminIcon /> },
-  { label: 'Users',     to: '/admin/users',     icon: <UsersIcon /> },
-  { label: 'Questions', to: '/admin/questions', icon: <QuestionsIcon /> },
-  { label: 'Import',    to: '/admin/import',    icon: <ImportIcon /> },
+  { label: 'Quản trị',    to: '/admin/dashboard', icon: <AdminIcon /> },
+  { label: 'Người dùng',  to: '/admin/users',     icon: <UsersIcon /> },
+  { label: 'Câu hỏi',     to: '/admin/questions', icon: <QuestionsIcon /> },
+  { label: 'Nhập dữ liệu',to: '/admin/import',    icon: <ImportIcon /> },
 ]
 
 export default function Sidebar() {
@@ -179,7 +179,7 @@ export default function Sidebar() {
           }}
         >
           <span className="shrink-0"><LogoutIcon /></span>
-          {sidebarOpen && <span>Logout</span>}
+          {sidebarOpen && <span>Đăng xuất</span>}
         </button>
       </div>
     </aside>

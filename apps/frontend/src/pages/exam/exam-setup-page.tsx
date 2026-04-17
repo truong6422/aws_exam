@@ -31,7 +31,7 @@ export default function ExamSetupPage() {
     examApi
       .getCertifications()
       .then(setCertifications)
-      .catch(() => addToast({ type: 'error', message: 'Failed to load certifications.' }))
+      .catch(() => addToast({ type: 'error', message: 'Không thể tải danh sách chứng chỉ.' }))
       .finally(() => setLoading(false))
   }, [addToast])
 
@@ -42,7 +42,7 @@ export default function ExamSetupPage() {
       initSession(attempt.id, attempt.questions, attempt.time_remaining_seconds, 'exam')
       navigate(`/exam/${attempt.id}`)
     } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || 'Failed to start exam.' })
+      addToast({ type: 'error', message: (err as Error).message || 'Không thể bắt đầu bài thi.' })
     } finally {
       setStartingId(null)
     }
@@ -66,11 +66,11 @@ export default function ExamSetupPage() {
 
   return (
     <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="New Exam" subtitle="Select a certification to start your timed exam" />
+      <PageHeader title="Bài thi mới" subtitle="Chọn chứng chỉ để bắt đầu bài thi có giới hạn thời gian" />
 
       {certifications.length === 0 ? (
         <div style={cardStyle}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '-0.224px' }}>No certifications available yet.</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '-0.224px' }}>Chưa có chứng chỉ nào.</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
@@ -105,9 +105,9 @@ export default function ExamSetupPage() {
               <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {[
-                    `${cert.time_limit_minutes} min`,
-                    `${cert.total_questions} questions`,
-                    `${cert.passing_score}% to pass`,
+                    `${cert.time_limit_minutes} phút`,
+                    `${cert.total_questions} câu hỏi`,
+                    `${cert.passing_score}% để đạt`,
                   ].map((tag) => (
                     <span
                       key={tag}
@@ -132,7 +132,7 @@ export default function ExamSetupPage() {
                   className="btn-primary"
                   style={{ width: '100%', opacity: startingId !== null ? 0.6 : 1 }}
                 >
-                  {startingId === cert.id ? 'Starting...' : 'Start Exam'}
+                  {startingId === cert.id ? 'Đang bắt đầu...' : 'Bắt đầu thi'}
                 </button>
               </div>
             </div>

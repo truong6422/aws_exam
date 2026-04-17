@@ -1,0 +1,244 @@
+{
+  "provider": "claude",
+  "run_id": "ecb1753c-c55c-4144-8517-8708d49c8c06",
+  "purpose_summary": "AWS certification exam practice platform (commercial SaaS). Delivers timed, graded practice exams for SAA-C03, CLF-C02, DVA-C02, and SOA-C02 certifications. Users authenticate via JWT, attempt questions pulled from a seeded PostgreSQL question bank, and receive scored results with server-enforced timers to prevent cheating.",
+  "purpose_confidence": 0.95,
+  "architecture_overview": "Three-tier containerised monorepo. Backend: Django 4.x + DRF serving REST API at /api/v1/, custom JWT auth (simplejwt override) with Redis token blacklist, Celery worker for async tasks, WhiteNoise for static files, Gunicorn WSGI in production. Frontend: React 18 SPA built with Vite + TypeScript, Tailwind CSS, Zustand state, react-router-dom v6, @sentry/react monitoring. Data layer: PostgreSQL 16 (primary store) + Redis 7 (JWT blacklist + Celery broker). Reverse proxy: Nginx (HTTP/HTTPS) routes /api/* to Django, /* to static React bundle. Two nginx variants exist \u2014 docker/nginx/ (TLS, separate frontend container) and nginx/ (simplified single-container with embedded SPA). Environments: dev (bind-mount hot-reload), test (docker-compose.test.yml), prod (docker-compose.yml). Playwright at repo root for E2E. Exam question data lives as JSON files under exam-data/ and is seeded via Django migrations 0003\u20130006.",
+  "repository_index": [
+    {
+      "path": "apps/backend",
+      "role": "Django REST API \u2014 all backend logic, models, serializers, views, migrations",
+      "confidence": 0.97
+    },
+    {
+      "path": "apps/frontend",
+      "role": "React 18 + Vite + TypeScript SPA \u2014 exam UI, auth flows, result display",
+      "confidence": 0.97
+    },
+    {
+      "path": "apps/backend/core",
+      "role": "Shared Django utilities: custom JWT auth, ModelMixin, autoslug, extra DRF fields",
+      "confidence": 0.93
+    },
+    {
+      "path": "apps/backend/apps/questions",
+      "role": "Questions domain app \u2014 Question/Answer models, exam session, scoring, migrations 0003-0006 seed data",
+      "confidence": 0.92
+    },
+    {
+      "path": "apps/backend/config",
+      "role": "Django settings split (base/development/production), URL root, WSGI/ASGI entry points",
+      "confidence": 0.9
+    },
+    {
+      "path": "exam-data",
+      "role": "Source JSON question banks for SAA-C03, CLF-C02, DVA-C02, SOA-C02 used to populate seed migrations",
+      "confidence": 0.95
+    },
+    {
+      "path": "docker",
+      "role": "Per-service Dockerfiles: backend (multi-stage python:3.12-slim), frontend (node:20-alpine \u2192 nginx), nginx (reverse proxy)",
+      "confidence": 0.95
+    },
+    {
+      "path": "nginx",
+      "role": "Simplified single-container nginx config \u2014 serves SPA and proxies /api/ to Django (used by docker-compose.prod.yml)",
+      "confidence": 0.9
+    },
+    {
+      "path": "docker-compose.yml",
+      "role": "Full production compose: db, redis, api, celery, frontend, nginx with health checks and named networks",
+      "confidence": 0.95
+    },
+    {
+      "path": "docker-compose.dev.yml",
+      "role": "Development compose: bind-mounts for hot-reload, Vite HMR on :5173, Django runserver on :8000",
+      "confidence": 0.9
+    },
+    {
+      "path": "Makefile",
+      "role": "Developer convenience targets: make dev, make test, make build etc.",
+      "confidence": 0.82
+    },
+    {
+      "path": "docs",
+      "role": "Project documentation: PROJECT_SPEC, design standards, code standards, system architecture",
+      "confidence": 0.85
+    },
+    {
+      "path": "plans",
+      "role": "Implementation plan phases, decision logs, and agent reports \u2014 not runtime code",
+      "confidence": 0.88
+    },
+    {
+      "path": "scripts",
+      "role": "Utility scripts including exam question scraper (scripts/scraper.py)",
+      "confidence": 0.85
+    },
+    {
+      "path": "apps/backend/core/authentication",
+      "role": "Custom simplejwt override: ApiJWTAuthentication, Redis-backed token blacklist, created_by/updated_by signals",
+      "confidence": 0.92
+    }
+  ],
+  "key_modules": [
+    {
+      "name": "Questions App",
+      "path": "apps/backend/apps/questions",
+      "responsibility": "Core domain: Question/Answer models, exam session lifecycle, server-side timer enforcement, scoring, result storage. Migrations 0003-0006 seed all four certification question banks.",
+      "confidence": 0.92
+    },
+    {
+      "name": "ApiJWTAuthentication",
+      "path": "apps/backend/core/authentication",
+      "responsibility": "Custom simplejwt override providing Redis-backed token blacklist for logout invalidation, auto-populates created_by/updated_by/deleted_by on models via signals.",
+      "confidence": 0.9
+    },
+    {
+      "name": "Django Config / Settings",
+      "path": "apps/backend/config",
+      "responsibility": "Split settings (base/development/production), root URL conf routing /api/v1/, WSGI entry point for Gunicorn.",
+      "confidence": 0.88
+    },
+    {
+      "name": "Frontend SPA",
+      "path": "apps/frontend/src",
+      "responsibility": "React 18 exam UI: question rendering, countdown timer display, answer submission, result pages. Zustand for client state, react-router-dom for navigation, Sentry for error tracking.",
+      "confidence": 0.88
+    },
+    {
+      "name": "Core Utilities",
+      "path": "apps/backend/core",
+      "responsibility": "Shared DRF infrastructure: ModelMixin (base model with audit fields), extra_fields (Base64ImageField, PointField, RangeFields), autoslug (non-latin slug support).",
+      "confidence": 0.87
+    },
+    {
+      "name": "Celery Worker",
+      "path": "docker-compose.yml (celery service)",
+      "responsibility": "Async task processing using Redis as broker; 4 workers. Likely handles result aggregation, notification emails, or score computation offloading.",
+      "confidence": 0.72
+    },
+    {
+      "name": "Nginx Reverse Proxy",
+      "path": "docker/nginx/nginx.conf",
+      "responsibility": "Routes /api/* to Django :8000, /* to React static bundle :80. Terminates TLS in production via mounted certs.",
+      "confidence": 0.9
+    }
+  ],
+  "startup_instructions": [
+    {
+      "scenario": "Full stack \u2014 development (hot reload)",
+      "command": "cp .env.example .env && docker-compose -f docker-compose.dev.yml up -d",
+      "notes": "Backend bind-mounted; Django runserver :8000, Vite HMR :5173. Redis and Postgres must be healthy before API starts (depends_on with condition).",
+      "confidence": 0.88
+    },
+    {
+      "scenario": "Full stack \u2014 production",
+      "command": "cp .env.example .env && docker-compose up -d",
+      "notes": "Requires fully populated .env at repo root. Nginx exposes :80/:443. Migrations run inside container CMD on first start. Mount TLS certs at docker/nginx/ssl/.",
+      "confidence": 0.9
+    },
+    {
+      "scenario": "Makefile shortcut \u2014 development",
+      "command": "make dev",
+      "notes": "Wraps docker-compose dev command; inspect Makefile for exact targets.",
+      "confidence": 0.82
+    },
+    {
+      "scenario": "Backend only \u2014 local Python",
+      "command": "cd apps/backend && pip install -r requirements/dev.txt && python manage.py migrate && python manage.py runserver",
+      "notes": "Requires local Postgres and Redis; set DATABASE_URL and REDIS_URL env vars.",
+      "confidence": 0.85
+    },
+    {
+      "scenario": "Frontend only \u2014 local Node",
+      "command": "cd apps/frontend && npm install && npm run dev",
+      "notes": "Vite dev server on :5173; set VITE_API_BASE_URL to point at running Django instance.",
+      "confidence": 0.88
+    },
+    {
+      "scenario": "Run test suite",
+      "command": "docker-compose -f docker-compose.test.yml up --abort-on-container-exit",
+      "notes": "Dedicated test compose; backend uses pytest (conftest.py present), frontend uses vitest.",
+      "confidence": 0.83
+    },
+    {
+      "scenario": "Seed exam questions",
+      "command": "python manage.py migrate",
+      "notes": "Migrations 0003\u20130006 seed SAA-C03, CLF-C02, DVA-C02, SOA-C02 questions from exam-data/ JSON files. Runs automatically in production CMD.",
+      "confidence": 0.9
+    },
+    {
+      "scenario": "Create superuser",
+      "command": "python manage.py createsuperuser",
+      "notes": "Dev credentials from memory: admin@gmail.com / Admin@123",
+      "confidence": 0.8
+    }
+  ],
+  "critical_risks": [
+    {
+      "severity": "high",
+      "issue": "No README at repo root",
+      "evidence": "heuristic_summary.serious_findings[0]: 'Missing README'",
+      "recommendation": "Add README with setup steps, env var reference, and architecture diagram. Blocks developer onboarding.",
+      "confidence": 0.98
+    },
+    {
+      "severity": "high",
+      "issue": "No CI/CD pipeline",
+      "evidence": "heuristic_summary.serious_findings[1]: no .github/workflows directory detected",
+      "recommendation": "Add GitHub Actions: lint \u2192 test \u2192 build \u2192 docker-push pipeline. Without it, regressions ship silently.",
+      "confidence": 0.97
+    },
+    {
+      "severity": "medium",
+      "issue": "Large seed data baked into Django migrations (0003\u20130006)",
+      "evidence": "git status shows 4 new migration files: 0003_seed_saa_c03, 0004_seed_clf_c02, 0005_seed_dva_c02, 0006_seed_soa_c02",
+      "recommendation": "Migration-based seeding is slow, hard to update, and bloats migration history. Extract to a management command (loaddata or custom) triggered separately from migrate.",
+      "confidence": 0.9
+    },
+    {
+      "severity": "medium",
+      "issue": "Redis is single point of failure for JWT token blacklist",
+      "evidence": "core/authentication README: uses Redis blacklist; docker-compose.yml has single Redis instance with no replica",
+      "recommendation": "Add Redis Sentinel or Cluster for HA. Define fallback behaviour when Redis is unavailable (fail-open vs fail-closed is a security decision).",
+      "confidence": 0.85
+    },
+    {
+      "severity": "medium",
+      "issue": "Two divergent nginx configurations risk config drift",
+      "evidence": "Both nginx/nginx.conf and docker/nginx/nginx.conf exist; nginx/Dockerfile (prod.yml) is a simplified single-container build vs docker/nginx/ (docker-compose.yml) full TLS variant",
+      "recommendation": "Consolidate to one canonical nginx config path. Document which compose file is the authoritative production deployment.",
+      "confidence": 0.88
+    },
+    {
+      "severity": "low",
+      "issue": "Frontend Dockerfile uses npm install (non-reproducible) instead of npm ci",
+      "evidence": "docker/frontend/Dockerfile: 'npm install instead of npm ci (no lockfile present)'",
+      "recommendation": "Commit apps/frontend/package-lock.json and switch to npm ci for reproducible builds.",
+      "confidence": 0.92
+    },
+    {
+      "severity": "low",
+      "issue": "Sentry DSN and other secrets management not verified",
+      "evidence": "Frontend depends on @sentry/react ^8.55.0; no .env.example observed in scan",
+      "recommendation": "Confirm SENTRY_DSN and other build-time secrets are injected via Docker build args / env and not hardcoded. Add .env.example to repo.",
+      "confidence": 0.7
+    }
+  ],
+  "missing_information": [
+    "No .env.example in scan \u2014 required env vars (DATABASE_URL, REDIS_URL, SECRET_KEY, SENTRY_DSN, NGINX ports) are undocumented",
+    "Exact /api/v1/ route structure unknown \u2014 need to read apps/backend/config/urls.py and per-app urls.py",
+    "Server-side exam timer implementation not confirmed \u2014 referenced in plan direction but timer logic in questions app not inspected",
+    "Celery task definitions not located \u2014 what async work is actually offloaded is unknown",
+    "Subscription / monetization model for commercial product not visible in code scan",
+    "JWT token expiry and refresh configuration values not confirmed",
+    "Rate limiting strategy (DRF throttling or nginx) not evidenced",
+    "django-channels / WebSocket usage unclear \u2014 psycopg2 and Channels listed as backend system deps in Dockerfile comment",
+    "Test coverage baseline unknown \u2014 conftest.py exists but no coverage report found",
+    "Production hosting target (AWS, VPS, etc.) not documented"
+  ],
+  "overall_confidence": 0.88,
+  "quality_gate_pass": true,
+  "generated_at": "2026-04-16T13:10:55+00:00"
+}

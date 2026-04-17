@@ -48,7 +48,7 @@ export default function PracticeSetupPage() {
         setCertifications(certs)
         if (certs.length > 0) setSelectedCertId(certs[0].id)
       })
-      .catch(() => addToast({ type: 'error', message: 'Failed to load certifications.' }))
+      .catch(() => addToast({ type: 'error', message: 'Không thể tải danh sách chứng chỉ.' }))
       .finally(() => setLoading(false))
   }, [addToast])
 
@@ -69,7 +69,7 @@ export default function PracticeSetupPage() {
       initSession(attempt.id, attempt.questions, attempt.time_remaining_seconds, 'practice')
       navigate(`/practice/${attempt.id}`)
     } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || 'Failed to start practice.' })
+      addToast({ type: 'error', message: (err as Error).message || 'Không thể bắt đầu luyện tập.' })
     } finally {
       setStarting(false)
     }
@@ -94,8 +94,8 @@ export default function PracticeSetupPage() {
   return (
     <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Practice Mode"
-        subtitle="Learn at your own pace with instant feedback"
+        title="Chế độ luyện tập"
+        subtitle="Học theo tốc độ của bạn với phản hồi ngay lập tức"
       />
 
       <form
@@ -111,14 +111,14 @@ export default function PracticeSetupPage() {
       >
         {/* Certification picker */}
         <div>
-          <label style={labelStyle}>Certification</label>
+          <label style={labelStyle}>Chứng chỉ</label>
           <select
             value={selectedCertId}
             onChange={(e) => { setSelectedCertId(Number(e.target.value)); setSelectedDomainId('') }}
             style={selectStyle}
             required
           >
-            <option value="">Select a certification...</option>
+            <option value="">Chọn chứng chỉ...</option>
             {certifications.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.code} — {c.name}
@@ -130,13 +130,13 @@ export default function PracticeSetupPage() {
         {/* Domain filter */}
         {domains.length > 0 && (
           <div>
-            <label style={labelStyle}>Domain (optional)</label>
+            <label style={labelStyle}>Lĩnh vực (không bắt buộc)</label>
             <select
               value={selectedDomainId}
               onChange={(e) => setSelectedDomainId(e.target.value ? Number(e.target.value) : '')}
               style={selectStyle}
             >
-              <option value="">All Domains</option>
+              <option value="">Tất cả lĩnh vực</option>
               {domains.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -158,7 +158,7 @@ export default function PracticeSetupPage() {
             letterSpacing: '-0.12px',
           }}
         >
-          Explanations shown after each answer · No time limit · No score tracking
+          Giải thích được hiện sau mỗi câu trả lời · Không giới hạn thời gian · Không theo dõi điểm số
         </div>
 
         <button
@@ -167,7 +167,7 @@ export default function PracticeSetupPage() {
           className="btn-primary"
           style={{ width: '100%', opacity: starting || !selectedCertId ? 0.6 : 1 }}
         >
-          {starting ? 'Starting...' : 'Start Practice'}
+          {starting ? 'Đang bắt đầu...' : 'Bắt đầu luyện tập'}
         </button>
       </form>
     </div>

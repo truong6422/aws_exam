@@ -91,8 +91,13 @@ export const apiClient = {
   delete: <T>(path: string, options?: Omit<RequestOptions, 'method' | 'body'>) =>
     request<T>(path, { ...options, method: 'DELETE' }),
 
-  /** Fetch a DRF list endpoint and unwrap paginated {results:[]} or plain array. */
+  /** Fetch a DRF list endpoint and unwrap paginated {results:[]}, {data:[]}, or plain array. */
   list: <T>(path: string, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<T[]> =>
-    request<{ results: T[] } | T[]>(path, { ...options, method: 'GET' })
-      .then((data) => (Array.isArray(data) ? data : (data.results ?? []))),
+    request<{ results: T[] } | { data: T[] } | T[]>(path, { ...options, method: 'GET' })
+      .then((res) => {
+        if (Array.isArray(res)) return res
+        if ('data' in res && Array.isArray(res.data)) return res.data
+        if ('results' in res && Array.isArray(res.results)) return res.results
+        return []
+      }),
 }

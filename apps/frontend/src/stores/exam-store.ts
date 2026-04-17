@@ -5,7 +5,7 @@
  */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { examApi, type PartialAnswer, type Question } from '@/services/exam-api'
+import { examApi, practiceApi, type PartialAnswer, type Question } from '@/services/exam-api'
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -15,6 +15,7 @@ interface ExamState {
   questions: Question[]
   answers: Record<number, number[]>
   flagged: number[]
+  bookmarked: number[]
   currentIndex: number
   timeRemaining: number
   isSaving: boolean
@@ -36,6 +37,8 @@ interface ExamActions {
   syncToBackend: () => Promise<void>
   clearSession: () => void
   getAnswersAsPartial: () => PartialAnswer[]
+  setBookmarked: (questionId: number, bookmarked: boolean) => void
+  loadBookmarks: () => Promise<void>
 }
 
 // ── Initial state ─────────────────────────────────────────────────────────────
@@ -46,6 +49,7 @@ const INITIAL_STATE: ExamState = {
   questions: [],
   answers: {},
   flagged: [],
+  bookmarked: [],
   currentIndex: 0,
   timeRemaining: 0,
   isSaving: false,
@@ -108,6 +112,22 @@ export const useExamStore = create<ExamState & ExamActions>()(
           answer_ids: aIds,
         }))
       },
+
+      setBookmarked: (questionId, bookmarked) =>
+        set((s) => ({
+          bookmarked: bookmarked
+            ? [...new Set([...s.bookmarked, questionId])]
+            : s.bookmarked.filter((id) => id !== questionId),
+        })),
+
+      loadBookmarks: async () => {
+        try {
+          const result = await practiceApi.getBookmarkedIds()
+          set({ bookmarked: result.question_ids })
+        } catch {
+          // Not critical — silently ignore (e.g. user not logged in)
+        }
+      },
     }),
     {
       name: 'aws-exam-session',
@@ -117,6 +137,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
         mode: state.mode,
         answers: state.answers,
         flagged: state.flagged,
+        bookmarked: state.bookmarked,
         currentIndex: state.currentIndex,
         timeRemaining: state.timeRemaining,
       }),

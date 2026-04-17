@@ -31,3 +31,20 @@ CACHES = {
 # Disable debug toolbar in tests (not needed)
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != "debug_toolbar"]  # noqa: F405
 MIDDLEWARE = [m for m in MIDDLEWARE if "debug_toolbar" not in m]  # noqa: F405
+
+# Skip all migrations in tests — schema is created directly from models.
+# This avoids running seed data migrations (0003–0008) which are slow and
+# contain production data that tests don't need.
+MIGRATION_MODULES = {
+    "accounts": None,
+    "admin": None,
+    "analytics": None,
+    "auth": None,
+    "contenttypes": None,
+    "db": None,
+    "django_core": None,
+    "exams": None,
+    "imports": None,
+    "questions": None,
+    "sessions": None,
+}

@@ -59,14 +59,14 @@ export default function AnalyticsPage() {
   if (error) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Analytics" subtitle="Track your performance over time" />
+        <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
         <p style={{ color: '#e0453c', fontSize: '13px', letterSpacing: '-0.224px' }}>{error}</p>
         <button
           className="btn-ghost"
           style={{ alignSelf: 'flex-start' }}
           onClick={() => window.location.reload()}
         >
-          Retry
+          Thử lại
         </button>
       </div>
     )
@@ -75,11 +75,11 @@ export default function AnalyticsPage() {
   if (!overview || overview.total_submitted === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Analytics" subtitle="Track your performance over time" />
+        <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
         <EmptyState
-          title="No analytics yet"
-          description="Complete at least one exam to see your weak domains and score trends."
-          actionLabel="Take an Exam"
+          title="Chưa có dữ liệu thống kê"
+          description="Hoàn thành ít nhất một bài thi để xem lĩnh vực yếu và xu hướng điểm số."
+          actionLabel="Bắt đầu thi"
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -90,7 +90,7 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Analytics" subtitle="Track your performance over time" />
+      <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
 
       {/* Certification filter */}
       <select
@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
         value={selectedCertId ?? ''}
         onChange={(e) => setSelectedCertId(e.target.value ? Number(e.target.value) : null)}
       >
-        <option value="">All Certifications</option>
+        <option value="">Tất cả chứng chỉ</option>
         {certifications.map((c) => (
           <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
         ))}
@@ -132,12 +132,12 @@ export default function AnalyticsPage() {
               marginBottom: '16px',
             }}
           >
-            Weak Domains
+            Lĩnh vực yếu
           </h2>
           <WeakDomainsChart domains={domains} />
           {weakestDomain && (
             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '16px', letterSpacing: '-0.12px' }}>
-              Focus on:{' '}
+              Tập trung vào:{' '}
               <strong style={{ color: '#e0453c' }}>{weakestDomain.domain_name}</strong>
             </p>
           )}

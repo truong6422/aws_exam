@@ -120,13 +120,13 @@ export default function ExamSessionPage() {
         <div style={{ ...sidebarPanelStyle, textAlign: 'center' }}>
           <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
           {isSaving && (
-            <p style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>Saving...</p>
+            <p style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>Đang lưu...</p>
           )}
         </div>
 
         <div style={{ ...sidebarPanelStyle, padding: 0, overflow: 'hidden' }}>
           <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', fontSize: '11px', fontWeight: 600, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
-            {answeredCount} / {questions.length} answered
+            {answeredCount} / {questions.length} đã trả lời
           </div>
           <QuestionNavigationGrid
             totalQuestions={questions.length}
@@ -144,7 +144,7 @@ export default function ExamSessionPage() {
           className="btn-primary"
           style={{ width: '100%', opacity: submitting ? 0.6 : 1 }}
         >
-          Submit Exam
+          Nộp bài thi
         </button>
       </aside>
 
@@ -161,7 +161,7 @@ export default function ExamSessionPage() {
           className="lg:hidden"
         >
           <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>{answeredCount}/{questions.length} answered</span>
+          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>{answeredCount}/{questions.length} đã trả lời</span>
         </div>
 
         {/* Question card */}
@@ -182,7 +182,7 @@ export default function ExamSessionPage() {
                     letterSpacing: '-0.12px',
                   }}
                 >
-                  Select all that apply
+                  Chọn tất cả đáp án đúng
                 </span>
               )}
             </span>
@@ -199,9 +199,9 @@ export default function ExamSessionPage() {
                 color: isFlagged ? '#e0453c' : 'rgba(255,255,255,0.5)',
                 cursor: 'pointer',
               }}
-              title={isFlagged ? 'Unflag question' : 'Flag for review'}
+              title={isFlagged ? 'Bỏ đánh dấu câu hỏi' : 'Đánh dấu để xem lại'}
             >
-              {isFlagged ? 'Flagged' : 'Flag'}
+              {isFlagged ? 'Đã đánh dấu' : 'Đánh dấu'}
             </button>
           </div>
           <p style={{ fontSize: '17px', fontWeight: 400, color: '#fff', lineHeight: 1.47, letterSpacing: '-0.374px' }}>{question.text}</p>
@@ -228,14 +228,14 @@ export default function ExamSessionPage() {
             className="btn-ghost"
             style={{ opacity: currentIndex === 0 ? 0.4 : 1 }}
           >
-            Previous
+            Câu trước
           </button>
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goToQuestion(currentIndex + 1)}
               className="btn-ghost"
             >
-              Next
+              Câu tiếp
             </button>
           ) : (
             <button
@@ -244,7 +244,7 @@ export default function ExamSessionPage() {
               className="btn-primary"
               style={{ opacity: submitting ? 0.6 : 1 }}
             >
-              Submit Exam
+              Nộp bài thi
             </button>
           )}
         </div>
@@ -262,12 +262,12 @@ export default function ExamSessionPage() {
               padding: '24px',
             }}
           >
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>Submit Exam?</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>Nộp bài thi?</h3>
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px', marginBottom: '16px' }}>
-              You have answered {answeredCount} of {questions.length} questions.
+              Bạn đã trả lời {answeredCount} trong {questions.length} câu hỏi.
               {answeredCount < questions.length && (
                 <span style={{ fontWeight: 600, color: '#e0453c' }}>
-                  {' '}{questions.length - answeredCount} unanswered.
+                  {' '}{questions.length - answeredCount} câu chưa trả lời.
                 </span>
               )}
             </p>
@@ -276,7 +276,7 @@ export default function ExamSessionPage() {
                 onClick={() => setConfirmSubmit(false)}
                 className="btn-ghost"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={() => { setConfirmSubmit(false); handleSubmit() }}
@@ -284,7 +284,7 @@ export default function ExamSessionPage() {
                 className="btn-primary"
                 style={{ opacity: submitting ? 0.6 : 1 }}
               >
-                {submitting ? 'Submitting...' : 'Confirm Submit'}
+                {submitting ? 'Đang nộp...' : 'Xác nhận nộp bài'}
               </button>
             </div>
           </div>

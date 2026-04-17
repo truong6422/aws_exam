@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "phases": {
+    "phase-01-backend-question-bank": {
+      "spec_id": "phase-01-backend-question-bank",
+      "status": "completed",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-01-backend-question-bank.md"
+    },
+    "phase-02-backend-exam-engine": {
+      "spec_id": "phase-02-backend-exam-engine",
+      "status": "completed",
+      "blockedBy": [
+        "phase-01-backend-question-bank"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-02-backend-exam-engine.md"
+    },
+    "phase-03-backend-auth-profile": {
+      "spec_id": "phase-03-backend-auth-profile",
+      "status": "completed",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-03-backend-auth-profile.md"
+    },
+    "phase-04-backend-analytics": {
+      "spec_id": "phase-04-backend-analytics",
+      "status": "completed",
+      "blockedBy": [
+        "phase-02-backend-exam-engine"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-04-backend-analytics.md"
+    },
+    "phase-05-backend-import": {
+      "spec_id": "phase-05-backend-import",
+      "status": "in-progress",
+      "blockedBy": [
+        "phase-01-backend-question-bank"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-05-backend-import.md"
+    },
+    "phase-06-frontend-exam-practice": {
+      "spec_id": "phase-06-frontend-exam-practice",
+      "status": "completed",
+      "blockedBy": [
+        "phase-02-backend-exam-engine"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-06-frontend-exam-practice.md"
+    },
+    "phase-07-frontend-dashboard-analytics": {
+      "spec_id": "phase-07-frontend-dashboard-analytics",
+      "status": "completed",
+      "blockedBy": [
+        "phase-04-backend-analytics"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-07-frontend-dashboard-analytics.md"
+    },
+    "phase-08-frontend-admin": {
+      "spec_id": "phase-08-frontend-admin",
+      "status": "completed",
+      "blockedBy": [
+        "phase-05-backend-import"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-08-frontend-admin.md"
+    },
+    "phase-09-integration-tests": {
+      "spec_id": "phase-09-integration-tests",
+      "status": "completed",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-09-integration-tests.md"
+    },
+    "phase-10-infra-deploy": {
+      "spec_id": "phase-10-infra-deploy",
+      "status": "in-progress",
+      "blockedBy": [
+        "phase-09-integration-tests"
+      ],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260315-0247-full-project-implementation/phase-10-infra-deploy.md"
+    }
+  },
+  "ready": [],
+  "in_progress": [
+    "phase-05-backend-import",
+    "phase-10-infra-deploy"
+  ],
+  "blocked": [],
+  "completed": [
+    "phase-01-backend-question-bank",
+    "phase-02-backend-exam-engine",
+    "phase-03-backend-auth-profile",
+    "phase-04-backend-analytics",
+    "phase-06-frontend-exam-practice",
+    "phase-07-frontend-dashboard-analytics",
+    "phase-08-frontend-admin",
+    "phase-09-integration-tests"
+  ],
+  "generated_at": "2026-04-17T04:41:42+00:00"
+}

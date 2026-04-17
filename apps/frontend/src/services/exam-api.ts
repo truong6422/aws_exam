@@ -104,6 +104,31 @@ export interface PaginatedExamList {
   results: ExamListItem[]
 }
 
+// ── Practice Community Types ──────────────────────────────────────────────────
+
+export interface Comment {
+  id: number
+  body: string
+  referenced_answer: number | null
+  author_name: string
+  upvote_count: number
+  upvoted_by_me: boolean
+  created_at: string
+}
+
+export interface BookmarkListResult {
+  question_ids: number[]
+}
+
+export interface UpvoteResult {
+  upvoted: boolean
+  upvote_count: number
+}
+
+export interface BookmarkResult {
+  bookmarked: boolean
+}
+
 // ── API ───────────────────────────────────────────────────────────────────────
 
 export const examApi = {
@@ -127,4 +152,27 @@ export const examApi = {
 
   getExamList: (page = 1) =>
     apiClient.get<PaginatedExamList>(`/exams/?page=${page}`),
+}
+
+export const practiceApi = {
+  getComments: (questionId: number) =>
+    apiClient.list<Comment>(`/questions/${questionId}/comments/`),
+
+  postComment: (questionId: number, body: string, referencedAnswer?: number | null) =>
+    apiClient.post<Comment>(`/questions/${questionId}/comments/`, {
+      body,
+      referenced_answer: referencedAnswer ?? null,
+    }),
+
+  upvoteComment: (commentId: number) =>
+    apiClient.post<UpvoteResult>(`/questions/comments/${commentId}/upvote/`, {}),
+
+  toggleBookmark: (questionId: number) =>
+    apiClient.post<BookmarkResult>(`/questions/${questionId}/bookmark/`, {}),
+
+  getBookmarkedIds: () =>
+    apiClient.get<BookmarkListResult>('/questions/bookmarks/'),
+
+  reportAnswer: (questionId: number, reason: string) =>
+    apiClient.post<{ id: number; reason: string }>(`/questions/${questionId}/report/`, { reason }),
 }

@@ -71,8 +71,8 @@ export default function ExamResultPage() {
   return (
     <div style={{ maxWidth: '680px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Exam Results"
-        subtitle={review ? `${review.certification.code} — ${review.certification.name}` : `Attempt #${sessionId}`}
+        title="Kết quả thi"
+        subtitle={review ? `${review.certification.code} — ${review.certification.name}` : `Lần thi #${sessionId}`}
       />
 
       {/* Score hero */}
@@ -99,7 +99,7 @@ export default function ExamResultPage() {
           {Math.round(score)}%
         </p>
         <p style={{ fontSize: '12px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
-          Your Score
+          Điểm của bạn
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
@@ -114,7 +114,7 @@ export default function ExamResultPage() {
               letterSpacing: '-0.12px',
             }}
           >
-            {passed ? 'PASS' : 'FAIL'}
+            {passed ? 'ĐẠT' : 'CHƯA ĐẠT'}
           </span>
           <span
             style={{
@@ -126,7 +126,7 @@ export default function ExamResultPage() {
               letterSpacing: '-0.12px',
             }}
           >
-            {correct} / {total} correct
+            {correct} / {total} câu đúng
           </span>
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function ExamResultPage() {
               marginBottom: '16px',
             }}
           >
-            Answer Review
+            Xem lại đáp án
           </h2>
           <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {review.questions.map((q, idx) => {
@@ -201,7 +201,7 @@ export default function ExamResultPage() {
             className="btn-ghost"
             style={{ textDecoration: 'none' }}
           >
-            Review Answers
+            Xem lại đáp án
           </Link>
         )}
         <Link
@@ -209,21 +209,21 @@ export default function ExamResultPage() {
           className="btn-primary"
           style={{ textDecoration: 'none' }}
         >
-          New Exam
+          Bài thi mới
         </Link>
         <Link
           to="/history"
           className="btn-ghost"
           style={{ textDecoration: 'none' }}
         >
-          View History
+          Xem lịch sử
         </Link>
         <Link
           to="/dashboard"
           className="btn-ghost"
           style={{ textDecoration: 'none' }}
         >
-          Dashboard
+          Bảng điều khiển
         </Link>
       </div>
     </div>

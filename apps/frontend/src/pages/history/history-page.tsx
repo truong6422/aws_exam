@@ -49,14 +49,14 @@ export default function HistoryPage() {
   if (error) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="History" subtitle="All your past exam sessions" />
+        <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
         <p style={{ color: '#e0453c', fontSize: '13px' }}>{error}</p>
         <button
           className="btn-ghost"
           style={{ alignSelf: 'flex-start' }}
           onClick={() => load(1)}
         >
-          Retry
+          Thử lại
         </button>
       </div>
     )
@@ -65,11 +65,11 @@ export default function HistoryPage() {
   if (!data || data.count === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="History" subtitle="All your past exam sessions" />
+        <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
         <EmptyState
-          title="No exam history"
-          description="Your completed exams will appear here."
-          actionLabel="Start Exam"
+          title="Chưa có lịch sử thi"
+          description="Các bài thi đã hoàn thành sẽ xuất hiện ở đây."
+          actionLabel="Bắt đầu thi"
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -80,7 +80,7 @@ export default function HistoryPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="History" subtitle="All your past exam sessions" />
+      <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
 
       <div
         style={{
@@ -92,7 +92,7 @@ export default function HistoryPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
-              {['Certification', 'Date', 'Score', 'Status', ''].map((h) => (
+              {['Chứng chỉ', 'Ngày thi', 'Điểm', 'Trạng thái', ''].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -171,7 +171,7 @@ export default function HistoryPage() {
                       }}
                       onClick={() => navigate(`/exam/${item.id}/result`)}
                     >
-                      Review
+                      Xem lại
                     </button>
                   )}
                 </td>
@@ -190,7 +190,7 @@ export default function HistoryPage() {
             onClick={() => load(page - 1)}
             style={{ opacity: page === 1 ? 0.4 : 1 }}
           >
-            Prev
+            Trước
           </button>
           <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
             {page} / {totalPages}
@@ -201,7 +201,7 @@ export default function HistoryPage() {
             onClick={() => load(page + 1)}
             style={{ opacity: !data.next ? 0.4 : 1 }}
           >
-            Next
+            Tiếp
           </button>
         </div>
       )}

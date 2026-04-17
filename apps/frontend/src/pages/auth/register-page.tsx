@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '@/services/auth-api'
 import { useAuthStore } from '@/stores/auth-store'
+import { AUTH_UI, toVietnameseAuthError } from '@/constants/auth-messages'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -44,7 +45,8 @@ export default function RegisterPage() {
       if (data.user) setUser(data.user)
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.')
+      const raw = err instanceof Error ? err.message : ''
+      setError(toVietnameseAuthError(raw, 'register'))
     } finally {
       setLoading(false)
     }
@@ -68,7 +70,7 @@ export default function RegisterPage() {
       )}
 
       <div>
-        <label htmlFor="name" style={labelStyle}>Full Name</label>
+        <label htmlFor="name" style={labelStyle}>{AUTH_UI.LABEL_FULL_NAME}</label>
         <input
           id="name"
           type="text"
@@ -83,7 +85,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="email" style={labelStyle}>Email</label>
+        <label htmlFor="email" style={labelStyle}>{AUTH_UI.LABEL_EMAIL}</label>
         <input
           id="email"
           type="email"
@@ -99,7 +101,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="password" style={labelStyle}>Password</label>
+        <label htmlFor="password" style={labelStyle}>{AUTH_UI.LABEL_PASSWORD}</label>
         <input
           id="password"
           type="password"
@@ -121,19 +123,19 @@ export default function RegisterPage() {
         className="btn-primary w-full"
         style={{ marginTop: '8px' }}
       >
-        {loading ? 'Creating account...' : 'Create Account'}
+        {loading ? AUTH_UI.REGISTER_LOADING : AUTH_UI.REGISTER_BUTTON}
       </button>
 
       <p
         className="text-center"
         style={{ fontSize: '13px', color: 'rgba(0,0,0,0.48)', letterSpacing: '-0.12px' }}
       >
-        Already have an account?{' '}
+        {AUTH_UI.HAVE_ACCOUNT}{' '}
         <Link
           to="/login"
           style={{ color: '#0066cc', fontWeight: 500 }}
         >
-          Sign in
+          {AUTH_UI.LOGIN_LINK}
         </Link>
       </p>
     </form>

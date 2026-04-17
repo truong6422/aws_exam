@@ -28,7 +28,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div style={{ padding: '24px', fontSize: '14px', letterSpacing: '-0.224px', color: 'rgba(255,255,255,0.5)' }}>
-        Loading...
+        Đang tải...
       </div>
     )
   }
@@ -41,7 +41,7 @@ export default function DashboardPage() {
           style={{ color: '#fff', fontSize: '13px', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           onClick={() => window.location.reload()}
         >
-          Retry
+          Thử lại
         </button>
       </div>
     )
@@ -51,18 +51,18 @@ export default function DashboardPage() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <PageHeader title="Dashboard" subtitle="Welcome back" />
+          <PageHeader title="Bảng điều khiển" subtitle="Chào mừng trở lại" />
           <button
             className="btn-primary"
             onClick={() => navigate('/exam/setup')}
           >
-            Start Exam
+            Bắt đầu thi
           </button>
         </div>
         <EmptyState
-          title="No exams yet"
-          description="Take your first AWS certification practice exam to see your progress here."
-          actionLabel="Start Your First Exam"
+          title="Chưa có bài thi"
+          description="Hãy thực hiện bài thi thử chứng chỉ AWS đầu tiên để theo dõi tiến trình của bạn tại đây."
+          actionLabel="Bắt đầu bài thi đầu tiên"
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -75,20 +75,20 @@ export default function DashboardPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <PageHeader title="Dashboard" subtitle="Welcome back" />
+        <PageHeader title="Bảng điều khiển" subtitle="Chào mừng trở lại" />
         <button
           className="btn-primary"
           onClick={() => navigate('/exam/setup')}
         >
-          Start Exam
+          Bắt đầu thi
         </button>
       </div>
 
       {/* Score cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-        <ScoreCard label="Total Exams"    value={overview.total_attempts} />
-        <ScoreCard label="Average Score"  value={avgScore.toFixed(1)} suffix="%" />
-        <ScoreCard label="Best Score"     value={bestScore.toFixed(1)} suffix="%" />
+        <ScoreCard label="Tổng số bài thi"  value={overview.total_attempts} />
+        <ScoreCard label="Điểm trung bình"  value={avgScore.toFixed(1)} suffix="%" />
+        <ScoreCard label="Điểm cao nhất"    value={bestScore.toFixed(1)} suffix="%" />
       </div>
 
       {/* Recent attempts */}
@@ -98,13 +98,13 @@ export default function DashboardPage() {
             <span
               style={{ fontSize: '12px', fontWeight: 400, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}
             >
-              Recent Activity
+              Hoạt động gần đây
             </span>
             <button
               style={{ fontSize: '13px', color: '#2997ff', background: 'none', border: 'none', cursor: 'pointer' }}
               onClick={() => navigate('/history')}
             >
-              View all
+              Xem tất cả
             </button>
           </div>
           <div>

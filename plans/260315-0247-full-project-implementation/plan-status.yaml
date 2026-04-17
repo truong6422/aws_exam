@@ -1,0 +1,49 @@
+version: '1.0'
+plan_id: 260315-0247-full-project-implementation
+plan_file: plans/260315-0247-full-project-implementation/plan.md
+status: not-started
+summary:
+  total_phases: 10
+  completed: 8
+  in_progress: 2
+  pending: 0
+active_phase:
+  phase_id: '05'
+  phase_label: Backend Import
+  file: plans/260315-0247-full-project-implementation/phase-05-backend-import.md
+  status: in-progress
+  checklist_open: 0
+phases:
+- id: '01'
+  label: Backend Question Bank
+  status: completed
+- id: '02'
+  label: Backend Exam Engine
+  status: completed
+- id: '03'
+  label: Backend Auth Profile
+  status: completed
+- id: '04'
+  label: Backend Analytics
+  status: completed
+- id: '05'
+  label: Backend Import
+  status: in-progress
+- id: '06'
+  label: Frontend Exam Practice
+  status: completed
+- id: '07'
+  label: Frontend Dashboard Analytics
+  status: completed
+- id: 08
+  label: Frontend Admin
+  status: completed
+- id: 09
+  label: Integration Tests
+  status: completed
+- id: '10'
+  label: Infra Deploy
+  status: in-progress
+progress_pct: 0.0
+updated_at: '2026-04-17T04:41:42+00:00'
+created_at: '2026-04-16T13:14:36+00:00'

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '@/services/auth-api'
 import { useAuthStore } from '@/stores/auth-store'
+import { AUTH_UI, toVietnameseAuthError } from '@/constants/auth-messages'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -50,7 +51,8 @@ export default function LoginPage() {
 
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.')
+      const raw = err instanceof Error ? err.message : ''
+      setError(toVietnameseAuthError(raw, 'login'))
     } finally {
       setLoading(false)
     }
@@ -74,7 +76,7 @@ export default function LoginPage() {
       )}
 
       <div>
-        <label htmlFor="email" style={labelStyle}>Email</label>
+        <label htmlFor="email" style={labelStyle}>{AUTH_UI.LABEL_EMAIL}</label>
         <input
           id="email"
           type="email"
@@ -91,7 +93,7 @@ export default function LoginPage() {
       </div>
 
       <div>
-        <label htmlFor="password" style={labelStyle}>Password</label>
+        <label htmlFor="password" style={labelStyle}>{AUTH_UI.LABEL_PASSWORD}</label>
         <input
           id="password"
           type="password"
@@ -112,19 +114,19 @@ export default function LoginPage() {
         className="btn-primary w-full"
         style={{ marginTop: '8px' }}
       >
-        {loading ? 'Signing in...' : 'Sign In'}
+        {loading ? AUTH_UI.LOGIN_LOADING : AUTH_UI.LOGIN_BUTTON}
       </button>
 
       <p
         className="text-center"
         style={{ fontSize: '13px', color: 'rgba(0,0,0,0.48)', letterSpacing: '-0.12px' }}
       >
-        No account?{' '}
+        {AUTH_UI.NO_ACCOUNT}{' '}
         <Link
           to="/register"
           style={{ color: '#0066cc', fontWeight: 500 }}
         >
-          Register
+          {AUTH_UI.REGISTER_LINK}
         </Link>
       </p>
     </form>

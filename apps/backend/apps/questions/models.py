@@ -1,6 +1,8 @@
 """
 Question bank models: Certification → Domain → Question → Answer.
+Community models: Comment, AnswerReport, Bookmark.
 """
+from django.conf import settings
 from django.db import models
 
 from apps.core.models import TimestampedModel
@@ -82,3 +84,80 @@ class Answer(models.Model):
     def __str__(self) -> str:
         mark = "✓" if self.is_correct else "✗"
         return f"{mark} {self.text[:50]}"
+
+
+class Comment(TimestampedModel):
+    """Community comment on a question. Visible after answer reveal in Practice Mode."""
+
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="comments"
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
+    )
+    referenced_answer = models.ForeignKey(
+        Answer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="comments",
+    )
+    body = models.TextField(max_length=2000)
+    upvotes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_comments"
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Comment by {self.author_id} on Q#{self.question_id}"
+
+
+class AnswerReport(TimestampedModel):
+    """User report flagging a question's answer as incorrect. Reviewed in Admin."""
+
+    STATUS_PENDING = "pending"
+    STATUS_REVIEWED = "reviewed"
+    STATUS_DISMISSED = "dismissed"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_REVIEWED, "Reviewed"),
+        (STATUS_DISMISSED, "Dismissed"),
+    ]
+
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="reports"
+    )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reports"
+    )
+    reason = models.TextField(max_length=1000)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING
+    )
+
+    class Meta:
+        unique_together = ("question", "reporter")
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Report by {self.reporter_id} on Q#{self.question_id} [{self.status}]"
+
+
+class Bookmark(models.Model):
+    """User bookmark on a question for later review."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookmarks"
+    )
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="bookmarks"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "question")
+
+    def __str__(self) -> str:
+        return f"Bookmark by {self.user_id} on Q#{self.question_id}"
