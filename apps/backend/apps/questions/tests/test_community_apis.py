@@ -11,7 +11,6 @@ from apps.questions.models import (
     Bookmark,
     Certification,
     Comment,
-    Domain,
     Question,
 )
 
@@ -23,8 +22,7 @@ def make_question():
     cert = Certification.objects.create(
         code="TST-001", name="Test Cert", description="", time_limit_minutes=90
     )
-    domain = Domain.objects.create(certification=cert, name="Domain A")
-    question = Question.objects.create(domain=domain, text="Test question?")
+    question = Question.objects.create(certification=cert, text="Test question?")
     Answer.objects.create(question=question, text="Option A", is_correct=True)
     Answer.objects.create(question=question, text="Option B", is_correct=False)
     return question

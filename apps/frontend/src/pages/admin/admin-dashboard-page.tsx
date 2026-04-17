@@ -5,7 +5,6 @@ import { adminApi } from '@/services/admin-api'
 
 interface Stats {
   certs: number
-  domains: number
   questions: number
 }
 
@@ -17,29 +16,25 @@ const statPanelStyle: React.CSSProperties = {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate()
-  const [stats, setStats] = useState<Stats>({ certs: 0, domains: 0, questions: 0 })
+  const [stats, setStats] = useState<Stats>({ certs: 0, questions: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     adminApi
       .getCertifications()
       .then(async (certs) => {
-        let totalDomains = 0
         let totalQuestions = 0
         for (const cert of certs) {
-          const domains = await adminApi.getDomains(cert.id)
-          totalDomains += domains.length
           totalQuestions += cert.total_questions ?? 0
         }
-        setStats({ certs: certs.length, domains: totalDomains, questions: totalQuestions })
+        setStats({ certs: certs.length, questions: totalQuestions })
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false))
   }, [])
 
   const statCards = [
     { label: 'Chứng chỉ', value: stats.certs },
-    { label: 'Lĩnh vực', value: stats.domains },
     { label: 'Câu hỏi', value: stats.questions },
   ]
 
@@ -89,9 +84,9 @@ export default function AdminDashboardPage() {
           </button>
           <button
             className="btn-ghost"
-            onClick={() => navigate('/admin/questions')}
+            onClick={() => navigate('/admin/exams')}
           >
-            Xem câu hỏi
+            Quản lý bài thi
           </button>
           <button
             className="btn-ghost"

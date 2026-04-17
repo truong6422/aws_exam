@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.questions.models import Answer, Certification, Domain, Question
+from apps.questions.models import Answer, Certification, Question
 
 
 User = get_user_model()
@@ -41,8 +41,8 @@ def staff_user(db):
 
 @pytest.fixture
 def certification(db):
-    """Create SAA-C03 certification with a domain."""
-    cert = Certification.objects.create(
+    """Create SAA-C03 certification."""
+    return Certification.objects.create(
         code='SAA-C03',
         name='AWS Solutions Architect Associate',
         description='Test certification',
@@ -50,24 +50,17 @@ def certification(db):
         total_questions=65,
         passing_score=72,
     )
-    Domain.objects.create(
-        name='Cloud Concepts',
-        certification=cert,
-        weight_percentage=20,
-    )
-    return cert
 
 
 @pytest.fixture
 def questions(db, certification):
     """Create 10 questions with answers for testing."""
-    domain = certification.domains.first()
     qs = []
     for i in range(10):
         q = Question.objects.create(
             text=f'Which service provides object storage solution number {i+1} for AWS?',
             question_type='single',
-            domain=domain,
+            certification=certification,
             explanation=f'This is the explanation for question {i+1}.',
             source='AWS Exam Guide',
         )

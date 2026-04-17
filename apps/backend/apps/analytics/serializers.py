@@ -16,13 +16,6 @@ class OverviewSerializer(serializers.Serializer):
     recent_trend = RecentTrendItemSerializer(many=True)
 
 
-class WeakDomainSerializer(serializers.Serializer):
-    domain_id = serializers.IntegerField()
-    domain_name = serializers.CharField()
-    certification_code = serializers.CharField()
-    total_questions = serializers.IntegerField()
-    correct_count = serializers.IntegerField()
-    accuracy_percentage = serializers.DecimalField(max_digits=5, decimal_places=2)
 
 
 class HistoryItemSerializer(serializers.Serializer):

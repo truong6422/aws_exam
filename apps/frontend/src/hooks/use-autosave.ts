@@ -13,7 +13,7 @@ interface AutosaveResult {
 export function useAutosave(attemptId: number | null): AutosaveResult {
   const syncToBackend = useExamStore((s) => s.syncToBackend)
   const isSaving = useExamStore((s) => s.isSaving)
-  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
+  const [lastSavedAt] = useState<Date | null>(null)
   const syncRef = useRef(syncToBackend)
 
   useEffect(() => {
@@ -21,14 +21,8 @@ export function useAutosave(attemptId: number | null): AutosaveResult {
   }, [syncToBackend])
 
   useEffect(() => {
-    if (!attemptId) return
-
-    const interval = setInterval(async () => {
-      await syncRef.current()
-      setLastSavedAt(new Date())
-    }, 30_000)
-
-    return () => clearInterval(interval)
+    // Background interval disabled per user request to avoid API spam.
+    // Saving now only happens on explicit Pause or page unload.
   }, [attemptId])
 
   return { isSaving, lastSavedAt }

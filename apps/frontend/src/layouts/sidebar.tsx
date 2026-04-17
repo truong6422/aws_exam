@@ -61,13 +61,7 @@ const UsersIcon = () => (
   </svg>
 )
 
-const QuestionsIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    <path d="M6.5 6a1.5 1.5 0 0 1 3 0c0 1.5-1.5 1.5-1.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
-    <circle cx="8" cy="12" r="0.75" fill="currentColor" />
-  </svg>
-)
+
 
 const ImportIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -92,8 +86,8 @@ const NAV_ITEMS: NavItem[] = [
 
 const ADMIN_ITEMS: NavItem[] = [
   { labelKey: 'nav.admin', to: '/admin/dashboard', icon: <AdminIcon /> },
+  { labelKey: 'nav.exam', to: '/admin/exams', icon: <ExamIcon /> },
   { labelKey: 'nav.users', to: '/admin/users', icon: <UsersIcon /> },
-  { labelKey: 'nav.questions', to: '/admin/questions', icon: <QuestionsIcon /> },
   { labelKey: 'nav.import', to: '/admin/import', icon: <ImportIcon /> },
 ]
 

@@ -56,6 +56,11 @@ def _save_answers(attempt, answers_data):
             attempt=attempt, question_id=qid
         )
         aa.selected_answers.set(item['answer_ids'])
+        
+        # Save flag status if provided
+        if 'is_flagged' in item:
+            aa.is_flagged = item['is_flagged']
+            aa.save(update_fields=['is_flagged'])
 
 
 class ExamStartView(APIView):
@@ -65,20 +70,58 @@ class ExamStartView(APIView):
         serializer = StartExamSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        cert = Certification.objects.get(pk=serializer.validated_data['certification_id'])
+        cert_id = serializer.validated_data.get("certification_id")
+        exam_set_id = serializer.validated_data.get("exam_set_id")
+
+        exam_set = None
+        if exam_set_id:
+            from apps.questions.models import ExamSet
+            exam_set = ExamSet.objects.select_related("certification").get(pk=exam_set_id)
+            if exam_set.is_locked:
+                return Response({"detail": "Exam set is locked."}, status=status.HTTP_403_FORBIDDEN)
+            cert = exam_set.certification
+        else:
+            cert = Certification.objects.get(pk=cert_id)
+
+        # Smart Resume logic: find existing unfinished attempt
+        existing_attempt = ExamAttempt.objects.filter(
+            user=request.user,
+            certification=cert,
+            exam_set=exam_set,
+            status__in=['in_progress', 'paused']
+        ).first()
+
+        if existing_attempt:
+            if existing_attempt.is_expired:
+                # If expired, we can't resume it, but let's let the status change naturally later or here
+                pass
+            else:
+                # Resume it automatically
+                if existing_attempt.status == 'paused':
+                    existing_attempt.status = 'in_progress'
+                    existing_attempt.last_resumed_at = timezone.now()
+                    existing_attempt.save()
+                return Response(ExamAttemptDetailSerializer(existing_attempt).data)
 
         attempt = ExamAttempt.objects.create(
             user=request.user,
             certification=cert,
+            exam_set=exam_set,
             time_limit_minutes=cert.time_limit_minutes,
             total_questions=cert.total_questions,
         )
 
-        questions = list(
-            Question.objects.filter(domain__certification=cert).order_by('?')[
-                : cert.total_questions
-            ]
-        )
+        if exam_set:
+            # Use fixed set questions
+            questions = list(exam_set.questions.all())
+        else:
+            # Practice mode: random questions
+            questions = list(
+                Question.objects.filter(certification=cert).order_by("?")[
+                    : cert.total_questions
+                ]
+            )
+
         AttemptAnswer.objects.bulk_create(
             [AttemptAnswer(attempt=attempt, question=q) for q in questions]
         )
@@ -134,8 +177,55 @@ class ExamSubmitView(APIView):
         attempt.score_percentage = round(attempt.correct_count / total * 100, 2)
         attempt.submitted_at = timezone.now()
         attempt.save(update_fields=['status', 'correct_count', 'score_percentage', 'submitted_at'])
-
         return Response(ExamSubmitResponseSerializer(attempt).data)
+
+
+class ExamPauseView(APIView):
+    """POST /api/v1/exams/{pk}/pause/ — pause active attempt."""
+
+    def post(self, request, pk):
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        
+        if attempt.status not in ['in_progress', 'paused']:
+            return Response(
+                {'detail': 'Can only pause in-progress exams.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Final autosave if data provided
+        answers_data = request.data if isinstance(request.data, list) else []
+        if answers_data:
+            _save_answers(attempt, answers_data)
+
+        # Lock in time spent only if it was in progress
+        if attempt.status == 'in_progress':
+            attempt.accumulated_seconds = attempt.time_spent_total
+            attempt.status = 'paused'
+            attempt.save()
+            
+        return Response({'status': 'paused'})
+
+
+class ExamResumeView(APIView):
+    """POST /api/v1/exams/{pk}/resume/ — resume paused attempt."""
+
+    def post(self, request, pk):
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+
+        if attempt.status == 'in_progress':
+            return Response(ExamAttemptDetailSerializer(attempt).data)
+
+        if attempt.status != 'paused' or attempt.is_expired:
+            return Response(
+                {'detail': 'Cannot resume this exam.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        attempt.status = 'in_progress'
+        attempt.last_resumed_at = timezone.now()
+        attempt.save()
+
+        return Response(ExamAttemptDetailSerializer(attempt).data)
 
 
 class ExamReviewView(APIView):
@@ -154,13 +244,20 @@ class ExamReviewView(APIView):
 
 
 class ExamListView(generics.ListAPIView):
-    """GET /api/v1/exams/ — paginated list of the current user's attempts."""
+    """GET /api/v1/exams/ — paginated list of the current user's attempts.
+    
+    Supports optional ?exam_set_id=X filter to get history for a specific exam set.
+    """
 
     serializer_class = ExamAttemptListSerializer
 
     def get_queryset(self):
-        return (
+        qs = (
             ExamAttempt.objects.filter(user=self.request.user)
             .select_related('certification')
             .order_by('-started_at')
         )
+        exam_set_id = self.request.query_params.get('exam_set_id')
+        if exam_set_id:
+            qs = qs.filter(exam_set_id=exam_set_id)
+        return qs

@@ -24,8 +24,8 @@ import PracticeSessionPage from '@/pages/practice/practice-session-page'
 import AdminLayout from '@/layouts/admin-layout'
 import AdminDashboardPage from '@/pages/admin/admin-dashboard-page'
 import AdminUsersPage from '@/pages/admin/admin-users-page'
-import AdminQuestionsPage from '@/pages/admin/admin-questions-page'
 import AdminImportPage from '@/pages/admin/admin-import-page'
+import AdminExamsPage from '@/pages/admin/admin-exams-page'
 
 // Guards
 import ProtectedRoute from '@/router/protected-route'
@@ -77,7 +77,7 @@ export const router = createBrowserRouter([
                   { index: true, element: <Navigate to="/admin/dashboard" replace /> },
                   { path: 'dashboard', element: <AdminDashboardPage /> },
                   { path: 'users', element: <AdminUsersPage /> },
-                  { path: 'questions', element: <AdminQuestionsPage /> },
+                  { path: 'exams', element: <AdminExamsPage /> },
                   { path: 'import', element: <AdminImportPage /> },
                 ],
               },

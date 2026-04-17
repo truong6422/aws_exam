@@ -1,10 +1,3 @@
-/**
- * Exam Session Page — full exam UI with timer, navigation grid, autosave.
- * Reads attemptId from URL :sessionId param (matches route /exam/:sessionId).
- * If no questions in store (page refresh), re-fetches from backend is not
- * supported — redirects to setup. Users must complete in one session or
- * resume via the persisted store (attemptId + answers survive refresh).
- */
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useExamStore } from '@/stores/exam-store'
@@ -15,6 +8,7 @@ import { useUiStore } from '@/stores/ui-store'
 import { ExamTimer } from '@/components/exam/exam-timer'
 import { QuestionNavigationGrid } from '@/components/exam/question-navigation-grid'
 import { AnswerOption } from '@/components/exam/answer-option'
+import { useTranslation } from 'react-i18next'
 
 const panelStyle: React.CSSProperties = {
   background: '#272729',
@@ -31,28 +25,46 @@ const sidebarPanelStyle: React.CSSProperties = {
 export default function ExamSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const addToast = useUiStore((s) => s.addToast)
 
   const {
     attemptId, questions, answers, flagged,
     currentIndex, timeRemaining,
-    updateAnswer, toggleFlag,
+    initSession, updateAnswer, toggleFlag,
     goToQuestion, getAnswersAsPartial,
   } = useExamStore()
 
   const [submitting, setSubmitting] = useState(false)
+  const [pausing, setPausing] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  // On mount: if questions not in store (refresh), re-fetch attempt
+  // On mount: if questions missing (refresh or direct link), resume session
   useEffect(() => {
     const id = Number(sessionId)
     if (!id) { navigate('/exam/setup'); return }
 
-    // If no questions in store (hard refresh), redirect to setup
-    if (questions.length === 0 && attemptId !== id) {
-      navigate('/exam/setup')
+    if (questions.length === 0 || attemptId !== id) {
+      setLoading(true)
+      examApi.resumeExam(id)
+        .then((attempt) => {
+          initSession(
+            attempt.id,
+            attempt.questions,
+            attempt.time_remaining_seconds,
+            'exam',
+            attempt.user_answers,
+            attempt.flagged_ids
+          )
+        })
+        .catch(() => {
+          addToast({ type: 'error', message: 'Không thể khôi phục bài thi.' })
+          navigate('/exam/setup')
+        })
+        .finally(() => setLoading(false))
     }
-  }, [sessionId, questions.length, attemptId, navigate])
+  }, [sessionId, questions.length, attemptId, navigate, initSession, addToast])
 
   const handleSubmit = useCallback(async (auto = false) => {
     if (submitting) return
@@ -63,11 +75,25 @@ export default function ExamSessionPage() {
       const result = await examApi.submitExam(id, getAnswersAsPartial())
       navigate(`/exam/${id}/result`, { state: { result } })
     } catch (err) {
-      if (!auto) addToast({ type: 'error', message: (err as Error).message || 'Submit failed.' })
+      if (!auto) addToast({ type: 'error', message: (err as Error).message || 'Nộp bài thất bại.' })
     } finally {
       setSubmitting(false)
     }
   }, [submitting, attemptId, sessionId, getAnswersAsPartial, navigate, addToast])
+
+  const handlePause = async () => {
+    if (pausing || !attemptId) return
+    setPausing(true)
+    try {
+      await examApi.pauseExam(attemptId, getAnswersAsPartial())
+      addToast({ type: 'success', message: 'Đã tạm dừng và lưu bài thi.' })
+      navigate('/dashboard')
+    } catch (err) {
+      addToast({ type: 'error', message: 'Tạm dừng thất bại.' })
+    } finally {
+      setPausing(false)
+    }
+  }
 
   const handleTimeUp = useCallback(() => handleSubmit(true), [handleSubmit])
 
@@ -76,6 +102,49 @@ export default function ExamSessionPage() {
     handleTimeUp,
   )
   const { isSaving } = useAutosave(attemptId)
+
+  // IMPLICIT PAUSE: Save and pause when closing tab or navigating away
+  useEffect(() => {
+    // Clear any pending pause from Strict Mode unmount
+    if ((window as any).__pauseTimeout) {
+      clearTimeout((window as any).__pauseTimeout);
+      (window as any).__pauseTimeout = null;
+    }
+
+    const handlePauseImplicitly = () => {
+      if (attemptId) {
+        try {
+          const raw = localStorage.getItem('aws-exam-auth')
+          const parsed = raw ? JSON.parse(raw) : null
+          const token = parsed?.state?.token
+          if (token) {
+            const data = JSON.stringify(getAnswersAsPartial())
+            fetch(`/api/v1/exams/${attemptId}/pause/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: data,
+              keepalive: true
+            }).catch(() => { })
+          }
+        } catch (e) { }
+      }
+    }
+
+    const handleBeforeUnload = () => handlePauseImplicitly()
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Delay implicit pause by 200ms to allow remount detection (Strict Mode)
+      (window as any).__pauseTimeout = setTimeout(() => {
+        handlePauseImplicitly();
+        (window as any).__pauseTimeout = null;
+      }, 200);
+    }
+  }, [attemptId, getAnswersAsPartial])
 
   const question = questions[currentIndex]
   const questionIds = questions.map((q) => q.id)
@@ -94,18 +163,10 @@ export default function ExamSessionPage() {
     }
   }
 
-  if (!question) {
+  if (loading || !question) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
-        <div
-          style={{
-            width: '32px', height: '32px',
-            border: '3px solid rgba(255,255,255,0.1)',
-            borderTopColor: '#0071e3',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }}
-        />
+        <div className="spinner-small" />
       </div>
     )
   }
@@ -114,177 +175,210 @@ export default function ExamSessionPage() {
   const selectedAnswers = answers[question.id] ?? []
 
   return (
-    <div style={{ display: 'flex', height: '100%', gap: '16px' }}>
-      {/* Sidebar */}
-      <aside style={{ width: '200px', flexShrink: 0, flexDirection: 'column', gap: '12px' }} className="hidden lg:flex">
-        <div style={{ ...sidebarPanelStyle, textAlign: 'center' }}>
-          <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
-          {isSaving && (
-            <p style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>Đang lưu...</p>
-          )}
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
 
-        <div style={{ ...sidebarPanelStyle, padding: 0, overflow: 'hidden' }}>
-          <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', fontSize: '11px', fontWeight: 600, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
-            {answeredCount} / {questions.length} đã trả lời
-          </div>
-          <QuestionNavigationGrid
-            totalQuestions={questions.length}
-            currentIndex={currentIndex}
-            answers={answers}
-            flagged={flagged}
-            questionIds={questionIds}
-            onSelectQuestion={goToQuestion}
-          />
-        </div>
-
-        <button
-          onClick={() => setConfirmSubmit(true)}
-          disabled={submitting}
-          className="btn-primary"
-          style={{ width: '100%', opacity: submitting ? 0.6 : 1 }}
-        >
-          Nộp bài thi
-        </button>
-      </aside>
-
-      {/* Main */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
-        {/* Mobile timer bar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            ...sidebarPanelStyle,
-          }}
-          className="lg:hidden"
-        >
-          <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>{answeredCount}/{questions.length} đã trả lời</span>
-        </div>
-
-        {/* Question card */}
-        <div style={{ ...panelStyle, padding: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
-              Question {currentIndex + 1} of {questions.length}
-              {question.question_type === 'multiple' && (
-                <span
-                  style={{
-                    marginLeft: '8px',
-                    fontSize: '11px',
-                    background: 'rgba(0,113,227,0.1)',
-                    color: '#2997ff',
-                    border: '1px solid rgba(0,113,227,0.4)',
-                    borderRadius: '6px',
-                    padding: '2px 6px',
-                    letterSpacing: '-0.12px',
-                  }}
-                >
-                  Chọn tất cả đáp án đúng
-                </span>
-              )}
-            </span>
-            <button
-              onClick={() => toggleFlag(question.id)}
-              style={{
-                background: 'none',
-                border: isFlagged ? '1px solid #e0453c' : '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '6px',
-                padding: '3px 8px',
-                fontSize: '11px',
-                fontWeight: 600,
-                letterSpacing: '-0.12px',
-                color: isFlagged ? '#e0453c' : 'rgba(255,255,255,0.5)',
-                cursor: 'pointer',
-              }}
-              title={isFlagged ? 'Bỏ đánh dấu câu hỏi' : 'Đánh dấu để xem lại'}
-            >
-              {isFlagged ? 'Đã đánh dấu' : 'Đánh dấu'}
-            </button>
-          </div>
-          <p style={{ fontSize: '17px', fontWeight: 400, color: '#fff', lineHeight: 1.47, letterSpacing: '-0.374px' }}>{question.text}</p>
-        </div>
-
-        {/* Answers */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {question.answers.map((answer) => (
-            <AnswerOption
-              key={answer.id}
-              answer={answer}
-              isSelected={selectedAnswers.includes(answer.id)}
-              questionType={question.question_type}
-              onSelect={handleAnswerSelect}
-            />
-          ))}
-        </div>
-
-        {/* Navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Unified Top Header — FIX REPETITION */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: '#272729',
+        borderRadius: '12px',
+        padding: '12px 20px',
+        border: '1px solid rgba(255,255,255,0.05)'
+      }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <button
-            onClick={() => goToQuestion(currentIndex - 1)}
-            disabled={currentIndex === 0}
-            className="btn-ghost"
-            style={{ opacity: currentIndex === 0 ? 0.4 : 1 }}
+            onClick={handlePause}
+            disabled={pausing}
+            style={{
+              background: 'rgba(255, 159, 10, 0.15)',
+              color: '#ff9f0a',
+              border: '1px solid rgba(255, 159, 10, 0.3)',
+              borderRadius: '8px',
+              padding: '6px 14px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
           >
-            Câu trước
+            {pausing ? 'Đang dừng...' : 'Tạm dừng bài thi'}
           </button>
-          {currentIndex < questions.length - 1 ? (
-            <button
-              onClick={() => goToQuestion(currentIndex + 1)}
-              className="btn-ghost"
-            >
-              Câu tiếp
-            </button>
-          ) : (
-            <button
-              onClick={() => setConfirmSubmit(true)}
-              disabled={submitting}
-              className="btn-primary"
-              style={{ opacity: submitting ? 0.6 : 1 }}
-            >
-              Nộp bài thi
-            </button>
+          {isSaving && (
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Đang tự động lưu...</span>
           )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>{t('exam.time_remaining')}</span>
+            <ExamTimer minutes={minutes} seconds={seconds} isWarning={isWarning} isCritical={isCritical} />
+          </div>
+          <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>{t('exam.progress')}</span>
+            <span style={{ color: '#fff', fontSize: '16px', fontWeight: 700 }}>{answeredCount} / {questions.length}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, gap: '16px', overflow: 'hidden' }}>
+        {/* Sidebar — ONLY NAVIGATION */}
+        <aside style={{ width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }} className="hidden lg:flex">
+          <div style={{ ...sidebarPanelStyle, padding: 0, overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '12px', fontSize: '11px', fontWeight: 700, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+              {t('exam.question_navigation')}
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              <QuestionNavigationGrid
+                totalQuestions={questions.length}
+                currentIndex={currentIndex}
+                answers={answers}
+                flagged={flagged}
+                questionIds={questionIds}
+                onSelectQuestion={goToQuestion}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => setConfirmSubmit(true)}
+            disabled={submitting}
+            className="btn-primary"
+            style={{ width: '100%', padding: '12px' }}
+          >
+            Nộp bài thi
+          </button>
+        </aside>
+
+        {/* Main Content */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', paddingRight: '4px' }}>
+          {/* Question card */}
+          <div style={{ ...panelStyle, padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                {t('exam.question_pos', { current: currentIndex + 1, total: questions.length })}
+                {question.question_type === 'multiple' && (
+                  <span
+                    style={{
+                      marginLeft: '12px',
+                      fontSize: '11px',
+                      background: 'rgba(0,113,227,0.1)',
+                      color: '#2997ff',
+                      border: '1px solid rgba(0,113,227,0.4)',
+                      borderRadius: '6px',
+                      padding: '2px 8px',
+                      textTransform: 'uppercase',
+                      fontWeight: 700
+                    }}
+                  >
+                    Chọn nhiều đáp án
+                  </span>
+                )}
+              </span>
+              <button
+                onClick={() => toggleFlag(question.id)}
+                style={{
+                  background: isFlagged ? 'rgba(224, 69, 60, 0.1)' : 'transparent',
+                  border: isFlagged ? '1px solid #e0453c' : '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '8px',
+                  padding: '4px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: isFlagged ? '#e0453c' : 'rgba(255,255,255,0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {isFlagged ? 'Đã đánh dấu' : 'Đánh dấu câu hỏi'}
+              </button>
+            </div>
+            <p style={{ fontSize: '18px', fontWeight: 400, color: '#fff', lineHeight: 1.55, letterSpacing: '-0.2px' }}>{question.text}</p>
+          </div>
+
+          {/* Answers */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {question.answers.map((answer) => (
+              <AnswerOption
+                key={answer.id}
+                answer={answer}
+                isSelected={selectedAnswers.includes(answer.id)}
+                questionType={question.question_type}
+                onSelect={handleAnswerSelect}
+              />
+            ))}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingBottom: '20px' }}>
+            <button
+              onClick={() => goToQuestion(currentIndex - 1)}
+              disabled={currentIndex === 0}
+              className="btn-ghost"
+              style={{ opacity: currentIndex === 0 ? 0.4 : 1, padding: '10px 20px' }}
+            >
+              Câu trước
+            </button>
+            {currentIndex < questions.length - 1 ? (
+              <button
+                onClick={() => goToQuestion(currentIndex + 1)}
+                className="btn-ghost"
+                style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.05)' }}
+              >
+                Câu tiếp theo
+              </button>
+            ) : (
+              <button
+                onClick={() => setConfirmSubmit(true)}
+                disabled={submitting}
+                className="btn-primary"
+                style={{ padding: '10px 30px' }}
+              >
+                Hoàn thành & Nộp bài
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Confirm submit dialog */}
       {confirmSubmit && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)' }}>
           <div
             style={{
               width: '100%',
-              maxWidth: '400px',
-              background: '#272729',
-              borderRadius: '12px',
-              padding: '24px',
+              maxWidth: '440px',
+              background: '#1c1c1e',
+              borderRadius: '20px',
+              padding: '32px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
             }}
           >
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>Nộp bài thi?</h3>
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px', marginBottom: '16px' }}>
-              Bạn đã trả lời {answeredCount} trong {questions.length} câu hỏi.
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>Nộp bài thi?</h3>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, marginBottom: '24px' }}>
+              Bạn đã hoàn thành <strong>{answeredCount}</strong> trên tổng số <strong>{questions.length}</strong> câu hỏi.
               {answeredCount < questions.length && (
-                <span style={{ fontWeight: 600, color: '#e0453c' }}>
-                  {' '}{questions.length - answeredCount} câu chưa trả lời.
-                </span>
+                <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(224, 69, 60, 0.1)', borderRadius: '10px', color: '#ff453a', fontSize: '13px', fontWeight: 500 }}>
+                  ⚠️ Lưu ý: Còn {questions.length - answeredCount} câu chưa có câu trả lời.
+                </div>
               )}
             </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-              <button
-                onClick={() => setConfirmSubmit(false)}
-                className="btn-ghost"
-              >
-                Hủy
-              </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 onClick={() => { setConfirmSubmit(false); handleSubmit() }}
                 disabled={submitting}
                 className="btn-primary"
-                style={{ opacity: submitting ? 0.6 : 1 }}
+                style={{ width: '100%', padding: '14px' }}
               >
-                {submitting ? 'Đang nộp...' : 'Xác nhận nộp bài'}
+                {submitting ? 'Đang nộp bài...' : 'Xác nhận nộp bài'}
+              </button>
+              <button
+                onClick={() => setConfirmSubmit(false)}
+                className="btn-ghost"
+                style={{ width: '100%', padding: '12px' }}
+              >
+                Quay lại làm tiếp
               </button>
             </div>
           </div>

@@ -29,6 +29,8 @@ interface ExamActions {
     questions: Question[],
     timeRemaining: number,
     mode: 'exam' | 'practice',
+    initialAnswers?: Record<number, number[]>,
+    flaggedIds?: number[],
   ) => void
   updateAnswer: (questionId: number, answerIds: number[]) => void
   toggleFlag: (questionId: number) => void
@@ -62,14 +64,14 @@ export const useExamStore = create<ExamState & ExamActions>()(
     (set, get) => ({
       ...INITIAL_STATE,
 
-      initSession: (attemptId, questions, timeRemaining, mode) =>
+      initSession: (attemptId, questions, timeRemaining, mode, initialAnswers, flaggedIds) =>
         set({
           attemptId,
           questions,
           timeRemaining,
           mode,
-          answers: {},
-          flagged: [],
+          answers: initialAnswers || {},
+          flagged: flaggedIds || [],
           currentIndex: 0,
           isSaving: false,
         }),
@@ -106,10 +108,16 @@ export const useExamStore = create<ExamState & ExamActions>()(
       clearSession: () => set(INITIAL_STATE),
 
       getAnswersAsPartial: () => {
-        const { answers } = get()
-        return Object.entries(answers).map(([qId, aIds]) => ({
-          question_id: Number(qId),
-          answer_ids: aIds,
+        const { answers, flagged } = get()
+        const questionIds = Array.from(new Set([
+          ...Object.keys(answers).map(Number),
+          ...flagged
+        ]))
+
+        return questionIds.map(qId => ({
+          question_id: qId,
+          answer_ids: answers[qId] || [],
+          is_flagged: flagged.includes(qId),
         }))
       },
 

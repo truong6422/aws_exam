@@ -25,25 +25,28 @@ class Certification(TimestampedModel):
         return f"{self.code} — {self.name}"
 
 
-class Domain(TimestampedModel):
-    """Exam domain/category within a certification."""
+
+
+class ExamSet(TimestampedModel):
+    """A collection of questions (typically 65) for a specific certification."""
 
     certification = models.ForeignKey(
-        Certification, on_delete=models.CASCADE, related_name="domains"
+        Certification, on_delete=models.CASCADE, related_name="exam_sets"
     )
     name = models.CharField(max_length=255)
-    weight_percentage = models.PositiveIntegerField(default=0)
+    description = models.TextField(blank=True)
+    is_locked = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ("certification", "name")
         ordering = ["certification", "name"]
+        unique_together = ("certification", "name")
 
     def __str__(self) -> str:
-        return f"{self.certification.code} / {self.name}"
+        return f"{self.certification.code} - {self.name}"
 
 
 class Question(TimestampedModel):
-    """Exam question belonging to a domain."""
+    """Exam question belonging to a certification and optionally an exam set."""
 
     SINGLE = "single"
     MULTIPLE = "multiple"
@@ -52,8 +55,19 @@ class Question(TimestampedModel):
         (MULTIPLE, "Multiple"),
     ]
 
-    domain = models.ForeignKey(
-        Domain, on_delete=models.CASCADE, related_name="questions"
+    certification = models.ForeignKey(
+        Certification,
+        on_delete=models.CASCADE,
+        related_name="questions",
+        null=True,
+        blank=True,
+    )
+    exam_set = models.ForeignKey(
+        ExamSet,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="questions",
     )
     text = models.TextField()
     explanation = models.TextField(blank=True)
@@ -63,7 +77,7 @@ class Question(TimestampedModel):
     )
 
     class Meta:
-        ordering = ["domain", "id"]
+        ordering = ["certification", "id"]
 
     def __str__(self) -> str:
         return self.text[:80]

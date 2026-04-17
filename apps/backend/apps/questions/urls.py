@@ -7,7 +7,8 @@ from .views import (
     CertificationListView,
     CommentListCreateView,
     CommentUpvoteView,
-    DomainListView,
+    ExamSetListView,
+    ExamSetUpdateView,
 )
 
 app_name = "questions"
@@ -15,10 +16,11 @@ app_name = "questions"
 urlpatterns = [
     path("certifications/", CertificationListView.as_view(), name="certification-list"),
     path(
-        "certifications/<int:certification_id>/domains/",
-        DomainListView.as_view(),
-        name="domain-list",
+        "certifications/<int:certification_id>/sets/",
+        ExamSetListView.as_view(),
+        name="exam-set-list",
     ),
+    path("sets/<int:pk>/", ExamSetUpdateView.as_view(), name="exam-set-update"),
     # Bookmarks (non-question-scoped must come before <int:question_id> patterns)
     path("bookmarks/", BookmarkListView.as_view(), name="bookmark-list"),
     # Comment upvote (non-question-scoped)

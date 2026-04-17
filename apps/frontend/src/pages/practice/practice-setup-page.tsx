@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
-import { examApi, type Certification, type Domain } from '@/services/exam-api'
+import { examApi, type Certification } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
 import { useUiStore } from '@/stores/ui-store'
 
@@ -33,9 +33,7 @@ export default function PracticeSetupPage() {
   const addToast = useUiStore((s) => s.addToast)
 
   const [certifications, setCertifications] = useState<Certification[]>([])
-  const [domains, setDomains] = useState<Domain[]>([])
   const [selectedCertId, setSelectedCertId] = useState<number | ''>('')
-  const [selectedDomainId, setSelectedDomainId] = useState<number | ''>('')
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false)
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState(false)
@@ -55,13 +53,6 @@ export default function PracticeSetupPage() {
     loadBookmarks()
   }, [addToast, loadBookmarks, t])
 
-  useEffect(() => {
-    if (!selectedCertId) { setDomains([]); return }
-    examApi
-      .getDomains(selectedCertId as number)
-      .then(setDomains)
-      .catch(() => setDomains([]))
-  }, [selectedCertId])
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,7 +120,7 @@ export default function PracticeSetupPage() {
           <label style={labelStyle}>{t('practice.certification_label')}</label>
           <select
             value={selectedCertId}
-            onChange={(e) => { setSelectedCertId(Number(e.target.value)); setSelectedDomainId('') }}
+            onChange={(e) => { setSelectedCertId(Number(e.target.value)) }}
             style={selectStyle}
             required
           >
@@ -142,24 +133,6 @@ export default function PracticeSetupPage() {
           </select>
         </div>
 
-        {/* Domain filter */}
-        {domains.length > 0 && (
-          <div>
-            <label style={labelStyle}>{t('practice.domain_label')}</label>
-            <select
-              value={selectedDomainId}
-              onChange={(e) => setSelectedDomainId(e.target.value ? Number(e.target.value) : '')}
-              style={selectStyle}
-            >
-              <option value="">{t('practice.all_domains')}</option>
-              {domains.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {/* Bookmarked only filter */}
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>

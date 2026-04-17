@@ -184,9 +184,9 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/day",
-        "user": "1000/day",
-        "login": "5/minute",
+        "anon": "1000/day",
+        "user": "10000/day",
+        "login": "10/minute",
     },
     "EXCEPTION_HANDLER": "core.exceptions.handlers.custom_exception_handler",
 }

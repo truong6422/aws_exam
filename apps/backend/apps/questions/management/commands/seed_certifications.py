@@ -5,7 +5,7 @@ Idempotent — uses get_or_create throughout.
 """
 from django.core.management.base import BaseCommand
 
-from apps.questions.models import Answer, Certification, Domain, Question
+from apps.questions.models import Answer, Certification, Question
 
 CERTIFICATIONS = [
     {
@@ -571,15 +571,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         total_certs = 0
-        total_domains = 0
         total_questions = 0
         total_answers = 0
 
         for cert_data in CERTIFICATIONS:
-            domains_data = cert_data.pop("domains")
+            # We don't want to mutate the global list, but we need to pop domains
+            data = cert_data.copy()
+            domains_data = data.pop("domains")
             cert, created = Certification.objects.get_or_create(
-                code=cert_data["code"],
-                defaults=cert_data,
+                code=data["code"],
+                defaults=data,
             )
             if created:
                 total_certs += 1
@@ -588,21 +589,15 @@ class Command(BaseCommand):
                 self.stdout.write(f"  Exists: {cert}")
 
             for domain_data in domains_data:
-                questions_data = domain_data.pop("questions")
-                domain, d_created = Domain.objects.get_or_create(
-                    certification=cert,
-                    name=domain_data["name"],
-                    defaults={"weight_percentage": domain_data["weight_percentage"]},
-                )
-                if d_created:
-                    total_domains += 1
-
+                questions_data = domain_data.get("questions", [])
                 for q_data in questions_data:
-                    answers_data = q_data.pop("answers")
+                    # Copy to avoid mutation
+                    question_data = q_data.copy()
+                    answers_data = question_data.pop("answers")
                     question, q_created = Question.objects.get_or_create(
-                        domain=domain,
-                        text=q_data["text"],
-                        defaults=q_data,
+                        certification=cert,
+                        text=question_data["text"],
+                        defaults=question_data,
                     )
                     if q_created:
                         total_questions += 1
@@ -617,7 +612,6 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"\nDone — created {total_certs} certifications, "
-                f"{total_domains} domains, {total_questions} questions, "
-                f"{total_answers} answers."
+                f"{total_questions} questions, {total_answers} answers."
             )
         )

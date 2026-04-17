@@ -3,17 +3,17 @@ Questions views: certification list (public), domain list (auth required),
 and community views: comments, upvote, bookmark, answer report.
 """
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
-from .models import AnswerReport, Bookmark, Certification, Comment, Domain, Question
+from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, Question
 from .serializers import (
     AnswerReportSerializer,
     CertificationSerializer,
     CommentSerializer,
-    DomainSerializer,
+    ExamSetSerializer,
 )
 
 
@@ -25,16 +25,37 @@ class CertificationListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
 
-class DomainListView(generics.ListAPIView):
-    """GET /api/v1/questions/certifications/<certification_id>/domains/ — auth required."""
 
-    serializer_class = DomainSerializer
+
+class ExamSetListView(generics.ListAPIView):
+    """GET /api/v1/questions/certifications/<certification_id>/sets/ — list exam sets."""
+
+    serializer_class = ExamSetSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Domain.objects.filter(
+        queryset = ExamSet.objects.filter(
             certification_id=self.kwargs["certification_id"]
-        ).select_related("certification")
+        )
+        # Standard users only see unlocked sets, staff see all
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(is_locked=False)
+        
+        # Natural sort in Python for "Exam 1", "Exam 2", "Exam 10"
+        import re
+        def natural_sort_key(s):
+            return [int(text) if text.isdigit() else text.lower()
+                    for text in re.split('([0-9]+)', s.name)]
+        
+        return sorted(queryset, key=natural_sort_key)
+
+
+class ExamSetUpdateView(generics.UpdateAPIView):
+    """PATCH /api/v1/questions/sets/<pk>/ — update exam set (Admin only)."""
+
+    queryset = ExamSet.objects.all()
+    serializer_class = ExamSetSerializer
+    permission_classes = [IsAdminUser]
 
 
 class CommentListCreateView(generics.ListCreateAPIView):

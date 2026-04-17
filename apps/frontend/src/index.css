@@ -211,3 +211,18 @@ h1, h2, h3 {
   outline: 2px solid var(--ap-blue);
   outline-offset: 2px;
 }
+
+/* Custom Utilities for New Exam Set Flow */
+.hover-card:hover {
+  transform: translateY(-2px);
+  background: #323234 !important;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--ap-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

@@ -2,7 +2,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.questions.models import Answer, Certification, Domain, Question
+from apps.questions.models import Answer, Certification, Question
 
 from .models import ImportJob
 from .validators import validate_import_data
@@ -39,13 +39,12 @@ class BulkQuestionImportSerializer(serializers.Serializer):
     def create(self, validated_data):
         import_data = validated_data["data"]
         cert = Certification.objects.get(code=import_data["certification_code"])
-        domain = Domain.objects.get(certification=cert, name=import_data["domain_name"])
 
         created_count = 0
         with transaction.atomic():
             for q_data in import_data["questions"]:
                 question = Question.objects.create(
-                    domain=domain,
+                    certification=cert,
                     text=q_data["text"],
                     explanation=q_data.get("explanation", ""),
                     source=q_data.get("source", ""),

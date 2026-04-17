@@ -3,7 +3,7 @@
  * Reuses certifications/domains from exam-api for question browsing.
  */
 import { apiClient } from '@/lib/api-client'
-import type { Certification, Domain } from '@/services/exam-api'
+import type { Certification } from '@/services/exam-api'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -40,6 +40,9 @@ export const adminApi = {
   getCertifications: () =>
     apiClient.list<Certification>('/questions/certifications/'),
 
-  getDomains: (certId: number) =>
-    apiClient.list<Domain>(`/questions/certifications/${certId}/domains/`),
+  getExamSets: (certId: number) =>
+    apiClient.list<any>(`/questions/certifications/${certId}/sets/`),
+
+  updateExamSet: (setId: number, data: { is_locked: boolean }) =>
+    apiClient.patch<any>(`/questions/sets/${setId}/`, data),
 }

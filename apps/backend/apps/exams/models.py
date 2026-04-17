@@ -12,6 +12,7 @@ from apps.core.models import TimestampedModel
 class ExamAttempt(TimestampedModel):
     STATUS_CHOICES = [
         ('in_progress', 'In Progress'),
+        ('paused', 'Paused'),
         ('submitted', 'Submitted'),
         ('expired', 'Expired'),
     ]
@@ -25,9 +26,20 @@ class ExamAttempt(TimestampedModel):
         'questions.Certification',
         on_delete=models.CASCADE,
     )
+    exam_set = models.ForeignKey(
+        'questions.ExamSet',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='exam_attempts',
+    )
     started_at = models.DateTimeField(auto_now_add=True)
+    # The last time the exam was resumed or started
+    last_resumed_at = models.DateTimeField(default=timezone.now)
     submitted_at = models.DateTimeField(null=True, blank=True)
     time_limit_minutes = models.PositiveIntegerField()
+    # Seconds spent across previous sessions (excluding the current session since last_resumed_at)
+    accumulated_seconds = models.PositiveIntegerField(default=0)
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default='in_progress'
     )
@@ -41,9 +53,17 @@ class ExamAttempt(TimestampedModel):
         ordering = ['-started_at']
 
     @property
+    def time_spent_total(self):
+        """Total seconds spent on this exam including current session."""
+        if self.status == 'in_progress':
+            current_session = (timezone.now() - self.last_resumed_at).total_seconds()
+            return int(self.accumulated_seconds + current_session)
+        return self.accumulated_seconds
+
+    @property
     def time_remaining_seconds(self):
-        elapsed = (timezone.now() - self.started_at).total_seconds()
-        return max(0, int(self.time_limit_minutes * 60 - elapsed))
+        limit_seconds = self.time_limit_minutes * 60
+        return max(0, limit_seconds - self.time_spent_total)
 
     @property
     def is_expired(self):
@@ -59,6 +79,7 @@ class AttemptAnswer(models.Model):
     )
     question = models.ForeignKey('questions.Question', on_delete=models.CASCADE)
     selected_answers = models.ManyToManyField('questions.Answer', blank=True)
+    is_flagged = models.BooleanField(default=False)
     answered_at = models.DateTimeField(auto_now=True)
 
     class Meta:

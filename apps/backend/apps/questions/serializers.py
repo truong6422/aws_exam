@@ -6,7 +6,7 @@ Question serializers split by context:
 """
 from rest_framework import serializers
 
-from .models import Answer, AnswerReport, Certification, Comment, Domain, Question
+from .models import Answer, AnswerReport, Certification, Comment, ExamSet, Question
 
 
 class AnswerExamSerializer(serializers.ModelSerializer):
@@ -59,10 +59,12 @@ class CertificationSerializer(serializers.ModelSerializer):
         ]
 
 
-class DomainSerializer(serializers.ModelSerializer):
+class ExamSetSerializer(serializers.ModelSerializer):
+    question_count = serializers.IntegerField(source="questions.count", read_only=True)
+
     class Meta:
-        model = Domain
-        fields = ["id", "name", "weight_percentage", "certification"]
+        model = ExamSet
+        fields = ["id", "name", "description", "is_locked", "question_count"]
 
 
 class CommentSerializer(serializers.ModelSerializer):

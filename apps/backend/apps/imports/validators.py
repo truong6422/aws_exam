@@ -1,14 +1,13 @@
 """JSON schema + business logic validation for bulk question import."""
 import jsonschema
 
-from apps.questions.models import Certification, Domain
+from apps.questions.models import Certification
 
 QUESTION_IMPORT_SCHEMA = {
     "type": "object",
-    "required": ["certification_code", "domain_name", "questions"],
+    "required": ["certification_code", "questions"],
     "properties": {
         "certification_code": {"type": "string", "minLength": 1},
-        "domain_name": {"type": "string", "minLength": 1},
         "questions": {
             "type": "array",
             "minItems": 1,
@@ -52,18 +51,12 @@ def validate_import_data(data):
         return False, [f"Schema error: {e.message}"]
 
     cert_code = data.get("certification_code")
-    domain_name = data.get("domain_name")
 
     # 2. DB existence checks
     try:
-        cert = Certification.objects.get(code=cert_code)
+        Certification.objects.get(code=cert_code)
     except Certification.DoesNotExist:
         return False, [f"Certification '{cert_code}' not found"]
-
-    try:
-        Domain.objects.get(certification=cert, name=domain_name)
-    except Domain.DoesNotExist:
-        return False, [f"Domain '{domain_name}' not found for certification '{cert_code}'"]
 
     # 3. Business logic: correct-answer counts per question
     errors = []

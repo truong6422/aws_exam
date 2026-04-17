@@ -1,9 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom'
 
 const ADMIN_TABS = [
-  { label: 'Dashboard', to: '/admin/dashboard' },
+  { label: 'Exams', to: '/admin/exams' },
   { label: 'Users', to: '/admin/users' },
-  { label: 'Questions', to: '/admin/questions' },
   { label: 'Import', to: '/admin/import' },
 ]
 
