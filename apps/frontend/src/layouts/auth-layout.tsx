@@ -1,8 +1,11 @@
 import { Outlet } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '@/components/language-switcher'
 
 /** Immersive dark layout for login / register pages — Apple dark style. */
 export default function AuthLayout() {
+  const { t } = useTranslation()
+
   return (
     <div
       className="flex min-h-screen items-center justify-center p-4"
@@ -57,7 +60,7 @@ export default function AuthLayout() {
               fontWeight: 400
             }}
           >
-            Practice makes perfect
+            {t('auth.subtitle')}
           </p>
         </div>
         <Outlet />

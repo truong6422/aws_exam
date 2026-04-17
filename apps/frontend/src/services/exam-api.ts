@@ -79,8 +79,9 @@ export interface ReviewQuestion {
   id: number
   text: string
   explanation: string
-  question_type: string
+  question_type: 'single' | 'multiple'
   answers: ReviewAnswer[]
+  comment_count: number
 }
 
 export interface ExamReview {
@@ -119,11 +120,13 @@ export interface PaginatedExamList {
 
 export interface Comment {
   id: number
+  parent: number | null
   body: string
-  referenced_answer: number | null
+  referenced_answers: number[]
   author_name: string
   upvote_count: number
   upvoted_by_me: boolean
+  replies: Comment[]
   created_at: string
 }
 
@@ -138,6 +141,17 @@ export interface UpvoteResult {
 
 export interface BookmarkResult {
   bookmarked: boolean
+}
+
+export interface PaginatedQuestions {
+  links: {
+    prev: string | null
+    next: string | null
+    current_page: number
+    total_pages: number
+    count: number
+  }
+  data: ReviewQuestion[]
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -180,13 +194,17 @@ export const examApi = {
 }
 
 export const practiceApi = {
+  getQuestions: (certId?: number, page = 1) =>
+    apiClient.get<PaginatedQuestions>(`/questions/practice/?certification_id=${certId || ''}&page=${page}`),
+
   getComments: (questionId: number) =>
     apiClient.list<Comment>(`/questions/${questionId}/comments/`),
 
-  postComment: (questionId: number, body: string, referencedAnswer?: number | null) =>
+  postComment: (questionId: number, body: string, referencedAnswers?: number[], parent?: number | null) =>
     apiClient.post<Comment>(`/questions/${questionId}/comments/`, {
       body,
-      referenced_answer: referencedAnswer ?? null,
+      referenced_answers: referencedAnswers ?? [],
+      parent: parent ?? null,
     }),
 
   upvoteComment: (commentId: number) =>

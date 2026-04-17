@@ -109,12 +109,17 @@ class Comment(TimestampedModel):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
     )
-    referenced_answer = models.ForeignKey(
+    referenced_answers = models.ManyToManyField(
         Answer,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name="comments",
+    )
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="replies",
     )
     body = models.TextField(max_length=2000)
     upvotes = models.ManyToManyField(

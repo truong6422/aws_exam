@@ -50,7 +50,16 @@ export default function ExamSetupPage() {
   useEffect(() => {
     examApi
       .getCertifications()
-      .then(setCertifications)
+      .then((certs) => {
+        const sorted = [...certs].sort((a, b) => {
+          const aSAA = a.code.toUpperCase().includes('SAA')
+          const bSAA = b.code.toUpperCase().includes('SAA')
+          if (aSAA && !bSAA) return -1
+          if (!aSAA && bSAA) return 1
+          return a.code.localeCompare(b.code)
+        })
+        setCertifications(sorted)
+      })
       .catch(() => addToast({ type: 'error', message: t('exam.error_load') }))
       .finally(() => setLoading(false))
   }, [addToast, t])

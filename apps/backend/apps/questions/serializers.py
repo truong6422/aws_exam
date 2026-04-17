@@ -45,6 +45,20 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
         fields = ["id", "text", "explanation", "question_type", "answers"]
 
 
+class PracticeQuestionSerializer(serializers.ModelSerializer):
+    """Question fields for practice mode — includes explanation and correct answers."""
+
+    answers = AnswerReviewSerializer(many=True, read_only=True)
+    comment_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = ["id", "text", "explanation", "question_type", "answers", "comment_count"]
+
+    def get_comment_count(self, obj):
+        return obj.comments.count()
+
+
 class CertificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certification
@@ -72,15 +86,23 @@ class CommentSerializer(serializers.ModelSerializer):
     upvote_count = serializers.SerializerMethodField()
     upvoted_by_me = serializers.SerializerMethodField()
 
+    replies = serializers.SerializerMethodField()
+
+    referenced_answers = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Answer.objects.all(), required=False
+    )
+
     class Meta:
         model = Comment
         fields = [
             "id",
+            "parent",
             "body",
-            "referenced_answer",
+            "referenced_answers",
             "author_name",
             "upvote_count",
             "upvoted_by_me",
+            "replies",
             "created_at",
         ]
         read_only_fields = [
@@ -88,8 +110,15 @@ class CommentSerializer(serializers.ModelSerializer):
             "author_name",
             "upvote_count",
             "upvoted_by_me",
+            "replies",
             "created_at",
         ]
+
+    def get_replies(self, obj):
+        # Only return flat list of replies for the top level to avoid deep nesting issues
+        if obj.parent is None:
+            return CommentSerializer(obj.replies.all(), many=True, context=self.context).data
+        return []
 
     def get_author_name(self, obj):
         full_name = obj.author.get_full_name()

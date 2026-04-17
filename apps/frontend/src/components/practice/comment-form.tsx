@@ -1,18 +1,18 @@
-/**
- * CommentForm — textarea + submit for posting a new community comment.
- * Shows the referenced answer label if provided.
- */
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Answer } from '@/services/exam-api'
 
 interface CommentFormProps {
   answers: Answer[]
-  onSubmit: (body: string, referencedAnswer: number | null) => Promise<void>
+  parent?: number | null
+  onSubmit: (body: string, referencedAnswers: number[], parent?: number | null) => Promise<void>
+  onCancel?: () => void
 }
 
-export function CommentForm({ answers, onSubmit }: CommentFormProps) {
+export function CommentForm({ answers, parent = null, onSubmit, onCancel }: CommentFormProps) {
+  const { t } = useTranslation()
   const [body, setBody] = useState('')
-  const [referencedAnswer, setReferencedAnswer] = useState<number | null>(null)
+  const [referencedAnswers, setReferencedAnswers] = useState<number[]>([])
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,12 +20,18 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
     if (!body.trim() || submitting) return
     setSubmitting(true)
     try {
-      await onSubmit(body.trim(), referencedAnswer)
+      await onSubmit(body.trim(), referencedAnswers, parent)
       setBody('')
-      setReferencedAnswer(null)
+      setReferencedAnswers([])
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const toggleAnswer = (id: number) => {
+    setReferencedAnswers((prev) =>
+      prev.includes(id) ? prev.filter((aid) => aid !== id) : [...prev, id]
+    )
   }
 
   return (
@@ -33,37 +39,37 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
       {/* Optional answer reference */}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>
-          Tham chiếu:
+          {t('comment.reference')}
         </span>
         <button
           type="button"
-          onClick={() => setReferencedAnswer(null)}
+          onClick={() => setReferencedAnswers([])}
           style={{
             fontSize: '11px',
             padding: '2px 8px',
             borderRadius: '4px',
             border: '1px solid',
-            borderColor: referencedAnswer === null ? '#0071e3' : 'rgba(255,255,255,0.15)',
-            background: referencedAnswer === null ? 'rgba(0,113,227,0.15)' : 'transparent',
-            color: referencedAnswer === null ? '#2997ff' : 'rgba(255,255,255,0.5)',
+            borderColor: referencedAnswers.length === 0 ? '#0071e3' : 'rgba(255,255,255,0.15)',
+            background: referencedAnswers.length === 0 ? 'rgba(0,113,227,0.15)' : 'transparent',
+            color: referencedAnswers.length === 0 ? '#2997ff' : 'rgba(255,255,255,0.5)',
             cursor: 'pointer',
           }}
         >
-          Không
+          {t('comment.none')}
         </button>
         {answers.map((a, i) => (
           <button
             key={a.id}
             type="button"
-            onClick={() => setReferencedAnswer(a.id)}
+            onClick={() => toggleAnswer(a.id)}
             style={{
               fontSize: '11px',
               padding: '2px 8px',
               borderRadius: '4px',
               border: '1px solid',
-              borderColor: referencedAnswer === a.id ? '#0071e3' : 'rgba(255,255,255,0.15)',
-              background: referencedAnswer === a.id ? 'rgba(0,113,227,0.15)' : 'transparent',
-              color: referencedAnswer === a.id ? '#2997ff' : 'rgba(255,255,255,0.5)',
+              borderColor: referencedAnswers.includes(a.id) ? '#0071e3' : 'rgba(255,255,255,0.15)',
+              background: referencedAnswers.includes(a.id) ? 'rgba(0,113,227,0.15)' : 'transparent',
+              color: referencedAnswers.includes(a.id) ? '#2997ff' : 'rgba(255,255,255,0.5)',
               cursor: 'pointer',
             }}
           >
@@ -75,9 +81,10 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        placeholder="Chia sẻ suy nghĩ của bạn về câu hỏi này..."
+        placeholder={parent ? t('comment.reply_placeholder') : t('comment.comment_placeholder')}
+        autoFocus={!!parent}
         maxLength={2000}
-        rows={3}
+        rows={parent ? 2 : 3}
         style={{
           width: '100%',
           background: 'rgba(255,255,255,0.05)',
@@ -94,9 +101,20 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
       />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
-          {body.length}/2000
-        </span>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
+            {body.length}/2000
+          </span>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {t('common.cancel')}
+            </button>
+          )}
+        </div>
         <button
           type="submit"
           disabled={!body.trim() || submitting}
@@ -107,7 +125,7 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
             opacity: !body.trim() || submitting ? 0.5 : 1,
           }}
         >
-          {submitting ? 'Đang đăng...' : 'Đăng bình luận'}
+          {submitting ? t('comment.posting') : parent ? t('comment.reply') : t('comment.post_comment')}
         </button>
       </div>
     </form>

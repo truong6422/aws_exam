@@ -3,6 +3,7 @@ Questions views: certification list (public), domain list (auth required),
 and community views: comments, upvote, bookmark, answer report.
 """
 from rest_framework import generics, status
+from core.pagination.page_number import CustomPageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,7 +15,14 @@ from .serializers import (
     CertificationSerializer,
     CommentSerializer,
     ExamSetSerializer,
+    PracticeQuestionSerializer,
 )
+from django.db import models
+
+
+class PracticeQuestionPagination(CustomPageNumberPagination):
+    page_size = 5
+    max_page_size = 5
 
 
 class CertificationListView(generics.ListAPIView):
@@ -57,6 +65,22 @@ class ExamSetUpdateView(generics.UpdateAPIView):
     serializer_class = ExamSetSerializer
     permission_classes = [IsAdminUser]
 
+class PracticeQuestionListView(generics.ListAPIView):
+    """GET /api/v1/questions/practice/ — paginated questions from unlocked sets."""
+
+    serializer_class = PracticeQuestionSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = PracticeQuestionPagination
+
+    def get_queryset(self):
+        cert_id = self.request.query_params.get("certification_id")
+        # Only show questions from UNLOCKED exam sets or questions with NO exam set
+        qs = Question.objects.filter(
+            models.Q(exam_set__is_locked=False) | models.Q(exam_set__isnull=True)
+        )
+        if cert_id:
+            qs = qs.filter(certification_id=cert_id)
+        return qs.order_by("id")
 
 class CommentListCreateView(generics.ListCreateAPIView):
     """GET/POST /api/v1/questions/<question_id>/comments/"""
@@ -65,9 +89,12 @@ class CommentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        return Comment.objects.filter(
-            question_id=self.kwargs["question_id"]
-        ).select_related("author")
+        # Return only top-level comments. Replies are nested within them via serializer.
+        return (
+            Comment.objects.filter(question_id=self.kwargs["question_id"], parent__isnull=True)
+            .select_related("author")
+            .prefetch_related("replies", "replies__author", "upvotes")
+        )
 
     def perform_create(self, serializer):
         question = get_object_or_404(Question, pk=self.kwargs["question_id"])

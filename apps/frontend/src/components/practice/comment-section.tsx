@@ -27,9 +27,20 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
       .finally(() => setLoading(false))
   }, [questionId])
 
-  const handlePost = async (body: string, referencedAnswer: number | null) => {
-    const newComment = await practiceApi.postComment(questionId, body, referencedAnswer)
-    setComments((prev) => [newComment, ...prev])
+  const handlePost = async (body: string, referencedAnswers: number[], parent?: number | null) => {
+    const newComment = await practiceApi.postComment(questionId, body, referencedAnswers, parent)
+
+    if (parent) {
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === parent
+            ? { ...c, replies: [...(c.replies || []), newComment] }
+            : c
+        )
+      )
+    } else {
+      setComments((prev) => [newComment, ...prev])
+    }
   }
 
   return (
@@ -70,7 +81,13 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {comments.map((c) => (
-            <CommentItem key={c.id} comment={c} isAuthenticated={isAuthenticated} />
+            <CommentItem
+              key={c.id}
+              comment={c}
+              answers={answers}
+              isAuthenticated={isAuthenticated}
+              onReply={handlePost as any}
+            />
           ))}
         </div>
       )}

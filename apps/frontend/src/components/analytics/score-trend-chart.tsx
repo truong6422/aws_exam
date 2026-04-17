@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { RecentTrendItem } from '../../services/analytics-api'
 
 interface Props {
@@ -7,12 +8,18 @@ interface Props {
 
 /** CSS sparkline bar chart showing score trend across recent exam attempts. */
 export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
+  const { t, i18n } = useTranslation()
   if (!trend.length) {
-    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Chưa có dữ liệu xu hướng.</p>
+    return (
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>
+        {t('analytics.no_trend')}
+      </p>
+    )
   }
 
   const maxScore = 100
   const height = 80 // px
+  const lang = i18n.language === 'en' ? 'en-US' : 'vi-VN'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -52,7 +59,7 @@ export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
                 }}
               />
               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', textAlign: 'center', lineHeight: 1, letterSpacing: '-0.12px' }}>
-                {new Date(item.date).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+                {new Date(item.date).toLocaleDateString(lang, { month: 'short', day: 'numeric' })}
               </span>
             </div>
           )
@@ -60,8 +67,8 @@ export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
-        <span>{trend.length} bài thi gần đây</span>
-        <span>Xu hướng điểm</span>
+        <span>{t('analytics.recent_exams_label', { count: trend.length })}</span>
+        <span>{t('analytics.score_trend')}</span>
       </div>
     </div>
   )

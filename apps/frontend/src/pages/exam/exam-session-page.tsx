@@ -59,12 +59,12 @@ export default function ExamSessionPage() {
           )
         })
         .catch(() => {
-          addToast({ type: 'error', message: 'Không thể khôi phục bài thi.' })
+          addToast({ type: 'error', message: t('exam.error_resume') })
           navigate('/exam/setup')
         })
         .finally(() => setLoading(false))
     }
-  }, [sessionId, questions.length, attemptId, navigate, initSession, addToast])
+  }, [sessionId, questions.length, attemptId, navigate, initSession, addToast, t])
 
   const handleSubmit = useCallback(async (auto = false) => {
     if (submitting) return
@@ -75,21 +75,21 @@ export default function ExamSessionPage() {
       const result = await examApi.submitExam(id, getAnswersAsPartial())
       navigate(`/exam/${id}/result`, { state: { result } })
     } catch (err) {
-      if (!auto) addToast({ type: 'error', message: (err as Error).message || 'Nộp bài thất bại.' })
+      if (!auto) addToast({ type: 'error', message: (err as Error).message || t('exam.error_submit') })
     } finally {
       setSubmitting(false)
     }
-  }, [submitting, attemptId, sessionId, getAnswersAsPartial, navigate, addToast])
+  }, [submitting, attemptId, sessionId, getAnswersAsPartial, navigate, addToast, t])
 
   const handlePause = async () => {
     if (pausing || !attemptId) return
     setPausing(true)
     try {
       await examApi.pauseExam(attemptId, getAnswersAsPartial())
-      addToast({ type: 'success', message: 'Đã tạm dừng và lưu bài thi.' })
+      addToast({ type: 'success', message: t('exam.success_pause') })
       navigate('/dashboard')
     } catch (err) {
-      addToast({ type: 'error', message: 'Tạm dừng thất bại.' })
+      addToast({ type: 'error', message: t('exam.error_pause') })
     } finally {
       setPausing(false)
     }
@@ -202,10 +202,10 @@ export default function ExamSessionPage() {
               cursor: 'pointer'
             }}
           >
-            {pausing ? 'Đang dừng...' : 'Tạm dừng bài thi'}
+            {pausing ? t('exam.pausing') : t('exam.pause_button')}
           </button>
           {isSaving && (
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Đang tự động lưu...</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{t('exam.autosaving')}</span>
           )}
         </div>
 
@@ -247,7 +247,7 @@ export default function ExamSessionPage() {
             className="btn-primary"
             style={{ width: '100%', padding: '12px' }}
           >
-            Nộp bài thi
+            {t('exam.finish_button')}
           </button>
         </aside>
 
@@ -272,7 +272,7 @@ export default function ExamSessionPage() {
                       fontWeight: 700
                     }}
                   >
-                    Chọn nhiều đáp án
+                    {t('exam.multi_choice_label')}
                   </span>
                 )}
               </span>
@@ -290,7 +290,7 @@ export default function ExamSessionPage() {
                   transition: 'all 0.2s'
                 }}
               >
-                {isFlagged ? 'Đã đánh dấu' : 'Đánh dấu câu hỏi'}
+                {isFlagged ? t('exam.flagged_badge') : t('exam.flag_question')}
               </button>
             </div>
             <p style={{ fontSize: '18px', fontWeight: 400, color: '#fff', lineHeight: 1.55, letterSpacing: '-0.2px' }}>{question.text}</p>
@@ -317,7 +317,7 @@ export default function ExamSessionPage() {
               className="btn-ghost"
               style={{ opacity: currentIndex === 0 ? 0.4 : 1, padding: '10px 20px' }}
             >
-              Câu trước
+              {t('exam.prev_question')}
             </button>
             {currentIndex < questions.length - 1 ? (
               <button
@@ -325,7 +325,7 @@ export default function ExamSessionPage() {
                 className="btn-ghost"
                 style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.05)' }}
               >
-                Câu tiếp theo
+                {t('exam.next_question')}
               </button>
             ) : (
               <button
@@ -334,7 +334,7 @@ export default function ExamSessionPage() {
                 className="btn-primary"
                 style={{ padding: '10px 30px' }}
               >
-                Hoàn thành & Nộp bài
+                {t('exam.finish_submit')}
               </button>
             )}
           </div>
@@ -355,12 +355,12 @@ export default function ExamSessionPage() {
               boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
             }}
           >
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>Nộp bài thi?</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>{t('exam.confirm_submit_title')}</h3>
             <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, marginBottom: '24px' }}>
-              Bạn đã hoàn thành <strong>{answeredCount}</strong> trên tổng số <strong>{questions.length}</strong> câu hỏi.
+              {t('exam.confirm_submit_desc', { answered: answeredCount, total: questions.length })}
               {answeredCount < questions.length && (
                 <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(224, 69, 60, 0.1)', borderRadius: '10px', color: '#ff453a', fontSize: '13px', fontWeight: 500 }}>
-                  ⚠️ Lưu ý: Còn {questions.length - answeredCount} câu chưa có câu trả lời.
+                  ⚠️ {t('exam.unanswered_warning', { count: questions.length - answeredCount })}
                 </div>
               )}
             </p>
@@ -371,14 +371,14 @@ export default function ExamSessionPage() {
                 className="btn-primary"
                 style={{ width: '100%', padding: '14px' }}
               >
-                {submitting ? 'Đang nộp bài...' : 'Xác nhận nộp bài'}
+                {submitting ? t('exam.submitting') : t('exam.confirm_submit_button')}
               </button>
               <button
                 onClick={() => setConfirmSubmit(false)}
                 className="btn-ghost"
                 style={{ width: '100%', padding: '12px' }}
               >
-                Quay lại làm tiếp
+                {t('exam.back_to_exam')}
               </button>
             </div>
           </div>

@@ -3,172 +3,127 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type Certification } from '@/services/exam-api'
-import { useExamStore } from '@/stores/exam-store'
-import { useUiStore } from '@/stores/ui-store'
 
-const selectStyle: React.CSSProperties = {
-  width: '100%',
-  background: '#242426',
-  border: '1px solid rgba(255,255,255,0.15)',
-  borderRadius: '8px',
-  padding: '8px 12px',
-  fontSize: '14px',
-  color: '#fff',
-  outline: 'none',
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '12px',
-  fontWeight: 400,
-  letterSpacing: '-0.12px',
-  color: 'rgba(255,255,255,0.5)',
-  marginBottom: '6px',
+const cardStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  background: 'rgba(39, 39, 41, 0.7)',
+  backdropFilter: 'blur(20px)',
+  borderRadius: '16px',
+  padding: '24px',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  cursor: 'pointer',
 }
 
 export default function PracticeSetupPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const initSession = useExamStore((s) => s.initSession)
-  const addToast = useUiStore((s) => s.addToast)
 
   const [certifications, setCertifications] = useState<Certification[]>([])
-  const [selectedCertId, setSelectedCertId] = useState<number | ''>('')
-  const [bookmarkedOnly, setBookmarkedOnly] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [starting, setStarting] = useState(false)
-
-  const { bookmarked, loadBookmarks } = useExamStore()
 
   useEffect(() => {
     examApi
       .getCertifications()
       .then((certs) => {
-        setCertifications(certs)
-        if (certs.length > 0) setSelectedCertId(certs[0].id)
+        // Ưu tiên SAA lên đầu, sau đó sắp xếp theo code
+        const sorted = [...certs].sort((a, b) => {
+          const aSAA = a.code.toUpperCase().includes('SAA')
+          const bSAA = b.code.toUpperCase().includes('SAA')
+          if (aSAA && !bSAA) return -1
+          if (!aSAA && bSAA) return 1
+          return a.code.localeCompare(b.code)
+        })
+        setCertifications(sorted)
       })
-      .catch(() => addToast({ type: 'error', message: t('practice.error_load') }))
+      .catch(() => { })
       .finally(() => setLoading(false))
+  }, [])
 
-    loadBookmarks()
-  }, [addToast, loadBookmarks, t])
-
-
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCertId) return
-    setStarting(true)
-    try {
-      const attempt = await examApi.startExam(selectedCertId as number)
-
-      let questions = attempt.questions
-      if (bookmarkedOnly && bookmarked.length > 0) {
-        questions = questions.filter((q) => bookmarked.includes(q.id))
-      }
-
-      if (bookmarkedOnly && questions.length === 0) {
-        addToast({ type: 'warning', message: t('practice.no_bookmarked_questions') })
-        setStarting(false)
-        return
-      }
-
-      initSession(attempt.id, questions, attempt.time_remaining_seconds, 'practice')
-      navigate(`/practice/${attempt.id}`)
-    } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || t('practice.error_start') })
-    } finally {
-      setStarting(false)
-    }
+  const handleStart = (certId: number) => {
+    navigate(`/practice?certification_id=${certId}`)
   }
 
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
-        <div
-          style={{
-            width: '32px', height: '32px',
-            border: '3px solid rgba(255,255,255,0.1)',
-            borderTopColor: '#0071e3',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }}
-        />
+        <div className="spinner" />
       </div>
     )
   }
 
   return (
-    <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '60px' }}>
       <PageHeader
         title={t('practice.setup_title')}
         subtitle={t('practice.setup_subtitle')}
       />
 
-      <form
-        onSubmit={handleStart}
-        style={{
-          background: '#272729',
-          borderRadius: '12px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
-        {/* Certification picker */}
-        <div>
-          <label style={labelStyle}>{t('practice.certification_label')}</label>
-          <select
-            value={selectedCertId}
-            onChange={(e) => { setSelectedCertId(Number(e.target.value)) }}
-            style={selectStyle}
-            required
-          >
-            <option value="">{t('practice.select_certification')}</option>
-            {certifications.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.code} — {c.name}
-              </option>
-            ))}
-          </select>
+      {certifications.length === 0 ? (
+        <div style={{
+          ...cardStyle,
+          padding: '40px 24px',
+          textAlign: 'center',
+          cursor: 'default'
+        }}>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+            {t('practice.no_sets_title')}
+          </p>
         </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+          {certifications.map((cert) => (
+            <div
+              key={cert.id}
+              style={cardStyle}
+              onClick={() => handleStart(cert.id)}
+              className="hover-card group"
+            >
+              <div style={{ marginBottom: '16px' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    background: '#0071e3',
+                    color: '#fff',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    letterSpacing: '0.5px',
+                    padding: '4px 10px',
+                    borderRadius: '100px',
+                    marginBottom: '12px',
+                    boxShadow: '0 4px 12px rgba(0, 113, 227, 0.3)'
+                  }}
+                >
+                  {cert.code}
+                </span>
+                <h3 style={{ fontSize: '19px', fontWeight: 600, color: '#fff', marginBottom: '8px', letterSpacing: '-0.3px' }}>
+                  {cert.name}
+                </h3>
+                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
+                  {t('practice.unlimited_time')}
+                </p>
+              </div>
 
-
-        {/* Bookmarked only filter */}
-        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={bookmarkedOnly}
-            onChange={(e) => setBookmarkedOnly(e.target.checked)}
-            style={{ width: '14px', height: '14px', accentColor: '#f5a623' }}
-          />
-          <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>{t('practice.bookmarked_only')}</span>
-        </label>
-
-        {/* Info banner */}
-        <div
-          style={{
-            background: 'rgba(0,113,227,0.1)',
-            border: '1px solid rgba(0,113,227,0.4)',
-            borderRadius: '8px',
-            padding: '10px 12px',
-            fontSize: '12px',
-            color: '#2997ff',
-            letterSpacing: '-0.12px',
-          }}
-        >
-          {t('practice.info_banner')}
+              <div style={{
+                marginTop: '12px',
+                paddingTop: '16px',
+                borderTop: '1px solid rgba(255,255,255,0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: '#0071e3',
+                fontSize: '13px',
+                fontWeight: 500
+              }}>
+                <span>{t('practice.start_now')}</span>
+                <span style={{ transition: 'transform 0.2s ease' }} className="group-hover:translate-x-1">→</span>
+              </div>
+            </div>
+          ))}
         </div>
-
-        <button
-          type="submit"
-          disabled={starting || !selectedCertId}
-          className="btn-primary"
-          style={{ width: '100%', opacity: starting || !selectedCertId ? 0.6 : 1 }}
-        >
-          {starting ? t('practice.starting') : t('practice.start_button')}
-        </button>
-      </form>
+      )}
     </div>
   )
 }

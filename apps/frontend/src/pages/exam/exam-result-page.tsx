@@ -1,8 +1,6 @@
-/**
- * Exam Result Page — score, pass/fail, donut chart tổng quan, review với filter đúng/sai.
- */
 import { useEffect, useState } from 'react'
 import { useParams, useLocation, Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type ExamReview, type ReviewQuestion } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
@@ -21,6 +19,7 @@ type FilterMode = 'all' | 'correct' | 'wrong'
 
 /** SVG donut chart */
 function DonutChart({ score, passed }: { score: number; passed: boolean }) {
+  const { t } = useTranslation()
   const r = 52
   const circ = 2 * Math.PI * r
   const filled = circ * (score / 100)
@@ -38,7 +37,7 @@ function DonutChart({ score, passed }: { score: number; passed: boolean }) {
       />
       <text x="60" y="56" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="700">{Math.round(score)}%</text>
       <text x="60" y="72" textAnchor="middle" fill={passed ? '#1d9b5e' : '#e0453c'} fontSize="11" fontWeight="700">
-        {passed ? 'ĐẠT' : 'CHƯA ĐẠT'}
+        {passed ? t('exam.result_passed') : t('exam.result_failed')}
       </text>
     </svg>
   )
@@ -52,6 +51,7 @@ function isQuestionCorrect(q: ReviewQuestion, userAnswerIds: number[]): boolean 
 
 export default function ExamResultPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const clearSession = useExamStore((s) => s.clearSession)
@@ -126,8 +126,8 @@ export default function ExamResultPage() {
   return (
     <div style={{ maxWidth: '780px', display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '60px' }}>
       <PageHeader
-        title="Kết quả thi"
-        subtitle={review ? `${review.certification.code} — ${review.certification.name}` : `Lần thi #${sessionId}`}
+        title={t('exam.result_title')}
+        subtitle={review ? `${review.certification.code} — ${review.certification.name}` : t('history.preview', { id: sessionId })}
       />
 
       {/* Score hero + donut chart */}
@@ -146,15 +146,15 @@ export default function ExamResultPage() {
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <div style={{ ...panelStyle, padding: '12px 16px', flex: 1, minWidth: '100px', textAlign: 'center' }}>
               <p style={{ fontSize: '24px', fontWeight: 700, color: '#1d9b5e' }}>{correct}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>Câu đúng</p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{t('exam.correct_answers')}</p>
             </div>
             <div style={{ ...panelStyle, padding: '12px 16px', flex: 1, minWidth: '100px', textAlign: 'center' }}>
               <p style={{ fontSize: '24px', fontWeight: 700, color: '#e0453c' }}>{wrong}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>Câu sai</p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{t('exam.wrong_answers')}</p>
             </div>
             <div style={{ ...panelStyle, padding: '12px 16px', flex: 1, minWidth: '100px', textAlign: 'center' }}>
               <p style={{ fontSize: '24px', fontWeight: 700, color: '#fff' }}>{total}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>Tổng câu</p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{t('exam.total_questions_count')}</p>
             </div>
           </div>
 
@@ -163,7 +163,9 @@ export default function ExamResultPage() {
             <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${score}%`, background: passed ? '#1d9b5e' : '#e0453c', borderRadius: '3px', transition: 'width 0.5s ease' }} />
             </div>
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>Ngưỡng đạt: 72%</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+              {t('exam.passing_threshold', { score: 72 })}
+            </span>
           </div>
         </div>
       </div>
@@ -174,15 +176,15 @@ export default function ExamResultPage() {
           {/* Filter bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <h2 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.12px' }}>
-              Xem lại đáp án ({filteredQuestions.length}/{allQuestions.length} câu)
+              {t('exam.review_answers', { count: filteredQuestions.length, total: allQuestions.length })}
             </h2>
             <div style={{ display: 'flex', gap: '6px' }}>
-              <button style={filterBtnStyle(filter === 'all')} onClick={() => setFilter('all')}>Tất cả</button>
+              <button style={filterBtnStyle(filter === 'all')} onClick={() => setFilter('all')}>{t('exam.filter_all')}</button>
               <button style={filterBtnStyle(filter === 'correct')} onClick={() => setFilter('correct')}>
-                ✓ Đúng ({correct})
+                ✓ {t('exam.filter_correct', { count: correct })}
               </button>
               <button style={filterBtnStyle(filter === 'wrong')} onClick={() => setFilter('wrong')}>
-                ✕ Sai ({wrong})
+                ✕ {t('exam.filter_wrong', { count: wrong })}
               </button>
             </div>
           </div>
@@ -190,7 +192,7 @@ export default function ExamResultPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '520px', overflowY: 'auto', paddingRight: '4px' }}>
             {filteredQuestions.length === 0 && (
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '24px' }}>
-                Không có câu nào trong bộ lọc này.
+                {t('exam.no_questions_filter')}
               </p>
             )}
             {filteredQuestions.map((q, idx) => {
@@ -214,7 +216,7 @@ export default function ExamResultPage() {
                       color: isCorrect ? '#1d9b5e' : '#e0453c',
                       border: `1px solid ${isCorrect ? 'rgba(29,155,94,0.3)' : 'rgba(224,69,60,0.3)'}`,
                     }}>
-                      {isCorrect ? '✓ ĐÚNG' : '✕ SAI'}
+                      {isCorrect ? `✓ ${t('exam.correct_badge')}` : `✕ ${t('exam.wrong_badge')}`}
                     </span>
                     <p style={{ fontSize: '13px', fontWeight: 500, color: '#fff', lineHeight: 1.5 }}>
                       {idx + 1}. {q.text}
@@ -268,13 +270,13 @@ export default function ExamResultPage() {
       {/* Actions */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
         <Link to="/exam/setup" className="btn-primary" style={{ textDecoration: 'none' }}>
-          Bài thi mới
+          {t('exam.new_exam')}
         </Link>
         <Link to="/history" className="btn-ghost" style={{ textDecoration: 'none' }}>
-          Xem lịch sử
+          {t('exam.view_history')}
         </Link>
         <Link to="/dashboard" className="btn-ghost" style={{ textDecoration: 'none' }}>
-          Bảng điều khiển
+          {t('nav.dashboard')}
         </Link>
       </div>
     </div>

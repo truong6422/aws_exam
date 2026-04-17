@@ -64,6 +64,7 @@ export const router = createBrowserRouter([
 
           // Practice flow
           { path: '/practice/setup', element: <PracticeSetupPage /> },
+          { path: '/practice', element: <PracticeSessionPage /> },
           { path: '/practice/:sessionId', element: <PracticeSessionPage /> },
 
           // Admin — nested under AppShell, guarded separately

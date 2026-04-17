@@ -1,8 +1,5 @@
-/**
- * AnswerReportModal — modal dialog for flagging a question's answer as wrong.
- * Returns 409 if user already reported; shows success/error inline.
- */
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { practiceApi } from '@/services/exam-api'
 
 interface AnswerReportModalProps {
@@ -11,6 +8,7 @@ interface AnswerReportModalProps {
 }
 
 export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProps) {
+  const { t } = useTranslation()
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,9 +25,9 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
     } catch (err: unknown) {
       const status = (err as { status?: number }).status
       if (status === 409) {
-        setError('Bạn đã báo cáo câu hỏi này rồi.')
+        setError(t('report.already_reported'))
       } else {
-        setError('Không thể gửi báo cáo. Vui lòng thử lại.')
+        setError(t('report.error_send'))
       }
     } finally {
       setSubmitting(false)
@@ -68,7 +66,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#fff' }}>
-            Báo cáo đáp án sai
+            {t('report.title')}
           </h2>
           <button
             onClick={onClose}
@@ -90,26 +88,26 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '28px', marginBottom: '10px' }}>✓</div>
             <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
-              Báo cáo của bạn đã được gửi. Cảm ơn bạn đã giúp cải thiện ngân hàng câu hỏi.
+              {t('report.success_msg')}
             </p>
             <button
               onClick={onClose}
               className="btn-primary"
               style={{ marginTop: '16px', width: '100%' }}
             >
-              Đóng
+              {t('common.cancel')}
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
-              Mô tả lý do bạn nghĩ rằng câu trả lời đã được đánh dấu là sai. Nhóm của chúng tôi sẽ xem xét nó.
+              {t('report.subtitle')}
             </p>
 
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="vd. Tùy chọn B là đúng vì..."
+              placeholder={t('report.placeholder')}
               maxLength={1000}
               rows={4}
               style={{
@@ -138,7 +136,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
                 className="btn-ghost"
                 style={{ fontSize: '13px' }}
               >
-                Hủy
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
@@ -149,7 +147,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
                   opacity: !reason.trim() || submitting ? 0.5 : 1,
                 }}
               >
-                {submitting ? 'Đang gửi...' : 'Gửi báo cáo'}
+                {submitting ? t('report.sending') : t('report.send_button')}
               </button>
             </div>
           </form>

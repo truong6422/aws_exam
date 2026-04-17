@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { analyticsApi, HistoryItem, PaginatedHistory } from '@/services/analytics-api'
 import { EmptyState } from '@/components/shared/empty-state'
 import PageHeader from '@/components/ui/page-header'
@@ -8,6 +9,7 @@ const PASSING_SCORE = 72
 
 /** Exam history list with pagination and review links. */
 export default function HistoryPage() {
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [data, setData] = useState<PaginatedHistory | null>(null)
   const [page, setPage] = useState(1)
@@ -30,6 +32,15 @@ export default function HistoryPage() {
     return 'rgba(255,255,255,0.4)'
   }
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'submitted': return t('history.status_submitted')
+      case 'expired': return t('history.status_expired')
+      case 'ongoing': return t('history.status_ongoing')
+      default: return status.replace('_', ' ')
+    }
+  }
+
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
@@ -49,14 +60,14 @@ export default function HistoryPage() {
   if (error) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
+        <PageHeader title={t('history.title')} subtitle={t('history.subtitle')} />
         <p style={{ color: '#e0453c', fontSize: '13px' }}>{error}</p>
         <button
           className="btn-ghost"
           style={{ alignSelf: 'flex-start' }}
           onClick={() => load(1)}
         >
-          Thử lại
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -65,11 +76,11 @@ export default function HistoryPage() {
   if (!data || data.count === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
+        <PageHeader title={t('history.title')} subtitle={t('history.subtitle')} />
         <EmptyState
-          title="Chưa có lịch sử thi"
-          description="Các bài thi đã hoàn thành sẽ xuất hiện ở đây."
-          actionLabel="Bắt đầu thi"
+          title={t('history.no_history')}
+          description={t('history.no_history_desc')}
+          actionLabel={t('exam.start_button')}
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -77,10 +88,11 @@ export default function HistoryPage() {
   }
 
   const totalPages = Math.ceil(data.count / 10)
+  const lang = i18n.language === 'en' ? 'en-US' : 'vi-VN'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Lịch sử" subtitle="Tất cả các lần thi của bạn" />
+      <PageHeader title={t('history.title')} subtitle={t('history.subtitle')} />
 
       <div
         style={{
@@ -92,9 +104,15 @@ export default function HistoryPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
-              {['Chứng chỉ', 'Ngày thi', 'Điểm', 'Trạng thái', ''].map((h) => (
+              {[
+                { label: t('history.cert_col'), key: 'cert' },
+                { label: t('history.date_col'), key: 'date' },
+                { label: t('history.score_col'), key: 'score' },
+                { label: t('history.status_col'), key: 'status' },
+                { label: '', key: 'action' }
+              ].map((h) => (
                 <th
-                  key={h}
+                  key={h.key}
                   style={{
                     padding: '10px 16px',
                     textAlign: 'left',
@@ -104,7 +122,7 @@ export default function HistoryPage() {
                     color: 'rgba(255,255,255,0.5)',
                   }}
                 >
-                  {h}
+                  {h.label}
                 </th>
               ))}
             </tr>
@@ -124,7 +142,7 @@ export default function HistoryPage() {
                   </span>
                 </td>
                 <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.4)', fontSize: '12px', whiteSpace: 'nowrap' }}>
-                  {new Date(item.started_at).toLocaleDateString()}
+                  {new Date(item.started_at).toLocaleDateString(lang)}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
                   {item.score_percentage !== null ? (
@@ -155,7 +173,7 @@ export default function HistoryPage() {
                     color: statusColor(item.status),
                   }}
                 >
-                  {item.status.replace('_', ' ')}
+                  {getStatusText(item.status)}
                 </td>
                 <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                   {item.status === 'submitted' && (
@@ -171,7 +189,7 @@ export default function HistoryPage() {
                       }}
                       onClick={() => navigate(`/exam/${item.id}/result`)}
                     >
-                      Xem lại
+                      {t('history.review')}
                     </button>
                   )}
                 </td>
@@ -190,7 +208,7 @@ export default function HistoryPage() {
             onClick={() => load(page - 1)}
             style={{ opacity: page === 1 ? 0.4 : 1 }}
           >
-            Trước
+            {t('history.prev_page')}
           </button>
           <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
             {page} / {totalPages}
@@ -201,7 +219,7 @@ export default function HistoryPage() {
             onClick={() => load(page + 1)}
             style={{ opacity: !data.next ? 0.4 : 1 }}
           >
-            Tiếp
+            {t('history.next_page')}
           </button>
         </div>
       )}

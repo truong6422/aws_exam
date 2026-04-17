@@ -9,11 +9,13 @@ from .views import (
     CommentUpvoteView,
     ExamSetListView,
     ExamSetUpdateView,
+    PracticeQuestionListView,
 )
 
 app_name = "questions"
 
 urlpatterns = [
+    path("practice/", PracticeQuestionListView.as_view(), name="practice-question-list"),
     path("certifications/", CertificationListView.as_view(), name="certification-list"),
     path(
         "certifications/<int:certification_id>/sets/",

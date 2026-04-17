@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { WeakDomainItem } from '../../services/analytics-api'
 
 interface Props {
@@ -6,8 +7,13 @@ interface Props {
 
 /** CSS bar chart showing domain accuracy — sorted weakest first. */
 export function WeakDomainsChart({ domains }: Props) {
+  const { t } = useTranslation()
   if (!domains.length) {
-    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Chưa có dữ liệu lĩnh vực. Hoàn thành thêm nhiều bài thi.</p>
+    return (
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>
+        {t('analytics.no_domains')}
+      </p>
+    )
   }
 
   const sorted = [...domains].sort((a, b) => a.accuracy_percentage - b.accuracy_percentage)
@@ -41,7 +47,9 @@ export function WeakDomainsChart({ domains }: Props) {
               }}
             />
           </div>
-          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', letterSpacing: '-0.12px' }}>{d.correct_count}/{d.total_questions} câu đúng</p>
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', letterSpacing: '-0.12px' }}>
+            {t('analytics.correct_count_label', { correct: d.correct_count, total: d.total_questions })}
+          </p>
         </div>
       ))}
     </div>

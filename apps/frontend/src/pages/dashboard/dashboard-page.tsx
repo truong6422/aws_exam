@@ -15,7 +15,7 @@ const panelStyle: React.CSSProperties = {
 /** Dashboard overview — recent attempts, score cards, start exam CTA. */
 export default function DashboardPage() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [overview, setOverview] = useState<OverviewResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,6 +74,8 @@ export default function DashboardPage() {
   const avgScore = Number(overview.avg_score) || 0
   const bestScore = Number(overview.best_score) || 0
 
+  const lang = i18n.language === 'en' ? 'en-US' : 'vi-VN'
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -128,7 +130,7 @@ export default function DashboardPage() {
                   <span
                     style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginLeft: '10px', letterSpacing: '-0.12px' }}
                   >
-                    {new Date(item.date).toLocaleDateString()}
+                    {new Date(item.date).toLocaleDateString(lang)}
                   </span>
                 </div>
                 <span
