@@ -31,7 +31,7 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
             marginBottom: '8px',
           }}
         >
-          Import Failed
+          Nhập thất bại
         </h3>
         <ul style={{ paddingLeft: '16px', margin: 0 }}>
           {result.errors.map((err, i) => (
@@ -61,11 +61,11 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
           marginBottom: '6px',
         }}
       >
-        Import Successful
+        Nhập thành công
       </h3>
       <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', letterSpacing: '-0.224px' }}>
-        Imported <strong>{result.imported}</strong> question{result.imported !== 1 ? 's' : ''}
-        {certCode && <> to <strong>{certCode}</strong></>}
+        Đã nhập <strong>{result.imported}</strong> câu hỏi
+        {certCode && <> vào <strong>{certCode}</strong></>}
         {domainName && <> / <strong>{domainName}</strong></>}
       </p>
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { analyticsApi, OverviewResponse } from '@/services/analytics-api'
 import { ScoreCard } from '@/components/dashboard/score-card'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -14,6 +15,7 @@ const panelStyle: React.CSSProperties = {
 /** Dashboard overview — recent attempts, score cards, start exam CTA. */
 export default function DashboardPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [overview, setOverview] = useState<OverviewResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,7 +30,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div style={{ padding: '24px', fontSize: '14px', letterSpacing: '-0.224px', color: 'rgba(255,255,255,0.5)' }}>
-        Đang tải...
+        {t('common.loading')}
       </div>
     )
   }
@@ -41,7 +43,7 @@ export default function DashboardPage() {
           style={{ color: '#fff', fontSize: '13px', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           onClick={() => window.location.reload()}
         >
-          Thử lại
+          {t('dashboard.retry')}
         </button>
       </div>
     )
@@ -51,18 +53,18 @@ export default function DashboardPage() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <PageHeader title="Bảng điều khiển" subtitle="Chào mừng trở lại" />
+          <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.welcome')} />
           <button
             className="btn-primary"
             onClick={() => navigate('/exam/setup')}
           >
-            Bắt đầu thi
+            {t('dashboard.start_exam')}
           </button>
         </div>
         <EmptyState
-          title="Chưa có bài thi"
-          description="Hãy thực hiện bài thi thử chứng chỉ AWS đầu tiên để theo dõi tiến trình của bạn tại đây."
-          actionLabel="Bắt đầu bài thi đầu tiên"
+          title={t('dashboard.no_exam')}
+          description={t('dashboard.no_exam_desc')}
+          actionLabel={t('dashboard.start_first_exam')}
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -75,20 +77,20 @@ export default function DashboardPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <PageHeader title="Bảng điều khiển" subtitle="Chào mừng trở lại" />
+        <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.welcome')} />
         <button
           className="btn-primary"
           onClick={() => navigate('/exam/setup')}
         >
-          Bắt đầu thi
+          {t('dashboard.start_exam')}
         </button>
       </div>
 
       {/* Score cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-        <ScoreCard label="Tổng số bài thi"  value={overview.total_attempts} />
-        <ScoreCard label="Điểm trung bình"  value={avgScore.toFixed(1)} suffix="%" />
-        <ScoreCard label="Điểm cao nhất"    value={bestScore.toFixed(1)} suffix="%" />
+        <ScoreCard label={t('dashboard.total_exams')} value={overview.total_attempts} />
+        <ScoreCard label={t('dashboard.avg_score')} value={avgScore.toFixed(1)} suffix="%" />
+        <ScoreCard label={t('dashboard.best_score')} value={bestScore.toFixed(1)} suffix="%" />
       </div>
 
       {/* Recent attempts */}
@@ -98,13 +100,13 @@ export default function DashboardPage() {
             <span
               style={{ fontSize: '12px', fontWeight: 400, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}
             >
-              Hoạt động gần đây
+              {t('dashboard.recent_activity')}
             </span>
             <button
               style={{ fontSize: '13px', color: '#2997ff', background: 'none', border: 'none', cursor: 'pointer' }}
               onClick={() => navigate('/history')}
             >
-              Xem tất cả
+              {t('dashboard.view_all')}
             </button>
           </div>
           <div>

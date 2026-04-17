@@ -38,14 +38,14 @@ export default function AdminDashboardPage() {
   }, [])
 
   const statCards = [
-    { label: 'Certifications', value: stats.certs },
-    { label: 'Domains', value: stats.domains },
-    { label: 'Questions', value: stats.questions },
+    { label: 'Chứng chỉ', value: stats.certs },
+    { label: 'Lĩnh vực', value: stats.domains },
+    { label: 'Câu hỏi', value: stats.questions },
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Admin Dashboard" subtitle="System overview" />
+      <PageHeader title="Bảng điều khiển Quản trị" subtitle="Tổng quan hệ thống" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
         {statCards.map(({ label, value }) => (
@@ -78,26 +78,26 @@ export default function AdminDashboardPage() {
             marginBottom: '14px',
           }}
         >
-          Quick Actions
+          Các hành động nhanh
         </h2>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           <button
             className="btn-primary"
             onClick={() => navigate('/admin/import')}
           >
-            Import Questions
+            Nhập câu hỏi
           </button>
           <button
             className="btn-ghost"
             onClick={() => navigate('/admin/questions')}
           >
-            View Questions
+            Xem câu hỏi
           </button>
           <button
             className="btn-ghost"
             onClick={() => navigate('/admin/users')}
           >
-            Manage Users
+            Quản lý người dùng
           </button>
         </div>
       </div>

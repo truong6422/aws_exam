@@ -38,8 +38,8 @@ export default function AdminImportPage() {
   return (
     <div style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Import Questions"
-        subtitle="Upload a JSON file to bulk-import questions into a certification domain"
+        title="Nhập câu hỏi"
+        subtitle="Tải lên tệp JSON để nhập hàng loạt câu hỏi vào lĩnh vực chứng chỉ"
       />
 
       <div
@@ -75,18 +75,18 @@ export default function AdminImportPage() {
                 marginBottom: '8px',
               }}
             >
-              Preview
+              Xem trước
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Certification: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Chứng chỉ: </span>
               <strong style={{ color: '#fff' }}>{parsedData.certification_code}</strong>
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Domain: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Lĩnh vực: </span>
               <strong style={{ color: '#fff' }}>{parsedData.domain_name}</strong>
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Questions: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Câu hỏi: </span>
               <strong style={{ color: '#fff' }}>{parsedData.questions?.length ?? 0}</strong>
             </p>
           </div>
@@ -100,8 +100,8 @@ export default function AdminImportPage() {
             disabled={isLoading}
           >
             {isLoading
-              ? 'Importing...'
-              : `Import ${parsedData.questions?.length ?? 0} Question${parsedData.questions?.length !== 1 ? 's' : ''}`}
+              ? 'Đang nhập...'
+              : `Nhập ${parsedData.questions?.length ?? 0} câu hỏi`}
           </button>
         )}
 
@@ -124,7 +124,7 @@ export default function AdminImportPage() {
             }}
             onClick={handleReset}
           >
-            Import another file
+            Nhập tệp khác
           </button>
         )}
       </div>

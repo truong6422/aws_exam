@@ -7,7 +7,7 @@ interface Props {
 /** CSS bar chart showing domain accuracy — sorted weakest first. */
 export function WeakDomainsChart({ domains }: Props) {
   if (!domains.length) {
-    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No domain data yet. Complete more exams.</p>
+    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Chưa có dữ liệu lĩnh vực. Hoàn thành thêm nhiều bài thi.</p>
   }
 
   const sorted = [...domains].sort((a, b) => a.accuracy_percentage - b.accuracy_percentage)
@@ -41,7 +41,7 @@ export function WeakDomainsChart({ domains }: Props) {
               }}
             />
           </div>
-          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', letterSpacing: '-0.12px' }}>{d.correct_count}/{d.total_questions} correct</p>
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', letterSpacing: '-0.12px' }}>{d.correct_count}/{d.total_questions} câu đúng</p>
         </div>
       ))}
     </div>

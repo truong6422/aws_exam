@@ -33,7 +33,7 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
       {/* Optional answer reference */}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>
-          Reference:
+          Tham chiếu:
         </span>
         <button
           type="button"
@@ -49,7 +49,7 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
             cursor: 'pointer',
           }}
         >
-          None
+          Không
         </button>
         {answers.map((a, i) => (
           <button
@@ -75,7 +75,7 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        placeholder="Share your thoughts on this question..."
+        placeholder="Chia sẻ suy nghĩ của bạn về câu hỏi này..."
         maxLength={2000}
         rows={3}
         style={{
@@ -107,7 +107,7 @@ export function CommentForm({ answers, onSubmit }: CommentFormProps) {
             opacity: !body.trim() || submitting ? 0.5 : 1,
           }}
         >
-          {submitting ? 'Posting...' : 'Post Comment'}
+          {submitting ? 'Đang đăng...' : 'Đăng bình luận'}
         </button>
       </div>
     </form>

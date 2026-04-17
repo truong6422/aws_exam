@@ -24,7 +24,7 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
 
   const processFile = (file: File) => {
     if (!file.name.endsWith('.json')) {
-      setParseError('Only .json files are accepted')
+      setParseError('Chỉ chấp nhận tệp .json')
       return
     }
     const reader = new FileReader()
@@ -36,14 +36,14 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
           typeof data.domain_name !== 'string' ||
           !Array.isArray(data.questions)
         ) {
-          setParseError('JSON must have certification_code, domain_name, and questions array')
+          setParseError('JSON phải có certification_code, domain_name, và mảng questions')
           return
         }
         setParseError('')
         setFileName(file.name)
         onFileLoaded(data as unknown as ImportPayload, file.name)
       } catch {
-        setParseError('Invalid JSON format')
+        setParseError('Định dạng JSON không hợp lệ')
       }
     }
     reader.readAsText(file)
@@ -93,8 +93,8 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
           <p style={{ fontSize: '13px', fontWeight: 600, color: '#1d9b5e' }}>{fileName}</p>
         ) : (
           <>
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>Drop a .json file here, or click to browse</p>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '-0.12px' }}>Accepts question import JSON format</p>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>Thả tệp .json ở đây, hoặc nhấp vào để duyệt</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '-0.12px' }}>Chấp nhận định dạng JSON nhập câu hỏi</p>
           </>
         )}
       </div>

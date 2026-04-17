@@ -40,14 +40,14 @@ export default function NotFoundPage() {
         404
       </h1>
       <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>
-        This page doesn't exist.
+        Trang này không tồn tại.
       </p>
       <Link
         to="/dashboard"
         className="btn-primary"
         style={{ textDecoration: 'none', marginTop: '8px' }}
       >
-        Back to Dashboard
+        Quay lại Bảng điều khiển
       </Link>
     </div>
   )

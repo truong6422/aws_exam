@@ -82,6 +82,17 @@ export default function PracticeSessionPage() {
       }
     }
     setRevealed(true)
+
+    // Fetch review data for explanation
+    if (attemptId) {
+      try {
+        const review = await examApi.getExamReview(attemptId)
+        const rq = review.questions.find((q) => q.id === question.id) ?? null
+        setReviewQuestion(rq)
+      } catch {
+        // Non-blocking — explanation falls back to empty string
+      }
+    }
   }
 
   const handleNext = async () => {
@@ -170,8 +181,8 @@ export default function PracticeSessionPage() {
                   background: isCurrent
                     ? 'rgba(0,113,227,0.15)'
                     : isAnswered
-                    ? 'rgba(52,199,89,0.15)'
-                    : 'transparent',
+                      ? 'rgba(52,199,89,0.15)'
+                      : 'transparent',
                   color: isCurrent ? '#2997ff' : isAnswered ? '#34c759' : 'rgba(255,255,255,0.5)',
                   fontSize: '12px',
                   fontWeight: 600,

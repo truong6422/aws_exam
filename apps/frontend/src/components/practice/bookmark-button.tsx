@@ -37,7 +37,7 @@ export function BookmarkButton({ questionId, isBookmarked, onToggle }: BookmarkB
     <button
       onClick={handleClick}
       disabled={loading}
-      title={isBookmarked ? 'Remove bookmark' : 'Bookmark this question'}
+      title={isBookmarked ? 'Xóa dấu trang' : 'Đánh dấu câu hỏi này'}
       style={{
         background: 'none',
         border: '1px solid',
@@ -58,7 +58,7 @@ export function BookmarkButton({ questionId, isBookmarked, onToggle }: BookmarkB
       <svg width="13" height="13" viewBox="0 0 13 13" fill={isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
         <path d="M2 2a1 1 0 011-1h7a1 1 0 011 1v9.5l-4.5-2.5L2 11.5V2z" />
       </svg>
-      {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+      {isBookmarked ? 'Đã đánh dấu' : 'Đánh dấu'}
     </button>
   )
 }

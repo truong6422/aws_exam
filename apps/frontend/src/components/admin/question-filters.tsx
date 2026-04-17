@@ -79,7 +79,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
         value={filters.certificationId ?? ''}
         onChange={handleCertChange}
       >
-        <option value="">All Certifications</option>
+        <option value="">Tất cả chứng chỉ</option>
         {certs.map((c) => (
           <option key={c.id} value={c.id}>
             {c.code} — {c.name}
@@ -93,7 +93,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
         onChange={(e) => update({ domainId: e.target.value ? Number(e.target.value) : null })}
         disabled={!filters.certificationId}
       >
-        <option value="">All Domains</option>
+        <option value="">Tất cả lĩnh vực</option>
         {domains.map((d) => (
           <option key={d.id} value={d.id}>
             {d.name}
@@ -103,7 +103,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
 
       <input
         type="text"
-        placeholder="Search certifications..."
+        placeholder="Tìm kiếm chứng chỉ..."
         style={inputStyle}
         value={filters.search}
         onChange={(e) => update({ search: e.target.value })}
@@ -114,7 +114,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
           className="btn-ghost"
           onClick={handleClear}
         >
-          Clear
+          Xóa
         </button>
       )}
     </div>

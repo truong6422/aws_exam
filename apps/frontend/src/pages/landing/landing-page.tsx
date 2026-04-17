@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from '@/components/language-switcher'
 
 /** Public landing page — Apple hero on pure black. */
 export default function LandingPage() {
+  const { t } = useTranslation()
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-black p-6 text-center">
+      <LanguageSwitcher />
       {/* AWS icon — minimal SVG */}
       <svg
         width="48"
@@ -31,7 +36,7 @@ export default function LandingPage() {
           color: '#fff',
         }}
       >
-        AWS Exam Lab
+        {t('landing.title')}
       </h1>
 
       {/* Subtitle */}
@@ -45,7 +50,7 @@ export default function LandingPage() {
           maxWidth: '480px',
         }}
       >
-        Practice questions &amp; simulate real exams
+        {t('landing.subtitle')}
       </p>
 
       {/* Divider */}
@@ -58,14 +63,14 @@ export default function LandingPage() {
           className="btn-ghost"
           style={{ minWidth: '160px', display: 'inline-block', textAlign: 'center', textDecoration: 'none' }}
         >
-          Start Practice
+          {t('landing.start_practice')}
         </Link>
         <Link
           to="/exam/setup"
           className="btn-primary"
           style={{ minWidth: '160px', display: 'inline-block', textAlign: 'center', textDecoration: 'none' }}
         >
-          Start Exam
+          {t('landing.start_exam')}
         </Link>
       </div>
 
@@ -74,12 +79,12 @@ export default function LandingPage() {
         className="mt-12"
         style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}
       >
-        Already have an account?{' '}
+        {t('landing.already_have_account')}{' '}
         <Link
           to="/login"
           style={{ color: '#2997ff', textDecoration: 'none' }}
         >
-          Sign in
+          {t('landing.login')}
         </Link>
       </p>
     </div>

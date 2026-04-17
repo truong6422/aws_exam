@@ -26,7 +26,7 @@ export function ExamTimer({ minutes, seconds, isWarning, isCritical }: Props) {
           color: 'rgba(255,255,255,0.5)',
         }}
       >
-        Time Remaining
+        Thời gian còn lại
       </span>
       <span
         style={{

@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 import App from './app'
+import './i18n/config'
 import './index.css'
 
 // Initialise Sentry only when a DSN is provided (opt-in via env var).

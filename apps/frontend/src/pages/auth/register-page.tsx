@@ -1,31 +1,34 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '@/services/auth-api'
 import { useAuthStore } from '@/stores/auth-store'
-import { AUTH_UI, toVietnameseAuthError } from '@/constants/auth-messages'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  background: 'transparent',
-  border: '1px solid rgba(0,0,0,0.2)',
-  borderRadius: '8px',
-  padding: '10px 12px',
-  fontSize: '14px',
-  color: '#1d1d1f',
+  background: '#2c2c2e',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  padding: '12px 14px',
+  fontSize: '15px',
+  color: '#ffffff',
   outline: 'none',
+  transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
 }
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
   fontSize: '12px',
-  fontWeight: 400,
+  fontWeight: 600,
   letterSpacing: '-0.12px',
-  color: 'rgba(0,0,0,0.48)',
-  marginBottom: '6px',
+  color: 'rgba(255,255,255,0.56)',
+  marginBottom: '8px',
+  fontFamily: "'SF Pro Text', sans-serif",
 }
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { setTokens, setUser } = useAuthStore()
 
   const [name, setName] = useState('')
@@ -33,6 +36,25 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const getErrorKey = (msg: string, context: 'login' | 'register' = 'login'): string => {
+    const m = msg.toLowerCase()
+    if (m.includes('no active account') || m.includes('invalid') || m.includes('credentials') || m.includes('401'))
+      return 'auth.errors.invalid_credentials'
+    if (m.includes('network') || m.includes('failed to fetch'))
+      return 'auth.errors.network_error'
+    if (m.includes('too many') || m.includes('throttle') || m.includes('429'))
+      return 'auth.errors.too_many_requests'
+    if (m.includes('already exist') || m.includes('email') && m.includes('exist'))
+      return 'auth.errors.email_taken'
+    if (m.includes('too short') || m.includes('at least 8'))
+      return 'auth.errors.password_too_short'
+    if (m.includes('too common') || m.includes('entirely numeric'))
+      return 'auth.errors.password_too_common'
+    if (!msg || m.includes('500') || m.includes('server'))
+      return 'auth.errors.server_error'
+    return context === 'register' ? 'auth.errors.register_failed' : 'auth.errors.login_failed'
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -46,31 +68,34 @@ export default function RegisterPage() {
       navigate('/dashboard', { replace: true })
     } catch (err) {
       const raw = err instanceof Error ? err.message : ''
-      setError(toVietnameseAuthError(raw, 'register'))
+      setError(t(getErrorKey(raw, 'register')))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
+    <form className="space-y-6" onSubmit={handleSubmit}>
       {error && (
         <div
           style={{
-            border: '1px solid #e0453c',
-            borderRadius: '8px',
-            padding: '10px 12px',
+            border: 'none',
+            borderRadius: '10px',
+            padding: '12px 14px',
             fontSize: '13px',
             color: '#e0453c',
-            background: '#fff5f4',
+            background: 'rgba(224, 69, 60, 0.08)',
+            fontFamily: "'SF Pro Text', sans-serif",
+            fontWeight: 400,
           }}
         >
           {error}
         </div>
       )}
 
+      {/* Full Name */}
       <div>
-        <label htmlFor="name" style={labelStyle}>{AUTH_UI.LABEL_FULL_NAME}</label>
+        <label htmlFor="name" style={labelStyle}>{t('auth.full_name')}</label>
         <input
           id="name"
           type="text"
@@ -79,13 +104,21 @@ export default function RegisterPage() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Jane Doe"
           style={inputStyle}
-          onFocus={(e) => { e.target.style.borderColor = '#0071e3' }}
-          onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.2)' }}
+          className="transition-all"
+          onFocus={(e) => {
+            e.target.style.borderColor = '#0071e3'
+            e.target.style.boxShadow = '0 0 0 4px rgba(0, 113, 227, 0.1)'
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+            e.target.style.boxShadow = 'none'
+          }}
         />
       </div>
 
+      {/* Email */}
       <div>
-        <label htmlFor="email" style={labelStyle}>{AUTH_UI.LABEL_EMAIL}</label>
+        <label htmlFor="email" style={labelStyle}>{t('auth.email')}</label>
         <input
           id="email"
           type="email"
@@ -95,13 +128,21 @@ export default function RegisterPage() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           style={inputStyle}
-          onFocus={(e) => { e.target.style.borderColor = '#0071e3' }}
-          onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.2)' }}
+          className="transition-all"
+          onFocus={(e) => {
+            e.target.style.borderColor = '#0071e3'
+            e.target.style.boxShadow = '0 0 0 4px rgba(0, 113, 227, 0.1)'
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+            e.target.style.boxShadow = 'none'
+          }}
         />
       </div>
 
+      {/* Password */}
       <div>
-        <label htmlFor="password" style={labelStyle}>{AUTH_UI.LABEL_PASSWORD}</label>
+        <label htmlFor="password" style={labelStyle}>{t('auth.password')}</label>
         <input
           id="password"
           type="password"
@@ -112,8 +153,15 @@ export default function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
           style={inputStyle}
-          onFocus={(e) => { e.target.style.borderColor = '#0071e3' }}
-          onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.2)' }}
+          className="transition-all"
+          onFocus={(e) => {
+            e.target.style.borderColor = '#0071e3'
+            e.target.style.boxShadow = '0 0 0 4px rgba(0, 113, 227, 0.1)'
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+            e.target.style.boxShadow = 'none'
+          }}
         />
       </div>
 
@@ -121,21 +169,33 @@ export default function RegisterPage() {
         type="submit"
         disabled={loading}
         className="btn-primary w-full"
-        style={{ marginTop: '8px' }}
+        style={{
+          marginTop: '12px',
+          height: '44px',
+          fontSize: '15px',
+          fontWeight: 600,
+          borderRadius: '10px'
+        }}
       >
-        {loading ? AUTH_UI.REGISTER_LOADING : AUTH_UI.REGISTER_BUTTON}
+        {loading ? t('auth.register_loading') : t('auth.register_button')}
       </button>
 
       <p
         className="text-center"
-        style={{ fontSize: '13px', color: 'rgba(0,0,0,0.48)', letterSpacing: '-0.12px' }}
+        style={{
+          fontSize: '14px',
+          color: 'rgba(255,255,255,0.48)',
+          letterSpacing: '-0.224px',
+          fontFamily: "'SF Pro Text', sans-serif"
+        }}
       >
-        {AUTH_UI.HAVE_ACCOUNT}{' '}
+        {t('auth.have_account')}{' '}
         <Link
           to="/login"
-          style={{ color: '#0066cc', fontWeight: 500 }}
+          style={{ color: '#2997ff', fontWeight: 500, textDecoration: 'none' }}
+          className="hover:underline"
         >
-          {AUTH_UI.LOGIN_LINK}
+          {t('auth.login_link')}
         </Link>
       </p>
     </form>

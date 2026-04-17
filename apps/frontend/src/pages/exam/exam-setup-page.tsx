@@ -1,9 +1,6 @@
-/**
- * Exam Setup Page — lists certifications from API and starts an exam on selection.
- * Fetches certifications on mount, shows cards with metadata, starts exam on click.
- */
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type Certification } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
@@ -20,6 +17,7 @@ const cardStyle: React.CSSProperties = {
 
 export default function ExamSetupPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const initSession = useExamStore((s) => s.initSession)
   const addToast = useUiStore((s) => s.addToast)
 
@@ -31,9 +29,9 @@ export default function ExamSetupPage() {
     examApi
       .getCertifications()
       .then(setCertifications)
-      .catch(() => addToast({ type: 'error', message: 'Không thể tải danh sách chứng chỉ.' }))
+      .catch(() => addToast({ type: 'error', message: t('exam.error_load') }))
       .finally(() => setLoading(false))
-  }, [addToast])
+  }, [addToast, t])
 
   const handleStart = async (cert: Certification) => {
     setStartingId(cert.id)
@@ -42,7 +40,7 @@ export default function ExamSetupPage() {
       initSession(attempt.id, attempt.questions, attempt.time_remaining_seconds, 'exam')
       navigate(`/exam/${attempt.id}`)
     } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || 'Không thể bắt đầu bài thi.' })
+      addToast({ type: 'error', message: (err as Error).message || t('exam.error_start') })
     } finally {
       setStartingId(null)
     }
@@ -66,11 +64,13 @@ export default function ExamSetupPage() {
 
   return (
     <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Bài thi mới" subtitle="Chọn chứng chỉ để bắt đầu bài thi có giới hạn thời gian" />
+      <PageHeader title={t('exam.setup_title')} subtitle={t('exam.setup_subtitle')} />
 
       {certifications.length === 0 ? (
         <div style={cardStyle}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '-0.224px' }}>Chưa có chứng chỉ nào.</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '-0.224px' }}>
+            {t('exam.no_certifications')}
+          </p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
@@ -105,9 +105,9 @@ export default function ExamSetupPage() {
               <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {[
-                    `${cert.time_limit_minutes} phút`,
-                    `${cert.total_questions} câu hỏi`,
-                    `${cert.passing_score}% để đạt`,
+                    t('exam.minutes', { count: cert.time_limit_minutes }),
+                    t('exam.questions_count', { count: cert.total_questions }),
+                    t('exam.passing_score', { score: cert.passing_score }),
                   ].map((tag) => (
                     <span
                       key={tag}
@@ -132,7 +132,7 @@ export default function ExamSetupPage() {
                   className="btn-primary"
                   style={{ width: '100%', opacity: startingId !== null ? 0.6 : 1 }}
                 >
-                  {startingId === cert.id ? 'Đang bắt đầu...' : 'Bắt đầu thi'}
+                  {startingId === cert.id ? t('exam.starting') : t('exam.start_button')}
                 </button>
               </div>
             </div>

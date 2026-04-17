@@ -41,20 +41,20 @@ export default function AdminQuestionsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-        <PageHeader title="Questions" subtitle="Browse the question bank by certification" />
+        <PageHeader title="Câu hỏi" subtitle="Duyệt ngân hàng câu hỏi theo chứng chỉ" />
         <button
           className="btn-primary"
           style={{ flexShrink: 0, marginTop: '4px' }}
           onClick={() => navigate('/admin/import')}
         >
-          + Import
+          + Nhập
         </button>
       </div>
 
       <QuestionFilters onFilterChange={handleFilterChange} />
 
       {loading && (
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Loading...</p>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Đang tải...</p>
       )}
 
       {error && (
@@ -74,7 +74,7 @@ export default function AdminQuestionsPage() {
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No certifications found.</p>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Không tìm thấy chứng chỉ nào.</p>
       )}
 
       {!loading && !error && (
@@ -96,9 +96,9 @@ export default function AdminQuestionsPage() {
               )}
               <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {[
-                  `${cert.total_questions} questions`,
-                  `${cert.time_limit_minutes} min`,
-                  `${cert.passing_score}% to pass`,
+                  `${cert.total_questions} câu hỏi`,
+                  `${cert.time_limit_minutes} phút`,
+                  `${cert.passing_score}% để đạt`,
                 ].map((tag) => (
                   <span
                     key={tag}

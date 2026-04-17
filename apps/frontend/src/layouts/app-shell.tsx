@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './sidebar'
 import Navbar from './navbar'
 import ToastContainer from '@/components/ui/toast-container'
+import LanguageSwitcher from '@/components/language-switcher'
 import { useUiStore } from '@/stores/ui-store'
 
 /** Root shell: sidebar + top navbar + page outlet — Apple dark theme. */
@@ -26,6 +27,7 @@ export default function AppShell() {
         </main>
       </div>
 
+      <LanguageSwitcher />
       <ToastContainer />
     </div>
   )

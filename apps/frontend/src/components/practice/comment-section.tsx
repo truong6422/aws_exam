@@ -52,7 +52,7 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
           textTransform: 'uppercase',
         }}
       >
-        Community ({comments.length})
+        Cộng đồng ({comments.length})
       </h3>
 
       {isAuthenticated && (
@@ -61,11 +61,11 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
 
       {loading ? (
         <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>
-          Loading comments...
+          Đang tải bình luận...
         </div>
       ) : comments.length === 0 ? (
         <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>
-          {isAuthenticated ? 'No comments yet. Be the first!' : 'No comments yet. Sign in to comment.'}
+          {isAuthenticated ? 'Chưa có bình luận nào. Hãy là người đầu tiên!' : 'Chưa có bình luận nào. Đăng nhập để bình luận.'}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

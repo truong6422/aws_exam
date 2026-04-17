@@ -88,7 +88,7 @@ export function CommentItem({ comment, isAuthenticated }: CommentItemProps) {
         <button
           onClick={handleUpvote}
           disabled={!isAuthenticated || upvoting}
-          title={isAuthenticated ? 'Upvote' : 'Sign in to upvote'}
+          title={isAuthenticated ? 'Thích' : 'Đăng nhập để thích'}
           style={{
             background: 'none',
             border: 'none',

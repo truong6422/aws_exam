@@ -27,9 +27,9 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
     } catch (err: unknown) {
       const status = (err as { status?: number }).status
       if (status === 409) {
-        setError('You have already reported this question.')
+        setError('Bạn đã báo cáo câu hỏi này rồi.')
       } else {
-        setError('Failed to submit report. Please try again.')
+        setError('Không thể gửi báo cáo. Vui lòng thử lại.')
       }
     } finally {
       setSubmitting(false)
@@ -68,7 +68,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#fff' }}>
-            Report Incorrect Answer
+            Báo cáo đáp án sai
           </h2>
           <button
             onClick={onClose}
@@ -90,26 +90,26 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '28px', marginBottom: '10px' }}>✓</div>
             <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
-              Your report has been submitted. Thank you for helping improve the question bank.
+              Báo cáo của bạn đã được gửi. Cảm ơn bạn đã giúp cải thiện ngân hàng câu hỏi.
             </p>
             <button
               onClick={onClose}
               className="btn-primary"
               style={{ marginTop: '16px', width: '100%' }}
             >
-              Close
+              Đóng
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
-              Describe why you think the marked answer is incorrect. Our team will review it.
+              Mô tả lý do bạn nghĩ rằng câu trả lời đã được đánh dấu là sai. Nhóm của chúng tôi sẽ xem xét nó.
             </p>
 
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Option B is correct because..."
+              placeholder="vd. Tùy chọn B là đúng vì..."
               maxLength={1000}
               rows={4}
               style={{
@@ -138,7 +138,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
                 className="btn-ghost"
                 style={{ fontSize: '13px' }}
               >
-                Cancel
+                Hủy
               </button>
               <button
                 type="submit"
@@ -149,7 +149,7 @@ export function AnswerReportModal({ questionId, onClose }: AnswerReportModalProp
                   opacity: !reason.trim() || submitting ? 0.5 : 1,
                 }}
               >
-                {submitting ? 'Submitting...' : 'Submit Report'}
+                {submitting ? 'Đang gửi...' : 'Gửi báo cáo'}
               </button>
             </div>
           </form>

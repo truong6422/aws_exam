@@ -8,7 +8,7 @@ interface Props {
 /** CSS sparkline bar chart showing score trend across recent exam attempts. */
 export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
   if (!trend.length) {
-    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>No trend data yet.</p>
+    return <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Chưa có dữ liệu xu hướng.</p>
   }
 
   const maxScore = 100
@@ -60,8 +60,8 @@ export function ScoreTrendChart({ trend, passingScore = 72 }: Props) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.12px' }}>
-        <span>Last {trend.length} exams</span>
-        <span>Score trend</span>
+        <span>{trend.length} bài thi gần đây</span>
+        <span>Xu hướng điểm</span>
       </div>
     </div>
   )

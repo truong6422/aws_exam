@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useUiStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 
 interface NavItem {
-  label: string
+  labelKey: string
   to: string
   icon: React.ReactNode
 }
@@ -82,21 +83,22 @@ const LogoutIcon = () => (
 )
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Bảng điều khiển', to: '/dashboard',     icon: <DashIcon /> },
-  { label: 'Thi thử',         to: '/exam/setup',    icon: <ExamIcon /> },
-  { label: 'Luyện tập',       to: '/practice/setup',icon: <PracticeIcon /> },
-  { label: 'Lịch sử',         to: '/history',        icon: <HistoryIcon /> },
-  { label: 'Thống kê',        to: '/analytics',      icon: <AnalyticsIcon /> },
+  { labelKey: 'nav.dashboard', to: '/dashboard', icon: <DashIcon /> },
+  { labelKey: 'nav.exam', to: '/exam/setup', icon: <ExamIcon /> },
+  { labelKey: 'nav.practice', to: '/practice/setup', icon: <PracticeIcon /> },
+  { labelKey: 'nav.history', to: '/history', icon: <HistoryIcon /> },
+  { labelKey: 'nav.analytics', to: '/analytics', icon: <AnalyticsIcon /> },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: 'Quản trị',    to: '/admin/dashboard', icon: <AdminIcon /> },
-  { label: 'Người dùng',  to: '/admin/users',     icon: <UsersIcon /> },
-  { label: 'Câu hỏi',     to: '/admin/questions', icon: <QuestionsIcon /> },
-  { label: 'Nhập dữ liệu',to: '/admin/import',    icon: <ImportIcon /> },
+  { labelKey: 'nav.admin', to: '/admin/dashboard', icon: <AdminIcon /> },
+  { labelKey: 'nav.users', to: '/admin/users', icon: <UsersIcon /> },
+  { labelKey: 'nav.questions', to: '/admin/questions', icon: <QuestionsIcon /> },
+  { labelKey: 'nav.import', to: '/admin/import', icon: <ImportIcon /> },
 ]
 
 export default function Sidebar() {
+  const { t } = useTranslation()
   const sidebarOpen = useUiStore((s) => s.sidebarOpen)
   const user = useAuthStore((s) => s.user)
   const navigate = useNavigate()
@@ -179,7 +181,7 @@ export default function Sidebar() {
           }}
         >
           <span className="shrink-0"><LogoutIcon /></span>
-          {sidebarOpen && <span>Đăng xuất</span>}
+          {sidebarOpen && <span>{t('nav.logout')}</span>}
         </button>
       </div>
     </aside>
@@ -187,6 +189,7 @@ export default function Sidebar() {
 }
 
 function SidebarLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
+  const { t } = useTranslation()
   return (
     <NavLink
       to={item.to}
@@ -207,7 +210,7 @@ function SidebarLink({ item, collapsed }: { item: NavItem; collapsed: boolean })
       })}
     >
       <span className="shrink-0">{item.icon}</span>
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      {!collapsed && <span className="truncate">{t(item.labelKey)}</span>}
     </NavLink>
   )
 }

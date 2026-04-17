@@ -47,10 +47,10 @@ export function QuestionNavigationGrid({
   }
 
   const legendItems = [
-    { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', label: 'Unanswered' },
-    { bg: 'rgba(29,155,94,0.15)', color: '#1d9b5e', label: 'Answered' },
-    { bg: 'rgba(224,69,60,0.15)', color: '#e0453c', label: 'Flagged' },
-    { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', label: 'Answered + Flagged' },
+    { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', label: 'Chưa trả lời' },
+    { bg: 'rgba(29,155,94,0.15)', color: '#1d9b5e', label: 'Đã trả lời' },
+    { bg: 'rgba(224,69,60,0.15)', color: '#e0453c', label: 'Đã đánh dấu' },
+    { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', label: 'Đã trả lời + Đã đánh dấu' },
   ]
 
   return (
@@ -61,7 +61,7 @@ export function QuestionNavigationGrid({
             key={i}
             style={getButtonStyle(i)}
             onClick={() => onSelectQuestion(i)}
-            aria-label={`Go to question ${i + 1}`}
+            aria-label={`Đi tới câu ${i + 1}`}
           >
             {i + 1}
           </button>

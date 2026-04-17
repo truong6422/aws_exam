@@ -4,9 +4,9 @@ export default function AdminUsersPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-        <PageHeader title="Users" subtitle="Manage registered accounts" />
+        <PageHeader title="Người dùng" subtitle="Quản lý tài khoản đã đăng ký" />
         <button className="btn-primary" style={{ flexShrink: 0, marginTop: '4px' }}>
-          + Invite User
+          + Mời người dùng
         </button>
       </div>
 
@@ -20,7 +20,7 @@ export default function AdminUsersPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
-              {['Name', 'Email', 'Role', 'Joined', 'Actions'].map((h) => (
+              {['Tên', 'Email', 'Vai trò', 'Tham gia', 'Hành động'].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
                   fontStyle: 'italic',
                 }}
               >
-                User list loads in Phase 2.
+                Danh sách người dùng tải trong Giai đoạn 2.
               </td>
             </tr>
           </tbody>

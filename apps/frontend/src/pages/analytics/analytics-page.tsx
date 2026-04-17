@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { analyticsApi, WeakDomainItem, OverviewResponse } from '@/services/analytics-api'
 import { examApi, Certification } from '@/services/exam-api'
 import { WeakDomainsChart } from '@/components/analytics/weak-domains-chart'
@@ -16,6 +17,7 @@ const panelStyle: React.CSSProperties = {
 /** Analytics page — weak domains chart + score trend, filterable by certification. */
 export default function AnalyticsPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [certifications, setCertifications] = useState<Certification[]>([])
   const [selectedCertId, setSelectedCertId] = useState<number | null>(null)
   const [domains, setDomains] = useState<WeakDomainItem[]>([])
@@ -59,14 +61,14 @@ export default function AnalyticsPage() {
   if (error) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
+        <PageHeader title={t('analytics.title')} subtitle={t('analytics.subtitle')} />
         <p style={{ color: '#e0453c', fontSize: '13px', letterSpacing: '-0.224px' }}>{error}</p>
         <button
           className="btn-ghost"
           style={{ alignSelf: 'flex-start' }}
           onClick={() => window.location.reload()}
         >
-          Thử lại
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -75,11 +77,11 @@ export default function AnalyticsPage() {
   if (!overview || overview.total_submitted === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
+        <PageHeader title={t('analytics.title')} subtitle={t('analytics.subtitle')} />
         <EmptyState
-          title="Chưa có dữ liệu thống kê"
-          description="Hoàn thành ít nhất một bài thi để xem lĩnh vực yếu và xu hướng điểm số."
-          actionLabel="Bắt đầu thi"
+          title={t('analytics.no_data')}
+          description={t('analytics.no_data_desc')}
+          actionLabel={t('dashboard.start_exam')}
           onAction={() => navigate('/exam/setup')}
         />
       </div>
@@ -90,7 +92,7 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Thống kê" subtitle="Theo dõi tiến trình của bạn theo thời gian" />
+      <PageHeader title={t('analytics.title')} subtitle={t('analytics.subtitle')} />
 
       {/* Certification filter */}
       <select
@@ -108,7 +110,7 @@ export default function AnalyticsPage() {
         value={selectedCertId ?? ''}
         onChange={(e) => setSelectedCertId(e.target.value ? Number(e.target.value) : null)}
       >
-        <option value="">Tất cả chứng chỉ</option>
+        <option value="">{t('analytics.all_certs')}</option>
         {certifications.map((c) => (
           <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
         ))}
@@ -132,12 +134,12 @@ export default function AnalyticsPage() {
               marginBottom: '16px',
             }}
           >
-            Lĩnh vực yếu
+            {t('analytics.weak_domains')}
           </h2>
           <WeakDomainsChart domains={domains} />
           {weakestDomain && (
             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '16px', letterSpacing: '-0.12px' }}>
-              Tập trung vào:{' '}
+              {t('analytics.focus_on')}{' '}
               <strong style={{ color: '#e0453c' }}>{weakestDomain.domain_name}</strong>
             </p>
           )}
@@ -154,7 +156,7 @@ export default function AnalyticsPage() {
               marginBottom: '16px',
             }}
           >
-            Score Trend
+            {t('analytics.score_trend')}
           </h2>
           <ScoreTrendChart trend={overview.recent_trend} />
         </div>

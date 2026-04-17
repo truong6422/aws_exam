@@ -1,9 +1,6 @@
-/**
- * Practice Setup Page — certification picker with optional domain filter.
- * Starts a practice exam using the same backend start endpoint, mode tracked in store.
- */
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type Certification, type Domain } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
@@ -31,6 +28,7 @@ const labelStyle: React.CSSProperties = {
 
 export default function PracticeSetupPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const initSession = useExamStore((s) => s.initSession)
   const addToast = useUiStore((s) => s.addToast)
 
@@ -38,8 +36,11 @@ export default function PracticeSetupPage() {
   const [domains, setDomains] = useState<Domain[]>([])
   const [selectedCertId, setSelectedCertId] = useState<number | ''>('')
   const [selectedDomainId, setSelectedDomainId] = useState<number | ''>('')
+  const [bookmarkedOnly, setBookmarkedOnly] = useState(false)
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState(false)
+
+  const { bookmarked, loadBookmarks } = useExamStore()
 
   useEffect(() => {
     examApi
@@ -48,9 +49,11 @@ export default function PracticeSetupPage() {
         setCertifications(certs)
         if (certs.length > 0) setSelectedCertId(certs[0].id)
       })
-      .catch(() => addToast({ type: 'error', message: 'Không thể tải danh sách chứng chỉ.' }))
+      .catch(() => addToast({ type: 'error', message: t('practice.error_load') }))
       .finally(() => setLoading(false))
-  }, [addToast])
+
+    loadBookmarks()
+  }, [addToast, loadBookmarks, t])
 
   useEffect(() => {
     if (!selectedCertId) { setDomains([]); return }
@@ -66,10 +69,22 @@ export default function PracticeSetupPage() {
     setStarting(true)
     try {
       const attempt = await examApi.startExam(selectedCertId as number)
-      initSession(attempt.id, attempt.questions, attempt.time_remaining_seconds, 'practice')
+
+      let questions = attempt.questions
+      if (bookmarkedOnly && bookmarked.length > 0) {
+        questions = questions.filter((q) => bookmarked.includes(q.id))
+      }
+
+      if (bookmarkedOnly && questions.length === 0) {
+        addToast({ type: 'warning', message: t('practice.no_bookmarked_questions') })
+        setStarting(false)
+        return
+      }
+
+      initSession(attempt.id, questions, attempt.time_remaining_seconds, 'practice')
       navigate(`/practice/${attempt.id}`)
     } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || 'Không thể bắt đầu luyện tập.' })
+      addToast({ type: 'error', message: (err as Error).message || t('practice.error_start') })
     } finally {
       setStarting(false)
     }
@@ -94,8 +109,8 @@ export default function PracticeSetupPage() {
   return (
     <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Chế độ luyện tập"
-        subtitle="Học theo tốc độ của bạn với phản hồi ngay lập tức"
+        title={t('practice.setup_title')}
+        subtitle={t('practice.setup_subtitle')}
       />
 
       <form
@@ -111,14 +126,14 @@ export default function PracticeSetupPage() {
       >
         {/* Certification picker */}
         <div>
-          <label style={labelStyle}>Chứng chỉ</label>
+          <label style={labelStyle}>{t('practice.certification_label')}</label>
           <select
             value={selectedCertId}
             onChange={(e) => { setSelectedCertId(Number(e.target.value)); setSelectedDomainId('') }}
             style={selectStyle}
             required
           >
-            <option value="">Chọn chứng chỉ...</option>
+            <option value="">{t('practice.select_certification')}</option>
             {certifications.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.code} — {c.name}
@@ -130,13 +145,13 @@ export default function PracticeSetupPage() {
         {/* Domain filter */}
         {domains.length > 0 && (
           <div>
-            <label style={labelStyle}>Lĩnh vực (không bắt buộc)</label>
+            <label style={labelStyle}>{t('practice.domain_label')}</label>
             <select
               value={selectedDomainId}
               onChange={(e) => setSelectedDomainId(e.target.value ? Number(e.target.value) : '')}
               style={selectStyle}
             >
-              <option value="">Tất cả lĩnh vực</option>
+              <option value="">{t('practice.all_domains')}</option>
               {domains.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -145,6 +160,17 @@ export default function PracticeSetupPage() {
             </select>
           </div>
         )}
+
+        {/* Bookmarked only filter */}
+        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={bookmarkedOnly}
+            onChange={(e) => setBookmarkedOnly(e.target.checked)}
+            style={{ width: '14px', height: '14px', accentColor: '#f5a623' }}
+          />
+          <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>{t('practice.bookmarked_only')}</span>
+        </label>
 
         {/* Info banner */}
         <div
@@ -158,7 +184,7 @@ export default function PracticeSetupPage() {
             letterSpacing: '-0.12px',
           }}
         >
-          Giải thích được hiện sau mỗi câu trả lời · Không giới hạn thời gian · Không theo dõi điểm số
+          {t('practice.info_banner')}
         </div>
 
         <button
@@ -167,7 +193,7 @@ export default function PracticeSetupPage() {
           className="btn-primary"
           style={{ width: '100%', opacity: starting || !selectedCertId ? 0.6 : 1 }}
         >
-          {starting ? 'Đang bắt đầu...' : 'Bắt đầu luyện tập'}
+          {starting ? t('practice.starting') : t('practice.start_button')}
         </button>
       </form>
     </div>
