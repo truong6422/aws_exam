@@ -214,5 +214,60 @@
         "correct_count_label": "{{correct}}/{{total}} câu đúng",
         "no_trend": "Chưa có dữ liệu xu hướng.",
         "recent_exams_label": "{{count}} bài thi gần đây"
+    },
+    "admin": {
+        "dashboard_title": "Bảng điều khiển Quản trị",
+        "dashboard_subtitle": "Tổng quan hệ thống",
+        "quick_actions": "Các hành động nhanh",
+        "import_questions": "Nhập câu hỏi",
+        "manage_exams": "Quản lý bài thi",
+        "manage_users": "Quản lý người dùng",
+        "certifications": "Chứng chỉ",
+        "questions": "Câu hỏi",
+        "manage_certs_sets": "Quản lý Chứng chỉ & Bộ đề",
+        "lock_unlock_api": "Khóa hoặc mở khóa quyền truy cập API",
+        "browse_question_bank": "Duyệt ngân hàng câu hỏi",
+        "manage_accounts": "Quản lý tài khoản",
+        "users_count": "Số tài khoản",
+        "total_exam_time": "Tổng giờ thi",
+        "unlock_rate_title": "Tỷ lệ đề thi được mở khóa",
+        "unlocked_label": "Đã mở khóa",
+        "locked_label": "Khóa (Chưa học)",
+        "import": {
+            "only_json_files": "Chỉ chấp nhận tệp .json",
+            "invalid_json_format": "Định dạng JSON không hợp lệ",
+            "missing_fields": "JSON phải có certification_code, domain_name, và mảng questions",
+            "drop_json_here": "Thả tệp .json ở đây, hoặc nhấp vào để duyệt",
+            "accepts_json_format": "Chấp nhận định dạng JSON nhập câu hỏi",
+            "failed": "Nhập thất bại",
+            "success": "Nhập thành công",
+            "imported_count": "Đã nhập {{count}} câu hỏi",
+            "into": "vào"
+        },
+        "filters": {
+            "all_certifications": "Tất cả chứng chỉ",
+            "all_domains": "Tất cả lĩnh vực",
+            "search_cert": "Tìm kiếm chứng chỉ...",
+            "clear": "Xóa"
+        }
+    },
+    "practice_extended": {
+        "bookmark": {
+            "remove": "Xóa dấu trang",
+            "add": "Đánh dấu câu hỏi này",
+            "bookmarked": "Đã đánh dấu",
+            "unbookmarked": "Đánh dấu"
+        },
+        "comment_section": {
+            "community": "Cộng đồng",
+            "loading_comments": "Đang tải bình luận...",
+            "no_comments": "Chưa có bình luận nào. Hãy là người đầu tiên!",
+            "no_comments_login": "Chưa có bình luận nào. Đăng nhập để bình luận."
+        }
+    },
+    "errors": {
+        "not_found_404": "404",
+        "page_not_exist": "Trang này không tồn tại.",
+        "back_to_dashboard": "Quay lại Bảng điều khiển"
     }
 }

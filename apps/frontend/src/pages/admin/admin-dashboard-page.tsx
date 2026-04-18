@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
-import { adminApi } from '@/services/admin-api'
-
-interface Stats {
-  certs: number
-  questions: number
-}
+import { adminApi, DashboardStats } from '@/services/admin-api'
 
 const statPanelStyle: React.CSSProperties = {
   background: '#272729',
@@ -16,31 +12,39 @@ const statPanelStyle: React.CSSProperties = {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate()
-  const [stats, setStats] = useState<Stats>({ certs: 0, questions: 0 })
+  const { t } = useTranslation()
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     adminApi
-      .getCertifications()
-      .then(async (certs) => {
-        let totalQuestions = 0
-        for (const cert of certs) {
-          totalQuestions += cert.total_questions ?? 0
-        }
-        setStats({ certs: certs.length, questions: totalQuestions })
-      })
+      .getDashboardStats()
+      .then((data) => setStats(data))
       .catch(() => { })
       .finally(() => setLoading(false))
   }, [])
 
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    return hours > 0 ? `${hours}h${mins}m` : `${mins}m`
+  }
+
   const statCards = [
-    { label: 'Chứng chỉ', value: stats.certs },
-    { label: 'Câu hỏi', value: stats.questions },
+    { label: t('admin.certifications'), value: stats?.certifications ?? 0 },
+    { label: t('admin.questions'), value: stats?.questions ?? 0 },
+    { label: t('admin.users_count'), value: stats?.users ?? 0 },
+    { label: t('admin.total_exam_time'), value: stats ? formatTime(stats.total_time_seconds) : '—' },
   ]
+
+  const totalSets = stats?.exam_sets.total || 0
+  const unlockedSets = stats?.exam_sets.unlocked || 0
+  const lockedSets = stats?.exam_sets.locked || 0
+  const percentUnlocked = totalSets > 0 ? (unlockedSets / totalSets) * 100 : 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <PageHeader title="Bảng điều khiển Quản trị" subtitle="Tổng quan hệ thống" />
+      <PageHeader title={t('admin.dashboard_title')} subtitle={t('admin.dashboard_subtitle')} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
         {statCards.map(({ label, value }) => (
@@ -63,6 +67,34 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
+      <div style={{ background: '#272729', borderRadius: '12px', padding: '20px 24px', display: 'flex', gap: '40px', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '16px' }}>
+            {t('admin.unlock_rate_title')} ({totalSets})
+          </h2>
+          <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
+            <div
+              style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                background: `conic-gradient(#1d9b5e ${percentUnlocked}%, rgba(255,255,255,0.1) 0)`
+              }}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#fff' }}>
+                <span style={{ display: 'block', width: '12px', height: '12px', borderRadius: '2px', background: '#1d9b5e' }} />
+                <span>{t('admin.unlocked_label')}: <strong>{unlockedSets}</strong></span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#fff' }}>
+                <span style={{ display: 'block', width: '12px', height: '12px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)' }} />
+                <span>{t('admin.locked_label')}: <strong>{lockedSets}</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div style={{ background: '#272729', borderRadius: '12px', padding: '20px 24px' }}>
         <h2
           style={{
@@ -73,26 +105,26 @@ export default function AdminDashboardPage() {
             marginBottom: '14px',
           }}
         >
-          Các hành động nhanh
+          {t('admin.quick_actions')}
         </h2>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           <button
             className="btn-primary"
             onClick={() => navigate('/admin/import')}
           >
-            Nhập câu hỏi
+            {t('admin.import_questions')}
           </button>
           <button
             className="btn-ghost"
             onClick={() => navigate('/admin/exams')}
           >
-            Quản lý bài thi
+            {t('admin.manage_exams')}
           </button>
           <button
             className="btn-ghost"
             onClick={() => navigate('/admin/users')}
           >
-            Quản lý người dùng
+            {t('admin.manage_users')}
           </button>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function NotFoundPage() {
+  const { t } = useTranslation()
   return (
     <div
       style={{
@@ -40,14 +42,14 @@ export default function NotFoundPage() {
         404
       </h1>
       <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>
-        Trang này không tồn tại.
+        {t('errors.page_not_exist')}
       </p>
       <Link
         to="/dashboard"
         className="btn-primary"
         style={{ textDecoration: 'none', marginTop: '8px' }}
       >
-        Quay lại Bảng điều khiển
+        {t('errors.back_to_dashboard')}
       </Link>
     </div>
   )

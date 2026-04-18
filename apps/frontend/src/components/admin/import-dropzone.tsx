@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ImportPayload } from '@/services/admin-api'
 
 interface Props {
@@ -17,6 +18,7 @@ function UploadIcon() {
 }
 
 export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
+  const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const [fileName, setFileName] = useState('')
   const [parseError, setParseError] = useState('')
@@ -24,7 +26,7 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
 
   const processFile = (file: File) => {
     if (!file.name.endsWith('.json')) {
-      setParseError('Chỉ chấp nhận tệp .json')
+      setParseError(t('admin.import.only_json_files'))
       return
     }
     const reader = new FileReader()
@@ -36,14 +38,14 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
           typeof data.domain_name !== 'string' ||
           !Array.isArray(data.questions)
         ) {
-          setParseError('JSON phải có certification_code, domain_name, và mảng questions')
+          setParseError(t('admin.import.missing_fields'))
           return
         }
         setParseError('')
         setFileName(file.name)
         onFileLoaded(data as unknown as ImportPayload, file.name)
       } catch {
-        setParseError('Định dạng JSON không hợp lệ')
+        setParseError(t('admin.import.invalid_json_format'))
       }
     }
     reader.readAsText(file)
@@ -93,8 +95,8 @@ export function ImportDropzone({ onFileLoaded, isLoading }: Props) {
           <p style={{ fontSize: '13px', fontWeight: 600, color: '#1d9b5e' }}>{fileName}</p>
         ) : (
           <>
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>Thả tệp .json ở đây, hoặc nhấp vào để duyệt</p>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '-0.12px' }}>Chấp nhận định dạng JSON nhập câu hỏi</p>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.224px' }}>{t('admin.import.drop_json_here')}</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '-0.12px' }}>{t('admin.import.accepts_json_format')}</p>
           </>
         )}
       </div>

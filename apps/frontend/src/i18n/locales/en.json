@@ -214,5 +214,60 @@
         "correct_count_label": "{{correct}}/{{total}} correct",
         "no_trend": "No trend data yet.",
         "recent_exams_label": "{{count}} recent exams"
+    },
+    "admin": {
+        "dashboard_title": "Admin Dashboard",
+        "dashboard_subtitle": "System Overview",
+        "quick_actions": "Quick Actions",
+        "import_questions": "Import Questions",
+        "manage_exams": "Manage Exams",
+        "manage_users": "Manage Users",
+        "certifications": "Certifications",
+        "questions": "Questions",
+        "manage_certs_sets": "Manage Certifications & Sets",
+        "lock_unlock_api": "Lock/Unlock API Access",
+        "browse_question_bank": "Browse Question Bank",
+        "manage_accounts": "Manage Accounts",
+        "users_count": "Users",
+        "total_exam_time": "Total Exam Time",
+        "unlock_rate_title": "Exam Set Unlock Rate",
+        "unlocked_label": "Unlocked",
+        "locked_label": "Locked",
+        "import": {
+            "only_json_files": "Only .json files accepted",
+            "invalid_json_format": "Invalid JSON format",
+            "missing_fields": "JSON must have certification_code, domain_name, and questions array",
+            "drop_json_here": "Drop .json file here, or click to browse",
+            "accepts_json_format": "Accepts JSON import format",
+            "failed": "Import Failed",
+            "success": "Import Successful",
+            "imported_count": "Successfully imported {{count}} questions",
+            "into": "into"
+        },
+        "filters": {
+            "all_certifications": "All certifications",
+            "all_domains": "All domains",
+            "search_cert": "Search certifications...",
+            "clear": "Clear"
+        }
+    },
+    "practice_extended": {
+        "bookmark": {
+            "remove": "Remove bookmark",
+            "add": "Bookmark this question",
+            "bookmarked": "Bookmarked",
+            "unbookmarked": "Bookmark"
+        },
+        "comment_section": {
+            "community": "Community",
+            "loading_comments": "Loading comments...",
+            "no_comments": "No comments. Be the first!",
+            "no_comments_login": "No comments. Login to comment."
+        }
+    },
+    "errors": {
+        "not_found_404": "404",
+        "page_not_exist": "This page doesn't exist.",
+        "back_to_dashboard": "Back to Dashboard"
     }
 }

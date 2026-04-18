@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { ImportDropzone } from '@/components/admin/import-dropzone'
 import { ImportResultPanel } from '@/components/admin/import-result-panel'
@@ -6,6 +7,7 @@ import { adminApi } from '@/services/admin-api'
 import type { ImportPayload, ImportResult } from '@/services/admin-api'
 
 export default function AdminImportPage() {
+  const { t } = useTranslation()
   const [parsedData, setParsedData] = useState<ImportPayload | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
@@ -38,7 +40,7 @@ export default function AdminImportPage() {
   return (
     <div style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Nhập câu hỏi"
+        title={t('nav.import')}
         subtitle="Tải lên tệp JSON để nhập hàng loạt câu hỏi vào lĩnh vực chứng chỉ"
       />
 
@@ -75,7 +77,7 @@ export default function AdminImportPage() {
                 marginBottom: '8px',
               }}
             >
-              Xem trước
+              {t('common.view_all')}
             </p>
             <p>
               <span style={{ color: 'rgba(255,255,255,0.5)' }}>Chứng chỉ: </span>
@@ -100,8 +102,8 @@ export default function AdminImportPage() {
             disabled={isLoading}
           >
             {isLoading
-              ? 'Đang nhập...'
-              : `Nhập ${parsedData.questions?.length ?? 0} câu hỏi`}
+              ? t('common.loading')
+              : `${t('nav.import')} ${parsedData.questions?.length ?? 0} ${t('exam.questions_count').split('{{count}}')[0].trim()}`}
           </button>
         )}
 

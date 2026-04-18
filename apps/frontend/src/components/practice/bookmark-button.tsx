@@ -2,6 +2,7 @@
  * BookmarkButton — toggles a question bookmark with optimistic UI.
  */
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { practiceApi } from '@/services/exam-api'
 
 interface BookmarkButtonProps {
@@ -11,6 +12,7 @@ interface BookmarkButtonProps {
 }
 
 export function BookmarkButton({ questionId, isBookmarked, onToggle }: BookmarkButtonProps) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
 
   const handleClick = async () => {
@@ -37,7 +39,7 @@ export function BookmarkButton({ questionId, isBookmarked, onToggle }: BookmarkB
     <button
       onClick={handleClick}
       disabled={loading}
-      title={isBookmarked ? 'Xóa dấu trang' : 'Đánh dấu câu hỏi này'}
+      title={isBookmarked ? t('practice_extended.bookmark.remove') : t('practice_extended.bookmark.add')}
       style={{
         background: 'none',
         border: '1px solid',
@@ -58,7 +60,7 @@ export function BookmarkButton({ questionId, isBookmarked, onToggle }: BookmarkB
       <svg width="13" height="13" viewBox="0 0 13 13" fill={isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
         <path d="M2 2a1 1 0 011-1h7a1 1 0 011 1v9.5l-4.5-2.5L2 11.5V2z" />
       </svg>
-      {isBookmarked ? 'Đã đánh dấu' : 'Đánh dấu'}
+      {isBookmarked ? t('practice_extended.bookmark.bookmarked') : t('practice_extended.bookmark.unbookmarked')}
     </button>
   )
 }

@@ -3,6 +3,7 @@
  * Only rendered after the user has revealed the answer in Practice Mode.
  */
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { practiceApi, type Comment } from '@/services/exam-api'
 import type { Answer } from '@/services/exam-api'
 import { CommentItem } from './comment-item'
@@ -15,6 +16,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ questionId, answers, isAuthenticated }: CommentSectionProps) {
+  const { t } = useTranslation()
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -63,7 +65,7 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
           textTransform: 'uppercase',
         }}
       >
-        Cộng đồng ({comments.length})
+        {t('practice_extended.comment_section.community')} ({comments.length})
       </h3>
 
       {isAuthenticated && (
@@ -72,11 +74,11 @@ export function CommentSection({ questionId, answers, isAuthenticated }: Comment
 
       {loading ? (
         <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>
-          Đang tải bình luận...
+          {t('practice_extended.comment_section.loading_comments')}
         </div>
       ) : comments.length === 0 ? (
         <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>
-          {isAuthenticated ? 'Chưa có bình luận nào. Hãy là người đầu tiên!' : 'Chưa có bình luận nào. Đăng nhập để bình luận.'}
+          {isAuthenticated ? t('practice_extended.comment_section.no_comments') : t('practice_extended.comment_section.no_comments_login')}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

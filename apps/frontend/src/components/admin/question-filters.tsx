@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { adminApi } from '@/services/admin-api'
 import type { Certification, Domain } from '@/services/exam-api'
 
@@ -35,6 +36,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 export function QuestionFilters({ onFilterChange }: Props) {
+  const { t } = useTranslation()
   const [certs, setCerts] = useState<Certification[]>([])
   const [domains, setDomains] = useState<Domain[]>([])
   const [filters, setFilters] = useState<QuestionFilters>({
@@ -79,7 +81,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
         value={filters.certificationId ?? ''}
         onChange={handleCertChange}
       >
-        <option value="">Tất cả chứng chỉ</option>
+        <option value="">{t('admin.filters.all_certifications')}</option>
         {certs.map((c) => (
           <option key={c.id} value={c.id}>
             {c.code} — {c.name}
@@ -93,7 +95,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
         onChange={(e) => update({ domainId: e.target.value ? Number(e.target.value) : null })}
         disabled={!filters.certificationId}
       >
-        <option value="">Tất cả lĩnh vực</option>
+        <option value="">{t('admin.filters.all_domains')}</option>
         {domains.map((d) => (
           <option key={d.id} value={d.id}>
             {d.name}
@@ -103,7 +105,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
 
       <input
         type="text"
-        placeholder="Tìm kiếm chứng chỉ..."
+        placeholder={t('admin.filters.search_cert')}
         style={inputStyle}
         value={filters.search}
         onChange={(e) => update({ search: e.target.value })}
@@ -114,7 +116,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
           className="btn-ghost"
           onClick={handleClear}
         >
-          Xóa
+          {t('admin.filters.clear')}
         </button>
       )}
     </div>

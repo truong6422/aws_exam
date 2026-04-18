@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { adminApi } from '@/services/admin-api'
 import type { Certification } from '@/services/exam-api'
@@ -28,6 +29,7 @@ const cellStyle: React.CSSProperties = {
 }
 
 export default function AdminExamsPage() {
+    const { t } = useTranslation()
     const addToast = useUiStore((s) => s.addToast)
     const [certs, setCerts] = useState<Certification[]>([])
     const [examSets, setExamSets] = useState<Record<number, ExamSet[]>>({})
@@ -81,7 +83,7 @@ export default function AdminExamsPage() {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '100px' }}>
-            <PageHeader title="Quản lý Chứng chỉ & Bộ đề" subtitle="Khóa hoặc mở khóa quyền truy cập API cho từng bộ đề thi" />
+            <PageHeader title={t('admin.manage_certs_sets')} subtitle={t('admin.lock_unlock_api')} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 {certs.map(cert => (
@@ -152,7 +154,7 @@ export default function AdminExamsPage() {
                                                     transition: 'all 0.2s'
                                                 }}
                                             >
-                                                {toggling === set.id ? 'Updating...' : (set.is_locked ? 'Unlock API' : 'Lock API')}
+                                                {toggling === set.id ? t('common.loading') : (set.is_locked ? 'Unlock API' : 'Lock API')}
                                             </button>
                                         </td>
                                     </tr>

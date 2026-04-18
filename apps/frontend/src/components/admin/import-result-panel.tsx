@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { ImportResult } from '@/services/admin-api'
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function ImportResultPanel({ result, certCode, domainName }: Props) {
+  const { t } = useTranslation()
   if (!result) return null
 
   const hasErrors = result.errors && result.errors.length > 0
@@ -31,7 +33,7 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
             marginBottom: '8px',
           }}
         >
-          Nhập thất bại
+          {t('admin.import.failed')}
         </h3>
         <ul style={{ paddingLeft: '16px', margin: 0 }}>
           {result.errors.map((err, i) => (
@@ -61,11 +63,11 @@ export function ImportResultPanel({ result, certCode, domainName }: Props) {
           marginBottom: '6px',
         }}
       >
-        Nhập thành công
+        {t('admin.import.success')}
       </h3>
       <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', letterSpacing: '-0.224px' }}>
-        Đã nhập <strong>{result.imported}</strong> câu hỏi
-        {certCode && <> vào <strong>{certCode}</strong></>}
+        {t('admin.import.imported_count', { count: result.imported })}
+        {certCode && <> {t('admin.import.into')} <strong>{certCode}</strong></>}
         {domainName && <> / <strong>{domainName}</strong></>}
       </p>
     </div>

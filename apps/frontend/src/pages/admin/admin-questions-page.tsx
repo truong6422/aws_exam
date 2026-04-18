@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { QuestionFilters } from '@/components/admin/question-filters'
 import { adminApi } from '@/services/admin-api'
@@ -8,6 +9,7 @@ import type { QuestionFilters as Filters } from '@/components/admin/question-fil
 
 export default function AdminQuestionsPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [certifications, setCertifications] = useState<Certification[]>([])
   const [filtered, setFiltered] = useState<Certification[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,20 +43,20 @@ export default function AdminQuestionsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-        <PageHeader title="Câu hỏi" subtitle="Duyệt ngân hàng câu hỏi theo chứng chỉ" />
+        <PageHeader title={t('admin.questions')} subtitle={t('admin.browse_question_bank')} />
         <button
           className="btn-primary"
           style={{ flexShrink: 0, marginTop: '4px' }}
           onClick={() => navigate('/admin/import')}
         >
-          + Nhập
+          + {t('common.edit')}
         </button>
       </div>
 
       <QuestionFilters onFilterChange={handleFilterChange} />
 
       {loading && (
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Đang tải...</p>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>{t('common.loading')}</p>
       )}
 
       {error && (
@@ -74,7 +76,7 @@ export default function AdminQuestionsPage() {
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>Không tìm thấy chứng chỉ nào.</p>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', letterSpacing: '-0.224px' }}>{t('common.none')}</p>
       )}
 
       {!loading && !error && (
@@ -96,9 +98,9 @@ export default function AdminQuestionsPage() {
               )}
               <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {[
-                  `${cert.total_questions} câu hỏi`,
-                  `${cert.time_limit_minutes} phút`,
-                  `${cert.passing_score}% để đạt`,
+                  `${cert.total_questions} ${t('exam.questions_count').split('{{count}}')[0].trim()}`,
+                  `${cert.time_limit_minutes} ${t('exam.minutes').split('{{count}}')[0].trim()}`,
+                  `${cert.passing_score}% ${t('exam.passing_score').split('{{score}}')[0].trim()}`,
                 ].map((tag) => (
                   <span
                     key={tag}
