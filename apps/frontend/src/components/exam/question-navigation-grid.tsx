@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 /**
  * Color-coded question navigation grid for the exam sidebar.
  * Unanswered: subtle dark | Answered: green tint | Flagged: red tint | Answered+Flagged: orange tint.
@@ -20,6 +22,7 @@ export function QuestionNavigationGrid({
   questionIds,
   onSelectQuestion,
 }: Props) {
+  const { t } = useTranslation()
   const getButtonStyle = (index: number): React.CSSProperties => {
     const qId = questionIds[index]
     const hasAnswer = (answers[qId]?.length ?? 0) > 0
@@ -47,10 +50,10 @@ export function QuestionNavigationGrid({
   }
 
   const legendItems = [
-    { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', label: 'Chưa trả lời' },
-    { bg: 'rgba(29,155,94,0.15)', color: '#1d9b5e', label: 'Đã trả lời' },
-    { bg: 'rgba(224,69,60,0.15)', color: '#e0453c', label: 'Đã đánh dấu' },
-    { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', label: 'Đã trả lời + Đã đánh dấu' },
+    { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', label: t('exam.navigator.unanswered') },
+    { bg: 'rgba(29,155,94,0.15)', color: '#1d9b5e', label: t('exam.navigator.answered') },
+    { bg: 'rgba(224,69,60,0.15)', color: '#e0453c', label: t('exam.navigator.flagged') },
+    { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', label: t('exam.navigator.answered_flagged') },
   ]
 
   return (
@@ -61,7 +64,7 @@ export function QuestionNavigationGrid({
             key={i}
             style={getButtonStyle(i)}
             onClick={() => onSelectQuestion(i)}
-            aria-label={`Đi tới câu ${i + 1}`}
+            aria-label={t('exam.navigator.go_to_question', { index: i + 1 })}
           >
             {i + 1}
           </button>

@@ -41,7 +41,7 @@ export default function AdminImportPage() {
     <div style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
         title={t('nav.import')}
-        subtitle="Tải lên tệp JSON để nhập hàng loạt câu hỏi vào lĩnh vực chứng chỉ"
+        subtitle={t('admin.import.subtitle_desc')}
       />
 
       <div
@@ -80,15 +80,15 @@ export default function AdminImportPage() {
               {t('common.view_all')}
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Chứng chỉ: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('admin.import.cert_label')} </span>
               <strong style={{ color: '#fff' }}>{parsedData.certification_code}</strong>
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Lĩnh vực: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('admin.import.domain_label')} </span>
               <strong style={{ color: '#fff' }}>{parsedData.domain_name}</strong>
             </p>
             <p>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Câu hỏi: </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('admin.import.questions_label')} </span>
               <strong style={{ color: '#fff' }}>{parsedData.questions?.length ?? 0}</strong>
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function AdminImportPage() {
             }}
             onClick={handleReset}
           >
-            Nhập tệp khác
+            {t('admin.import.import_another')}
           </button>
         )}
       </div>

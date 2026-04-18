@@ -12,6 +12,11 @@ from .views import (
     LogoutView,
     RegisterView,
 )
+from .admin_views import AdminUserViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r"users", AdminUserViewSet, basename="admin-users")
 
 urlpatterns = [
     # POST  — obtain tokens (original path, kept for compatibility)
@@ -28,4 +33,4 @@ urlpatterns = [
     path("me/", CurrentUserView.as_view(), name="current-user"),
     # POST  — validate old password and set new one
     path("change-password/", ChangePasswordView.as_view(), name="change-password"),
-]
+] + router.urls

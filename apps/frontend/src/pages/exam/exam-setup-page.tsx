@@ -87,7 +87,7 @@ export default function ExamSetupPage() {
       const historyList = await examApi.getExamSetHistory(examSet.id)
       setHistoryModal({ examSet, history: historyList })
     } catch (err) {
-      addToast({ type: 'error', message: 'Lỗi tải lịch sử thi.' })
+      addToast({ type: 'error', message: t('exam.error_load_history') })
     }
   }
 

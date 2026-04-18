@@ -13,7 +13,7 @@ export default function AdminUsersPage() {
     adminApi
       .getUsers()
       .then((data) => setUsers(data || []))
-      .catch(() => setError('Không thể tải danh sách người dùng.'))
+      .catch(() => setError(t('admin.error_load_users')))
       .finally(() => setLoading(false))
   }, [])
 
@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
-              {['Tên', 'Email', 'Vai trò', 'Thống kê', 'Tham gia'].map((h) => (
+              {[t('admin.table_name'), t('admin.table_email'), t('admin.table_role'), t('admin.table_stats'), t('admin.table_joined')].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -85,13 +85,13 @@ export default function AdminUsersPage() {
                   <td style={{ padding: '12px 16px', color: '#fff' }}>{user.name || user.username}</td>
                   <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.7)' }}>{user.email}</td>
                   <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.7)' }}>
-                    {user.is_staff ? 'Admin' : 'Học viên'}
+                    {user.is_staff ? t('admin.role_admin') : t('admin.role_learner')}
                   </td>
                   <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.7)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px' }}>
-                      <span><strong>{timeStr}</strong> thi</span>
-                      <span><strong>{user.total_questions_done || 0}</strong> câu đã làm</span>
-                      <span><strong>{user.total_comments || 0}</strong> bình luận</span>
+                      <span><strong>{timeStr}</strong> {t('admin.time_exam')}</span>
+                      <span><strong>{user.total_questions_done || 0}</strong> {t('admin.questions_done')}</span>
+                      <span><strong>{user.total_comments || 0}</strong> {t('admin.comments_amount')}</span>
                     </div>
                   </td>
                   <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.7)' }}>

@@ -211,7 +211,7 @@ export default function PracticeSessionPage() {
       setTotalCount(resp.links.count)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
-      addToast({ type: 'error', message: 'Không thể tải câu hỏi luyện tập.' })
+      addToast({ type: 'error', message: t('practice.error_load_questions') })
     } finally {
       setLoading(false)
     }

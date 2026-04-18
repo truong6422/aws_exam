@@ -7,6 +7,7 @@
  *   - Nút bắt đầu thi mới
  */
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { ExamListItem, ExamSet } from '@/services/exam-api'
 import { examApi } from '@/services/exam-api'
 import { useExamStore } from '@/stores/exam-store'
@@ -30,7 +31,7 @@ function formatSeconds(secs: number): string {
 }
 
 /** Minimal donut chart using SVG. correctPct = 0..100 */
-function DonutChart({ correctPct, total }: { correctPct: number; total: number }) {
+function DonutChart({ correctPct, total, t }: { correctPct: number; total: number; t: any }) {
     const r = 44
     const circ = 2 * Math.PI * r
     const correct = circ * (correctPct / 100)
@@ -69,13 +70,13 @@ function DonutChart({ correctPct, total }: { correctPct: number; total: number }
             </svg>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
-                    Tổng số: <strong style={{ color: '#fff' }}>{total}</strong> bộ đề
+                    {t('exam.history_modal.total_sets')} <strong style={{ color: '#fff' }}>{total}</strong> {t('exam.history_modal.sets')}
                 </span>
                 <span style={{ fontSize: '12px', color: '#1d9b5e' }}>
-                    ● Đúng trung bình: {Math.round(correctPct)}%
+                    ● {t('exam.history_modal.avg_correct')} {Math.round(correctPct)}%
                 </span>
                 <span style={{ fontSize: '12px', color: '#e0453c' }}>
-                    ● Sai trung bình: {Math.round(100 - correctPct)}%
+                    ● {t('exam.history_modal.avg_wrong')} {Math.round(100 - correctPct)}%
                 </span>
             </div>
         </div>
@@ -84,6 +85,7 @@ function DonutChart({ correctPct, total }: { correctPct: number; total: number }
 
 export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loadingStart }: Props) {
     const navigate = useNavigate()
+    const { t } = useTranslation()
     const initSession = useExamStore((s) => s.initSession)
     const addToast = useUiStore((s) => s.addToast)
 
@@ -102,7 +104,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
             initSession(data.id, data.questions, data.time_remaining_seconds, 'exam', data.user_answers, data.flagged_ids)
             navigate(`/exam/${data.id}`)
         } catch {
-            addToast({ type: 'error', message: 'Không thể tiếp tục bài thi.' })
+            addToast({ type: 'error', message: t('exam.error_resume') })
         }
     }
 
@@ -144,14 +146,14 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                             {examSet.name}
                         </h2>
                         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-                            Lịch sử thi · {history.length} lần
+                            {t('exam.history_modal.title_history', { count: history.length })}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
                         style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: '8px', color: 'rgba(255,255,255,0.6)', padding: '6px 12px', fontSize: '13px', cursor: 'pointer' }}
                     >
-                        ✕ Đóng
+                        {t('exam.history_modal.close')}
                     </button>
                 </div>
 
@@ -159,9 +161,9 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                 {submitted.length > 0 && (
                     <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.06)' }}>
                         <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>
-                            Tổng quan
+                            {t('exam.history_modal.overview')}
                         </p>
-                        <DonutChart correctPct={avgCorrectPct} total={submitted.length} />
+                        <DonutChart correctPct={avgCorrectPct} total={submitted.length} t={t} />
                     </div>
                 )}
 
@@ -169,7 +171,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                 {paused.length > 0 && (
                     <div>
                         <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,159,10,0.8)', marginBottom: '10px' }}>
-                            ⏸ Đang tạm dừng ({paused.length})
+                            {t('exam.history_modal.paused_title', { count: paused.length })}
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {paused.map((attempt) => (
@@ -192,10 +194,10 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                                         </span>
                                         <div style={{ display: 'flex', gap: '12px' }}>
                                             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-                                                🕐 Còn lại: <strong style={{ color: '#ff9f0a' }}>{formatSeconds(attempt.time_remaining_seconds)}</strong>
+                                                {t('exam.history_modal.time_left')} <strong style={{ color: '#ff9f0a' }}>{formatSeconds(attempt.time_remaining_seconds)}</strong>
                                             </span>
                                             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-                                                ✏️ Đã làm: <strong style={{ color: '#fff' }}>{attempt.answered_count}/{attempt.total_questions}</strong>
+                                                {t('exam.history_modal.done')} <strong style={{ color: '#fff' }}>{attempt.answered_count}/{attempt.total_questions}</strong>
                                             </span>
                                         </div>
                                     </div>
@@ -213,7 +215,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                                             whiteSpace: 'nowrap',
                                         }}
                                     >
-                                        Tiếp tục →
+                                        {t('exam.history_modal.continue_btn')}
                                     </button>
                                 </div>
                             ))}
@@ -225,7 +227,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                 {submitted.length > 0 && (
                     <div>
                         <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '10px' }}>
-                            Lịch sử đã nộp ({submitted.length})
+                            {t('exam.history_modal.submitted_title', { count: submitted.length })}
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {submitted.map((attempt) => {
@@ -257,15 +259,15 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                                                     color: passed ? '#1d9b5e' : '#e0453c',
                                                     border: `1px solid ${passed ? 'rgba(29,155,94,0.3)' : 'rgba(224,69,60,0.3)'}`,
                                                 }}>
-                                                    {passed ? 'ĐẠT' : 'CHƯA ĐẠT'}
+                                                    {passed ? t('exam.history_modal.status_passed') : t('exam.history_modal.status_failed')}
                                                 </span>
                                             </div>
                                             <div style={{ display: 'flex', gap: '12px' }}>
                                                 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-                                                    Điểm: <strong style={{ color: passed ? '#1d9b5e' : '#e0453c' }}>{score.toFixed(1)}%</strong>
+                                                    {t('exam.history_modal.score_label')} <strong style={{ color: passed ? '#1d9b5e' : '#e0453c' }}>{score.toFixed(1)}%</strong>
                                                 </span>
                                                 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-                                                    {attempt.correct_count}/{attempt.total_questions} câu đúng
+                                                    {attempt.correct_count}/{attempt.total_questions} {t('exam.history_modal.correct_questions')}
                                                 </span>
                                                 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
                                                     ⏱ {formatSeconds(attempt.time_spent_seconds)}
@@ -286,7 +288,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                                                 whiteSpace: 'nowrap',
                                             }}
                                         >
-                                            Chi tiết →
+                                            {t('exam.history_modal.details_btn')}
                                         </button>
                                     </div>
                                 )
@@ -302,7 +304,7 @@ export function ExamSetHistoryModal({ examSet, history, onClose, onStartNew, loa
                     className="btn-primary"
                     style={{ width: '100%', padding: '14px', fontSize: '15px', fontWeight: 600 }}
                 >
-                    {loadingStart ? 'Đang bắt đầu...' : '+ Bắt đầu lần thi mới'}
+                    {loadingStart ? t('exam.history_modal.starting') : t('exam.history_modal.start_new')}
                 </button>
             </div>
         </div>
