@@ -1,6 +1,7 @@
 import { useUiStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 import LanguageSwitcher from '@/components/language-switcher'
+import NotificationCenter from '@/components/notification-center'
 
 /** Top navigation bar — Apple glass effect. */
 export default function Navbar() {
@@ -44,6 +45,7 @@ export default function Navbar() {
 
       {/* User info */}
       <div className="flex items-center gap-3">
+        <NotificationCenter />
         <LanguageSwitcher variant="navbar" />
         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}>
           {user?.name ?? user?.email ?? 'Guest'}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 /**
  * Countdown timer display component.
  * Normal: white | Warning <5min: orange (#f5a623) | Critical <1min: red (#e0453c) pulsing
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function ExamTimer({ minutes, seconds, isWarning, isCritical }: Props) {
+  const { t } = useTranslation()
   const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
   let color = '#fff'
@@ -26,7 +28,7 @@ export function ExamTimer({ minutes, seconds, isWarning, isCritical }: Props) {
           color: 'rgba(255,255,255,0.5)',
         }}
       >
-        Thời gian còn lại
+        {t('exam.time_left')}
       </span>
       <span
         style={{

@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-04-18T12:48:30+00:00",
+  "status": "PASSED",
+  "passed": true,
+  "scope_requested": "auto",
+  "scope_effective": "medium",
+  "owner": "truonglb",
+  "report": "plans/260418-1923-credit-wallet-exam-purchase/reports/readiness-report.json",
+  "report_markdown": "plans/260418-1923-credit-wallet-exam-purchase/reports/readiness-report.md",
+  "issues": [],
+  "warnings": [
+    "phase UI contract skipped because the plan-ready UI payload was missing",
+    "plan.md missing sections: ## Phases, ## Dependencies",
+    "Phase file missing sections (phase-07-tests.md): Overview"
+  ],
+  "checks": [
+    "workflow-status present",
+    "owner set (truonglb)",
+    "active work item resolved (260418-1923-credit-wallet-exam-purchase)",
+    "plan file found (plans/260418-1923-credit-wallet-exam-purchase/plan.md)",
+    "plan-status synced (plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml)",
+    "plan-status phases tracked (7)",
+    "plan-status checklist tracked (22 items)",
+    "phase files found (7)",
+    "test strategy evidence present"
+  ],
+  "active_work_item_id": "260418-1923-credit-wallet-exam-purchase",
+  "active_work_item_path": "plans/260418-1923-credit-wallet-exam-purchase",
+  "work_item_resolution_reason": "",
+  "legacy_migration": {
+    "migrated": 0,
+    "active_item_id": "260418-1923-credit-wallet-exam-purchase",
+    "items": 3
+  },
+  "spec_lint": {
+    "warnings": [],
+    "warning_count": 0
+  },
+  "ui_readiness": {},
+  "plan_ui_backfill": {
+    "status": "skipped",
+    "action": "skipped",
+    "changed": false,
+    "item_id": "260418-1923-credit-wallet-exam-purchase",
+    "plan_path": "/home/truong/project/aws-exam-app/plans/260418-1923-credit-wallet-exam-purchase/plan.md",
+    "ui_readiness": {
+      "scope_detected": false,
+      "level": "not_applicable",
+      "enforcement_mode": "warning-only",
+      "required_fields": [
+        "information_architecture",
+        "sitemap",
+        "screen_inventory",
+        "primary_user_flows",
+        "interaction_contract",
+        "concept_options"
+      ],
+      "ready_fields": [],
+      "missing_fields": [],
+      "warnings": [],
+      "warning_count": 0
+    },
+    "ui_summary": {
+      "domain_pack": "",
+      "domain_label": "",
+      "selected_concept": "",
+      "concept_rationale": "",
+      "rejected_concepts": [],
+      "trust_signals": [],
+      "decision_checkpoints": [],
+      "phase_hydration_hints": {}
+    },
+    "plan_ready_artifact": {},
+    "phase_ui_sync": {
+      "status": "skipped",
+      "reason": "design-system-payload-missing",
+      "phase_paths": []
+    }
+  }
+}

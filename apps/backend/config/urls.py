@@ -33,6 +33,7 @@ def api_root(request):
             "exams": request.build_absolute_uri("/api/v1/exams/"),
             "analytics": request.build_absolute_uri("/api/v1/analytics/"),
             "imports": request.build_absolute_uri("/api/v1/imports/"),
+            "wallet": request.build_absolute_uri("/api/v1/wallet/"),
         }
     )
 
@@ -66,6 +67,16 @@ urlpatterns = [
     # Imports
     path("api/v1/imports/", include(("apps.imports.urls", "imports_v1"))),
     path("api/imports/", include(("apps.imports.urls", "imports"))),
+
+    # Wallet
+    path("api/v1/wallet/", include(("apps.wallet.urls", "wallet_v1"))),
+    path("api/v1/wallet/admin/", include(("apps.wallet.urls_admin", "admin_wallet_v1"))),
+
+    # Notifications
+    path("api/v1/notifications/", include(("apps.notifications.urls", "notifications_v1"))),
+
+    # Chat
+    path("api/v1/chat/", include(("apps.chat.urls", "chat_v1"))),
 
     # Core utilities
     path("api/core/", include("apps.core.urls")),

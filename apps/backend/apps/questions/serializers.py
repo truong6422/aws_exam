@@ -75,10 +75,27 @@ class CertificationSerializer(serializers.ModelSerializer):
 
 class ExamSetSerializer(serializers.ModelSerializer):
     question_count = serializers.IntegerField(source="questions.count", read_only=True)
+    is_unlocked = serializers.SerializerMethodField()
 
     class Meta:
         model = ExamSet
-        fields = ["id", "name", "description", "is_locked", "question_count"]
+        fields = ["id", "name", "description", "is_locked", "price_credits", "question_count", "is_unlocked"]
+
+    def get_is_unlocked(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        if obj.price_credits == 0:
+            return True
+        # Use cached set of unlocked IDs if available (N+1 mitigation)
+        unlocked_ids = self.context.get("unlocked_ids")
+        if unlocked_ids is not None:
+            return obj.id in unlocked_ids
+
+        from .models import UserExamUnlock
+        return UserExamUnlock.objects.filter(user=request.user, exam_set=obj).exists()
 
 
 class CommentSerializer(serializers.ModelSerializer):

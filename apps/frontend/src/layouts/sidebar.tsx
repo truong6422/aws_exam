@@ -45,6 +45,19 @@ const AnalyticsIcon = () => (
   </svg>
 )
 
+const WalletIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="1" y="3" width="14" height="10" rx="2" ry="2" fill="none" />
+    <line x1="1" y1="7" x2="15" y2="7" />
+  </svg>
+)
+
+const ChatIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+)
+
 const AdminIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
@@ -70,6 +83,13 @@ const ImportIcon = () => (
   </svg>
 )
 
+const SettingsIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M14.5 8.7a1.5 1.5 0 000-1.4l-.8-.6c-.2-.2-.3-.5-.2-.8l.2-1c0-.4-.2-.8-.6-.9l-.9-.2c-.3 0-.6-.3-.7-.5l-.6-.8a1 1 0 00-1.4 0l-.6.8c-.1.2-.4.4-.7.5l-1 .2c-.4 0-.7.4-.8.8l-.2 1c0 .3-.1.6-.3.8l-.8.6a1 1 0 000 1.4l.8.6c.2.2.3.5.2.8l-.2 1c0 .4.2.8.6.9l.9.2c.3 0 .6.3.7.5l.6.8a1 1 0 001.4 0l.6-.8c.1-.2.4-.4.7-.5l1-.2c.4 0 .7-.4.8-.8l.2-1c0-.3.1-.6.3-.8l.8-.6z" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+)
+
 const LogoutIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path d="M6 2H2v12h4M10 5l4 3-4 3M6 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
@@ -82,11 +102,16 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'nav.practice', to: '/practice/setup', icon: <PracticeIcon /> },
   { labelKey: 'nav.history', to: '/history', icon: <HistoryIcon /> },
   { labelKey: 'nav.analytics', to: '/analytics', icon: <AnalyticsIcon /> },
+  { labelKey: 'nav.wallet', to: '/wallet', icon: <WalletIcon /> },
+  { labelKey: 'nav.chat', to: '/chat', icon: <ChatIcon /> },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
   { labelKey: 'nav.admin', to: '/admin/dashboard', icon: <AdminIcon /> },
   { labelKey: 'nav.exam', to: '/admin/exams', icon: <ExamIcon /> },
+  { labelKey: 'nav.wallet', to: '/admin/wallet', icon: <WalletIcon /> },
+  { labelKey: 'nav.chat', to: '/admin/chat', icon: <ChatIcon /> },
+  { labelKey: 'nav.settings', to: '/admin/settings', icon: <SettingsIcon /> },
   { labelKey: 'nav.users', to: '/admin/users', icon: <UsersIcon /> },
   { labelKey: 'nav.import', to: '/admin/import', icon: <ImportIcon /> },
 ]

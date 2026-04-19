@@ -79,6 +79,15 @@ class ExamStartView(APIView):
             exam_set = ExamSet.objects.select_related("certification").get(pk=exam_set_id)
             if exam_set.is_locked:
                 return Response({"detail": "Exam set is locked."}, status=status.HTTP_403_FORBIDDEN)
+            
+            # Paywall check: STAFF users skip this
+            if exam_set.price_credits > 0 and not request.user.is_staff:
+                from apps.questions.models import UserExamUnlock
+                if not UserExamUnlock.objects.filter(user=request.user, exam_set=exam_set).exists():
+                    return Response(
+                        {"detail": "Purchase required to access this exam set."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
             cert = exam_set.certification
         else:
             cert = Certification.objects.get(pk=cert_id)
@@ -115,9 +124,32 @@ class ExamStartView(APIView):
             # Use fixed set questions
             questions = list(exam_set.questions.all())
         else:
-            # Practice mode: random questions
+            # Practice mode: random questions ONLY from accessible sets
+            # Access rules: is_locked=False AND (price_credits=0 OR UserExamUnlock exists)
+            # Staff can access all unlocked sets
+            from apps.questions.models import ExamSet, UserExamUnlock
+            from django.db import models
+            
+            if request.user.is_staff:
+                accessible_set_ids = ExamSet.objects.filter(
+                    certification=cert, is_locked=False
+                ).values_list("id", flat=True)
+            else:
+                purchased_set_ids = UserExamUnlock.objects.filter(
+                    user=request.user
+                ).values_list("exam_set_id", flat=True)
+                
+                accessible_set_ids = ExamSet.objects.filter(
+                    certification=cert, is_locked=False
+                ).filter(
+                    models.Q(price_credits=0) | models.Q(id__in=purchased_set_ids)
+                ).values_list("id", flat=True)
+
             questions = list(
-                Question.objects.filter(certification=cert).order_by("?")[
+                Question.objects.filter(
+                    certification=cert, 
+                    exam_set_id__in=accessible_set_ids
+                ).order_by("?")[
                     : cert.total_questions
                 ]
             )

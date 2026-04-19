@@ -8,7 +8,7 @@
   "scope_in": [],
   "scope_out": [],
   "constraints": [],
-  "chosen_direction": "S\u1ea3n ph\u1ea9m th\u01b0\u01a1ng m\u1ea1i. REST API /api/v1/ + Next.js App Router + JWT v\u1edbi Redis blacklist + server-side exam timer + strict 3NF PostgreSQL. Celery removed (YAGNI). difficulty field removed MVP v1.",
+  "chosen_direction": "Wallet + CreditTransaction + TopUpRequest (manual Telegram approval) + UserExamUnlock (per-user). ExamSet +price_credits. SystemConfig for telegram/bank/exchange-rate. Access logic: is_locked=hard-block, price_credits=0 free, >0 needs UserExamUnlock. Apps: wallet/, questions/ extended, config/. API: /wallet/, /wallet/topup/, /questions/sets/{id}/purchase/, /admin/topup-requests/. Frontend: wallet page + exam price badges. Django Admin + React Admin both.",
   "architecture_decisions": [
     "JWT: short-lived access (15m) + refresh (7d) + Redis JTI blacklist",
     "Exam timer: started_at + time_limit_minutes stored in ExamAttempt, validated on submit",
@@ -16,46 +16,96 @@
     "No Celery: Redis used for caching + JWT blacklist only",
     "No difficulty field in MVP v1",
     "Question.source field added for future extensibility",
-    "Next.js App Router (not React SPA) for SEO + SSR"
+    "Next.js App Router (not React SPA) for SEO + SSR",
+    "Favor additive changes and reuse existing workflow artifacts.",
+    "Keep plan-status as the only progress source of truth.",
+    "Lock design direction before planning implementation details."
   ],
-  "ui_decisions": [],
-  "information_architecture": [],
-  "sitemap": [],
-  "screen_inventory": [],
-  "primary_user_flows": [],
-  "interaction_contract": [],
-  "concept_options": [],
-  "decision_checkpoints": [],
-  "design_system": "",
-  "responsive_strategy": "",
-  "accessibility_constraints": [],
-  "state_matrix": [],
-  "product_domain": "",
+  "ui_decisions": [
+    "Run ui-ux-pro-max before frontend-design during brainstorm/planning.",
+    "Lock sitemap, screen inventory, and interaction contract before detailed visual styling.",
+    "Capture empty/loading/error/success/disabled states in the plan."
+  ],
+  "information_architecture": [
+    "Identify the dominant navigation model before visual exploration.",
+    "Group functionality by user goals, not by implementation layers."
+  ],
+  "sitemap": [
+    "List core routes, nested views, and cross-screen entry points.",
+    "Include overlays as first-class surfaces when they carry meaningful tasks."
+  ],
+  "screen_inventory": [
+    "Inventory pages, tabs, panes, modals, drawers, sheets, and notification surfaces.",
+    "Mark which surfaces are persistent, contextual, or transient."
+  ],
+  "primary_user_flows": [
+    "Map the happy path, empty-start path, and recovery path for each critical task.",
+    "Call out state transitions that move users between screens or overlays."
+  ],
+  "interaction_contract": [
+    "Define how buttons, forms, tables, filters, modals, drawers, toasts, banners, and notifications behave.",
+    "Make ownership between blocks explicit: which surface triggers, updates, confirms, or dismisses another."
+  ],
+  "concept_options": [
+    "Prepare 2-3 viable design directions with trade-offs before finalizing a single aesthetic.",
+    "Ask for user sign-off when direction materially changes hierarchy, density, or brand tone."
+  ],
+  "decision_checkpoints": [
+    "Sitemap approved or assumptions explicitly recorded.",
+    "Primary flows and interaction contract documented before final visual system.",
+    "Chosen design direction approved or marked as a blocking decision gate."
+  ],
+  "design_system": "Document palette, typography, spacing, and motion only after IA, flows, and block interactions are clear.",
+  "responsive_strategy": "Desktop/tablet/mobile breakpoints must be explicit before /plan finishes. Define what collapses, stacks, drawers, or becomes full-screen on smaller viewports.",
+  "accessibility_constraints": [
+    "Contrast, focus visibility, keyboard support, and touch targets must be explicit.",
+    "Error messaging, announcements, and destructive actions must remain perceivable and recoverable."
+  ],
+  "state_matrix": [
+    "empty",
+    "loading",
+    "error",
+    "success",
+    "disabled"
+  ],
+  "product_domain": "finance",
   "primary_user_archetypes": [],
   "primary_jobs": [],
   "information_architecture_details": {
     "navigation_model": "",
     "entry_points": [],
     "primary_zones": [],
-    "notes": []
+    "notes": [
+      "Identify the dominant navigation model before visual exploration.",
+      "Group functionality by user goals, not by implementation layers."
+    ]
   },
   "interaction_contract_details": {
     "buttons": [],
     "modals": [],
     "notifications": [],
-    "state_model": [],
-    "contract_notes": []
+    "state_model": [
+      "empty",
+      "loading",
+      "error",
+      "success",
+      "disabled"
+    ],
+    "contract_notes": [
+      "Define how buttons, forms, tables, filters, modals, drawers, toasts, banners, and notifications behave.",
+      "Make ownership between blocks explicit: which surface triggers, updates, confirms, or dismisses another."
+    ]
   },
   "selected_concept": {
-    "name": "S\u1ea3n ph\u1ea9m th\u01b0\u01a1ng m\u1ea1i. REST API /api/v1/ + Next.js App Router + JWT v\u1edbi Redis blacklist + server-side exam timer + strict 3NF PostgreSQL. Celery removed (YAGNI). difficulty field removed MVP v1.",
+    "name": "Wallet + CreditTransaction + TopUpRequest (manual Telegram approval) + UserExamUnlock (per-user). ExamSet +price_credits. SystemConfig for telegram/bank/exchange-rate. Access logic: is_locked=hard-block, price_credits=0 free, >0 needs UserExamUnlock. Apps: wallet/, questions/ extended, config/. API: /wallet/, /wallet/topup/, /questions/sets/{id}/purchase/, /admin/topup-requests/. Frontend: wallet page + exam price badges. Django Admin + React Admin both.",
     "description": "",
     "rationale": ""
   },
   "rejected_concepts": [],
   "concept_rationale": "",
   "ui_readiness": {
-    "scope_detected": false,
-    "level": "not_applicable",
+    "scope_detected": true,
+    "level": "strong",
     "enforcement_mode": "warning-only",
     "required_fields": [
       "information_architecture",
@@ -65,7 +115,14 @@
       "interaction_contract",
       "concept_options"
     ],
-    "ready_fields": [],
+    "ready_fields": [
+      "information_architecture",
+      "sitemap",
+      "screen_inventory",
+      "primary_user_flows",
+      "interaction_contract",
+      "concept_options"
+    ],
     "missing_fields": [],
     "warnings": [],
     "warning_count": 0
@@ -79,10 +136,14 @@
     "Next.js 14 App Router",
     "TailwindCSS",
     "Zustand",
-    "Sentry SDK (django + nextjs)"
+    "Sentry SDK (django + nextjs)",
+    "Decision handoff must be current before /plan.",
+    "Readiness must pass before /cook."
   ],
   "test_strategy": "Unit tests for serializer field exclusion (is_correct). Integration test for timer validation. E2E test for exam submit flow. Auth blacklist test.",
-  "tradeoffs": [],
+  "tradeoffs": [
+    "Prefer refreshed handoff data over stale brainstorming artifacts."
+  ],
   "acceptance_criteria": [
     "Exam Mode: 65 questions, 130min timer enforced server-side",
     "Exam Mode: autosave every 30s \u2014 state survives refresh",
@@ -108,11 +169,12 @@
   "sources": [
     "docs/project-context.md",
     "plans/260315-0247-full-project-implementation/brainstorm/brainstorm-v01.md",
+    "plans/260315-0247-full-project-implementation/brainstorm/brainstorm-v02.md",
     "plans/project-scan-report.json"
   ],
   "approved_by": "",
   "approved_at": "",
-  "updated_at": "2026-04-16T13:18:35+00:00",
+  "updated_at": "2026-04-18T12:23:27+00:00",
   "created_at": "2026-04-16T13:08:25+00:00",
   "topic": "AWS Exam App \u2014 Full Project Development Strategy",
   "brainstorm_date": "2026-03-22",
@@ -309,5 +371,19 @@
   "requirement_confirmation_status": "pending",
   "inference_policy": "advisory-only",
   "inferred_problem_statement": "Purpose is unclear from static signals. Run deeper discovery and inspect business modules.",
-  "inferred_chosen_direction": "Architecture appears mixed or monolithic; deeper scan may be required for precise boundaries."
+  "inferred_chosen_direction": "Architecture appears mixed or monolithic; deeper scan may be required for precise boundaries.",
+  "ba_extracted": false,
+  "user_stories": [],
+  "stakeholders": [],
+  "target_platforms": [],
+  "assumptions": [],
+  "conflicts": [],
+  "ba_readiness": {
+    "extracted": false,
+    "stories_count": 0,
+    "criteria_count": 8,
+    "platforms_detected": [],
+    "open_conflicts": 0,
+    "unconfirmed_assumptions": 0
+  }
 }

@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -47,8 +48,10 @@ export default function RegisterPage() {
       return 'auth.errors.too_many_requests'
     if (m.includes('already exist') || m.includes('email') && m.includes('exist'))
       return 'auth.errors.email_taken'
-    if (m.includes('too short') || m.includes('at least 8'))
+    if (m.includes('too short') || m.includes('at least 6'))
       return 'auth.errors.password_too_short'
+    if (m.includes('password') && m.includes('match'))
+      return 'auth.errors.password_mismatch'
     if (m.includes('too common') || m.includes('entirely numeric'))
       return 'auth.errors.password_too_common'
     if (!msg || m.includes('500') || m.includes('server'))
@@ -61,8 +64,14 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
 
+    if (password !== confirmPassword) {
+      setError(t('auth.errors.password_mismatch'))
+      setLoading(false)
+      return
+    }
+
     try {
-      const data = await authApi.register({ email, password, name })
+      const data = await authApi.register({ email, password, confirm_password: confirmPassword, name })
       setTokens(data.access, data.refresh)
       if (data.user) setUser(data.user)
       navigate('/dashboard', { replace: true })
@@ -148,10 +157,38 @@ export default function RegisterPage() {
           type="password"
           autoComplete="new-password"
           required
-          minLength={8}
+          minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
+          placeholder="••••••"
+          style={inputStyle}
+          className="transition-all"
+          onFocus={(e) => {
+            e.target.style.borderColor = '#0071e3'
+            e.target.style.boxShadow = '0 0 0 4px rgba(0, 113, 227, 0.1)'
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+            e.target.style.boxShadow = 'none'
+          }}
+        />
+        <p style={{ marginTop: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: "'SF Pro Text', sans-serif" }}>
+          {t('auth.password_hint')}
+        </p>
+      </div>
+
+      {/* Confirm Password */}
+      <div>
+        <label htmlFor="confirmPassword" style={labelStyle}>{t('auth.confirm_password')}</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={6}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••"
           style={inputStyle}
           className="transition-all"
           onFocus={(e) => {

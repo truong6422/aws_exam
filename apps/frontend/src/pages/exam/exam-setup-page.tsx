@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type Certification, type ExamSet, type ExamListItem } from '@/services/exam-api'
+import { walletApi } from '@/services/wallet-api'
 import { useExamStore } from '@/stores/exam-store'
 import { useUiStore } from '@/stores/ui-store'
 import { ExamSetHistoryModal } from '@/components/exam/exam-set-history-modal'
+import { Link } from 'react-router-dom'
 
 const cardStyle: React.CSSProperties = {
   display: 'flex',
@@ -41,6 +43,11 @@ export default function ExamSetupPage() {
   const [loadingSets, setLoadingSets] = useState(false)
   const [startingId, setStartingId] = useState<number | null>(null)
 
+  // Purchase state
+  const [userBalance, setUserBalance] = useState<number | null>(null)
+  const [purchasingId, setPurchasingId] = useState<number | null>(null)
+  const [purchaseModal, setPurchaseModal] = useState<ExamSet | null>(null)
+
   // Modal state
   const [historyModal, setHistoryModal] = useState<{
     examSet: ExamSet
@@ -62,6 +69,11 @@ export default function ExamSetupPage() {
       })
       .catch(() => addToast({ type: 'error', message: t('exam.error_load') }))
       .finally(() => setLoading(false))
+
+    // Fetch user balance
+    walletApi.getWallet()
+      .then(w => setUserBalance(w.balance))
+      .catch(() => { }) // silent fail
   }, [addToast, t])
 
   const handleSelectCert = async (cert: Certification) => {
@@ -105,10 +117,31 @@ export default function ExamSetupPage() {
         attempt.flagged_ids,
       )
       navigate(`/exam/${attempt.id}`)
-    } catch (err) {
-      addToast({ type: 'error', message: (err as Error).message || t('exam.error_start') })
     } finally {
       setStartingId(null)
+    }
+  }
+
+  const handlePurchase = async (examSet: ExamSet) => {
+    setPurchasingId(examSet.id)
+    setPurchaseModal(null)
+    try {
+      const result = await examApi.purchaseExamSet(examSet.id)
+      // Update local state: mark set as unlocked
+      setExamSets(prev => prev.map(s =>
+        s.id === examSet.id ? { ...s, is_unlocked: true } : s
+      ))
+      setUserBalance(result.new_balance)
+      addToast({ type: 'success', message: t('exam.purchase_success') })
+    } catch (err) {
+      const msg = (err as Error).message
+      if (msg.includes('Insufficient')) {
+        addToast({ type: 'error', message: t('exam.purchase_insufficient') })
+      } else {
+        addToast({ type: 'error', message: t('exam.purchase_error') })
+      }
+    } finally {
+      setPurchasingId(null)
     }
   }
 
@@ -140,6 +173,15 @@ export default function ExamSetupPage() {
           onClose={() => setHistoryModal(null)}
           onStartNew={() => doStartExam(historyModal.examSet)}
           loadingStart={startingId === historyModal.examSet.id}
+        />
+      )}
+      {purchaseModal && (
+        <PurchaseModal
+          examSet={purchaseModal}
+          userBalance={userBalance ?? 0}
+          onClose={() => setPurchaseModal(null)}
+          onConfirm={handlePurchase}
+          purchasing={purchasingId === purchaseModal.id}
         />
       )}
       <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '60px' }}>
@@ -227,8 +269,18 @@ export default function ExamSetupPage() {
               >
                 ← {t('common.back')}
               </button>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <PageHeader title={selectedCert.name} subtitle={t('exam.select_set_subtitle')} />
+                {userBalance !== null && (
+                  <span style={{
+                    fontSize: '12px', padding: '4px 12px', borderRadius: '100px',
+                    background: 'rgba(255,149,0,0.15)', color: '#ff9500',
+                    border: '1px solid rgba(255,149,0,0.2)', fontWeight: 600,
+                    marginBottom: '8px'
+                  }}>
+                    {userBalance.toLocaleString()} {t('wallet.unit')}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -245,25 +297,50 @@ export default function ExamSetupPage() {
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                 {examSets.map((set) => {
-                  const isLocked = set.is_locked
-                  const canEnter = !isLocked
+                  const isAdminLocked = set.is_locked
+                  const isFree = set.price_credits === 0
+                  const isUnlocked = set.is_unlocked
+                  const isPurchasable = !isAdminLocked && !isFree && !isUnlocked
+                  const canStart = !isAdminLocked && isUnlocked
 
                   return (
                     <div
                       key={set.id}
                       style={{
                         ...cardStyle,
-                        opacity: isLocked ? 0.5 : 1,
-                        cursor: isLocked ? 'not-allowed' : 'pointer',
+                        opacity: isAdminLocked ? 0.5 : 1,
+                        cursor: isAdminLocked ? 'not-allowed' : 'pointer',
                         border: cardStyle.border,
                         background: cardStyle.background
                       }}
-                      onClick={() => canEnter && handleStart(set)}
+                      onClick={() => {
+                        if (canStart) handleStart(set)
+                        else if (isPurchasable) setPurchaseModal(set)
+                      }}
                       className="hover-card"
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                        <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>{set.name}</h4>
-                        {isLocked && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>{set.name}</h4>
+                          {!isAdminLocked && (
+                            <div>
+                              <span style={{
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                background: isFree ? 'rgba(29, 155, 94, 0.15)' : 'rgba(255, 149, 0, 0.15)',
+                                color: isFree ? '#1d9b5e' : '#ff9500',
+                                border: isFree ? '1px solid rgba(29,155,94,0.2)' : '1px solid rgba(255,149,0,0.2)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.2px'
+                              }}>
+                                {isFree ? t('exam.price_free') : `${set.price_credits.toLocaleString()} ${t('wallet.unit')}`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {isAdminLocked && (
                           <div style={{
                             color: 'rgba(255,255,255,0.3)',
                             padding: '4px',
@@ -288,15 +365,29 @@ export default function ExamSetupPage() {
                       </div>
 
                       <button
-                        disabled={(!canEnter) || startingId !== null}
-                        className={isLocked ? "btn-secondary" : "btn-primary"}
+                        disabled={isAdminLocked || startingId !== null || (purchasingId !== null)}
+                        className={canStart ? "btn-primary" : "btn-secondary"}
                         style={{
                           width: '100%',
                           fontSize: '14px',
                           padding: '10px'
                         }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (canStart) handleStart(set)
+                          else if (isPurchasable) setPurchaseModal(set)
+                        }}
                       >
-                        {startingId === set.id ? t('exam.starting') : (isLocked ? t('exam.locked') : t('exam.start_button'))}
+                        {startingId === set.id
+                          ? t('exam.starting')
+                          : purchasingId === set.id
+                            ? t('exam.purchasing')
+                            : isAdminLocked
+                              ? t('exam.locked')
+                              : canStart
+                                ? t('exam.start_button')
+                                : `${t('exam.unlock_button')} (${set.price_credits.toLocaleString()} ${t('wallet.unit')})`
+                        }
                       </button>
                     </div>
                   )
@@ -307,5 +398,94 @@ export default function ExamSetupPage() {
         )}
       </div>
     </>
+  )
+}
+
+function PurchaseModal({ examSet, userBalance, onClose, onConfirm, purchasing }: {
+  examSet: ExamSet
+  userBalance: number
+  onClose: () => void
+  onConfirm: (set: ExamSet) => void
+  purchasing: boolean
+}) {
+  const { t } = useTranslation()
+  const hasEnough = userBalance >= examSet.price_credits
+
+  const overlayStyle: React.CSSProperties = {
+    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+    background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    zIndex: 2000, backdropFilter: 'blur(10px)'
+  }
+
+  const contentStyle: React.CSSProperties = {
+    background: '#1d1d1f', borderRadius: '20px', width: '100%', maxWidth: '400px',
+    padding: '32px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', position: 'relative'
+  }
+
+  return (
+    <div style={overlayStyle} onClick={onClose}>
+      <div style={contentStyle} onClick={e => e.stopPropagation()}>
+        <h2 style={{ fontSize: '22px', fontWeight: 600, letterSpacing: '-0.5px', marginBottom: '24px', textAlign: 'center' }}>
+          {t('exam.purchase_modal_title')}
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px' }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('exam.purchase_balance')}</span>
+            <span style={{ fontWeight: 600 }}>{userBalance.toLocaleString()} {t('wallet.unit')}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px' }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('exam.purchase_cost')}</span>
+            <span style={{ fontWeight: 600, color: '#ff9500' }}>-{examSet.price_credits.toLocaleString()} {t('wallet.unit')}</span>
+          </div>
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 600 }}>
+            <span>{t('exam.purchase_balance_after')}</span>
+            <span style={{ color: hasEnough ? '#1d9b5e' : '#e0453c' }}>
+              {(userBalance - examSet.price_credits).toLocaleString()} {t('wallet.unit')}
+            </span>
+          </div>
+        </div>
+
+        {!hasEnough && (
+          <div style={{
+            background: 'rgba(224, 69, 60, 0.1)',
+            border: '1px solid rgba(224, 69, 60, 0.2)',
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '24px'
+          }}>
+            <p style={{ fontSize: '14px', color: '#e0453c', marginBottom: '12px', lineHeight: 1.4 }}>
+              {t('exam.purchase_insufficient_warning')}
+            </p>
+            <Link
+              to="/wallet"
+              style={{ fontSize: '14px', color: '#2997ff', fontWeight: 600, textDecoration: 'none' }}
+              onClick={onClose}
+            >
+              {t('exam.topup_link')} →
+            </Link>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button
+            className="btn-primary"
+            style={{ width: '100%', padding: '12px' }}
+            disabled={!hasEnough || purchasing}
+            onClick={() => onConfirm(examSet)}
+          >
+            {purchasing ? t('common.loading') : t('exam.confirm_unlock')}
+          </button>
+          <button
+            className="btn-secondary"
+            style={{ width: '100%', padding: '12px' }}
+            onClick={onClose}
+          >
+            {t('common.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -63,7 +63,8 @@ class RegisterSerializer(serializers.Serializer):
     """Validate and create a new user account."""
 
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=6)
+    confirm_password = serializers.CharField(write_only=True, min_length=6)
     name = serializers.CharField(max_length=150, required=False, default="", allow_blank=True)
 
     def validate_email(self, value):
@@ -72,12 +73,10 @@ class RegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
-    def validate_password(self, value):
-        try:
-            validate_password(value)
-        except DjangoValidationError as exc:
-            raise serializers.ValidationError(list(exc.messages))
-        return value
+    def validate(self, data):
+        if data.get("password") != data.get("confirm_password"):
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+        return data
 
     def create(self, validated_data):
         email = validated_data["email"]
@@ -109,14 +108,15 @@ class ChangePasswordSerializer(serializers.Serializer):
     """Validate old password and accept new password for change."""
 
     old_password = serializers.CharField(required=True, write_only=True)
-    new_password = serializers.CharField(required=True, write_only=True, min_length=8)
+    new_password = serializers.CharField(required=True, write_only=True, min_length=6)
 
     def validate(self, attrs):
         user = self.context["request"].user
         if not user.check_password(attrs["old_password"]):
             raise serializers.ValidationError({"old_password": "Current password is incorrect."})
-        try:
-            validate_password(attrs["new_password"], user=user)
-        except DjangoValidationError as exc:
-            raise serializers.ValidationError({"new_password": list(exc.messages)})
+        # skip complex validation as requested
+        # try:
+        #     validate_password(attrs["new_password"], user=user)
+        # except DjangoValidationError as exc:
+        #     raise serializers.ValidationError({"new_password": list(exc.messages)})
         return attrs

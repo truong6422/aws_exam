@@ -1,0 +1,40 @@
+version: '1.0'
+plan_id: 260418-1923-credit-wallet-exam-purchase
+plan_file: plans/260418-1923-credit-wallet-exam-purchase/plan.md
+status: not-started
+summary:
+  total_phases: 7
+  completed: 0
+  in_progress: 0
+  pending: 7
+active_phase:
+  phase_id: '01'
+  phase_label: Db Models
+  file: plans/260418-1923-credit-wallet-exam-purchase/phase-01-db-models.md
+  status: not-started
+  checklist_open: 0
+phases:
+- id: '01'
+  label: Db Models
+  status: not-started
+- id: '02'
+  label: Backend Api
+  status: not-started
+- id: '03'
+  label: Access Logic
+  status: not-started
+- id: '04'
+  label: Frontend Wallet
+  status: no-checklist
+- id: '05'
+  label: Frontend Exam Purchase
+  status: not-started
+- id: '06'
+  label: Frontend Admin
+  status: not-started
+- id: '07'
+  label: Tests
+  status: not-started
+progress_pct: 0.0
+updated_at: '2026-04-18T12:49:25+00:00'
+created_at: '2026-04-18T12:48:29+00:00'

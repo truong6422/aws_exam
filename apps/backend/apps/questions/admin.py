@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Answer, AnswerReport, Certification, ExamSet, Question
+from .models import Answer, AnswerReport, Certification, ExamSet, Question, UserExamUnlock
 
 
 class AnswerInline(admin.TabularInline):
@@ -33,7 +33,7 @@ class CertificationAdmin(admin.ModelAdmin):
 
 @admin.register(ExamSet)
 class ExamSetAdmin(admin.ModelAdmin):
-    list_display = ["name", "certification", "is_locked", "question_count_display"]
+    list_display = ["name", "certification", "is_locked", "price_credits", "question_count_display"]
     list_editable = ["is_locked"]
     list_filter = ["certification", "is_locked"]
     search_fields = ["name"]
@@ -71,3 +71,11 @@ class AnswerReportAdmin(admin.ModelAdmin):
     @admin.action(description="Mark selected as Dismissed")
     def mark_dismissed(self, request, queryset):
         queryset.update(status=AnswerReport.STATUS_DISMISSED)
+
+
+@admin.register(UserExamUnlock)
+class UserExamUnlockAdmin(admin.ModelAdmin):
+    list_display = ["user", "exam_set", "credits_spent", "unlocked_at"]
+    search_fields = ["user__email", "exam_set__name"]
+    readonly_fields = ["unlocked_at"]
+    list_filter = ["exam_set__certification"]

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
-from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, Question
+from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, Question, UserExamUnlock
 from .serializers import (
     AnswerReportSerializer,
     CertificationSerializer,
@@ -40,6 +40,7 @@ class ExamSetListView(generics.ListAPIView):
 
     serializer_class = ExamSetSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = []  # Sort is handled in Python code (natural sort)
 
     def get_queryset(self):
         queryset = ExamSet.objects.filter(
@@ -56,6 +57,16 @@ class ExamSetListView(generics.ListAPIView):
                     for text in re.split('([0-9]+)', s.name)]
         
         return sorted(queryset, key=natural_sort_key)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.request.user.is_authenticated and not self.request.user.is_staff:
+            context["unlocked_ids"] = set(
+                UserExamUnlock.objects.filter(user=self.request.user).values_list(
+                    "exam_set_id", flat=True
+                )
+            )
+        return context
 
 
 class ExamSetUpdateView(generics.UpdateAPIView):
@@ -74,9 +85,29 @@ class PracticeQuestionListView(generics.ListAPIView):
 
     def get_queryset(self):
         cert_id = self.request.query_params.get("certification_id")
-        # Only show questions from UNLOCKED exam sets or questions with NO exam set
+        user = self.request.user
+
+        # Get exam_set IDs the user can access:
+        # 1. is_locked=False AND price_credits=0  ->  free, accessible
+        # 2. is_locked=False AND UserExamUnlock exists  ->  purchased, accessible
+        # Staff can access all unlocked sets
+        if user.is_staff:
+            accessible_sets = ExamSet.objects.filter(is_locked=False).values_list(
+                "id", flat=True
+            )
+        else:
+            purchased_set_ids = UserExamUnlock.objects.filter(user=user).values_list(
+                "exam_set_id", flat=True
+            )
+
+            accessible_sets = (
+                ExamSet.objects.filter(is_locked=False)
+                .filter(models.Q(price_credits=0) | models.Q(id__in=purchased_set_ids))
+                .values_list("id", flat=True)
+            )
+
         qs = Question.objects.filter(
-            models.Q(exam_set__is_locked=False) | models.Q(exam_set__isnull=True)
+            models.Q(exam_set_id__in=accessible_sets) | models.Q(exam_set__isnull=True)
         )
         if cert_id:
             qs = qs.filter(certification_id=cert_id)

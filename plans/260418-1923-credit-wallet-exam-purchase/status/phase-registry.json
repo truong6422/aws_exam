@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "phases": {
+    "260418-1923-credit-wallet-exam-purchase-phase-01": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-01",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-01-db-models.md"
+    },
+    "260418-1923-credit-wallet-exam-purchase-phase-02": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-02",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-02-backend-api.md"
+    },
+    "260418-1923-credit-wallet-exam-purchase-phase-03": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-03",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-03-access-logic.md"
+    },
+    "phase-04-frontend-wallet": {
+      "spec_id": "phase-04-frontend-wallet",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-04-frontend-wallet.md"
+    },
+    "260418-1923-credit-wallet-exam-purchase-phase-05": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-05",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-05-frontend-exam-purchase.md"
+    },
+    "260418-1923-credit-wallet-exam-purchase-phase-06": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-06",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-06-frontend-admin.md"
+    },
+    "260418-1923-credit-wallet-exam-purchase-phase-07": {
+      "spec_id": "260418-1923-credit-wallet-exam-purchase-phase-07",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-07-tests.md"
+    }
+  },
+  "ready": [
+    "260418-1923-credit-wallet-exam-purchase-phase-01",
+    "260418-1923-credit-wallet-exam-purchase-phase-02",
+    "260418-1923-credit-wallet-exam-purchase-phase-03",
+    "phase-04-frontend-wallet",
+    "260418-1923-credit-wallet-exam-purchase-phase-05",
+    "260418-1923-credit-wallet-exam-purchase-phase-06",
+    "260418-1923-credit-wallet-exam-purchase-phase-07"
+  ],
+  "in_progress": [],
+  "blocked": [],
+  "completed": [],
+  "generated_at": "2026-04-18T12:49:25+00:00"
+}

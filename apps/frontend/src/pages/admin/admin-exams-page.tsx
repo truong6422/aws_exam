@@ -10,6 +10,7 @@ interface ExamSet {
     name: string
     is_locked: boolean
     question_count: number
+    price_credits: number
 }
 
 const tableHeaderStyle: React.CSSProperties = {
@@ -36,6 +37,11 @@ export default function AdminExamsPage() {
     const [loading, setLoading] = useState(true)
     const [toggling, setToggling] = useState<number | null>(null)
 
+    // Price editing state
+    const [editingPrice, setEditingPrice] = useState<number | null>(null)
+    const [priceInput, setPriceInput] = useState<string>('')
+    const [savingPrice, setSavingPrice] = useState<number | null>(null)
+
     useEffect(() => {
         loadAll()
     }, [])
@@ -57,25 +63,25 @@ export default function AdminExamsPage() {
         }
     }
 
-    const handleToggleLock = async (setId: number, currentLocked: boolean, certId: number) => {
-        setToggling(setId)
+    const handleSavePrice = async (setId: number, certId: number) => {
+        const parsed = parseInt(priceInput, 10)
+        if (isNaN(parsed) || parsed < 0) {
+            addToast({ type: 'error', message: t('admin.wallet.price_invalid') })
+            return
+        }
+        setSavingPrice(setId)
         try {
-            await adminApi.updateExamSet(setId, { is_locked: !currentLocked })
-
-            // Update local state
+            await adminApi.updateExamSet(setId, { price_credits: parsed })
             setExamSets(prev => ({
                 ...prev,
-                [certId]: prev[certId].map(s => s.id === setId ? { ...s, is_locked: !currentLocked } : s)
+                [certId]: prev[certId].map(s => s.id === setId ? { ...s, price_credits: parsed } : s)
             }))
-
-            addToast({
-                type: 'success',
-                message: `${!currentLocked ? 'Locked' : 'Unlocked'} successfully`
-            })
-        } catch (err) {
-            addToast({ type: 'error', message: 'Failed to update status' })
+            setEditingPrice(null)
+            addToast({ type: 'success', message: t('admin.wallet.price_saved') })
+        } catch {
+            addToast({ type: 'error', message: t('admin.wallet.price_save_error') })
         } finally {
-            setToggling(null)
+            setSavingPrice(null)
         }
     }
 
@@ -115,6 +121,7 @@ export default function AdminExamsPage() {
                                 <tr>
                                     <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>Exam Set Name</th>
                                     <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Questions</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>{t('admin.wallet.price_column_header')}</th>
                                     <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Status</th>
                                     <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>Actions</th>
                                 </tr>
@@ -124,6 +131,51 @@ export default function AdminExamsPage() {
                                     <tr key={set.id} style={{ transition: 'background 0.2s' }} className="admin-row-hover">
                                         <td style={cellStyle}>{set.name}</td>
                                         <td style={{ ...cellStyle, textAlign: 'center', opacity: 0.6 }}>{set.question_count}</td>
+                                        <td style={{ ...cellStyle, textAlign: 'center' }}>
+                                            {editingPrice === set.id ? (
+                                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', alignItems: 'center' }}>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        value={priceInput}
+                                                        onChange={(e) => setPriceInput(e.target.value)}
+                                                        style={{
+                                                            width: '60px', padding: '4px 8px',
+                                                            background: 'rgba(255,255,255,0.06)',
+                                                            border: '1px solid rgba(255,255,255,0.2)',
+                                                            borderRadius: '6px', color: '#fff', fontSize: '12px'
+                                                        }}
+                                                        autoFocus
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') handleSavePrice(set.id, cert.id)
+                                                            if (e.key === 'Escape') setEditingPrice(null)
+                                                        }}
+                                                    />
+                                                    <button onClick={() => handleSavePrice(set.id, cert.id)}
+                                                        disabled={savingPrice === set.id}
+                                                        style={{ background: '#34c759', border: 'none', color: '#fff', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>
+                                                        {savingPrice === set.id ? '...' : '✓'}
+                                                    </button>
+                                                    <button onClick={() => setEditingPrice(null)}
+                                                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => { setEditingPrice(set.id); setPriceInput(String(set.price_credits)) }}
+                                                    style={{
+                                                        background: 'transparent', cursor: 'pointer',
+                                                        color: set.price_credits === 0 ? '#34c759' : '#ff9f0a',
+                                                        fontSize: '11px', fontWeight: 600, padding: '4px 10px',
+                                                        borderRadius: '100px',
+                                                        border: '1px solid ' + (set.price_credits === 0 ? 'rgba(52,199,89,0.2)' : 'rgba(255,159,10,0.2)')
+                                                    }}
+                                                >
+                                                    {set.price_credits === 0 ? t('admin.wallet.price_free') : `${set.price_credits} xu`}
+                                                </button>
+                                            )}
+                                        </td>
                                         <td style={{ ...cellStyle, textAlign: 'center' }}>
                                             <span style={{
                                                 padding: '4px 10px',
@@ -138,24 +190,41 @@ export default function AdminExamsPage() {
                                             </span>
                                         </td>
                                         <td style={{ ...cellStyle, textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => handleToggleLock(set.id, set.is_locked, cert.id)}
-                                                disabled={toggling === set.id}
-                                                style={{
-                                                    background: set.is_locked ? '#34c759' : '#ff3b30',
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                    padding: '6px 14px',
-                                                    borderRadius: '8px',
-                                                    fontSize: '12px',
-                                                    fontWeight: 600,
-                                                    cursor: toggling === set.id ? 'not-allowed' : 'pointer',
-                                                    opacity: toggling === set.id ? 0.5 : 1,
-                                                    transition: 'all 0.2s'
-                                                }}
-                                            >
-                                                {toggling === set.id ? t('common.loading') : (set.is_locked ? 'Unlock API' : 'Lock API')}
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                <button
+                                                    onClick={async () => {
+                                                        const currentLocked = set.is_locked
+                                                        setToggling(set.id)
+                                                        try {
+                                                            await adminApi.updateExamSet(set.id, { is_locked: !currentLocked })
+                                                            setExamSets(prev => ({
+                                                                ...prev,
+                                                                [cert.id]: prev[cert.id].map(s => s.id === set.id ? { ...s, is_locked: !currentLocked } : s)
+                                                            }))
+                                                            addToast({ type: 'success', message: `${!currentLocked ? 'Locked' : 'Unlocked'} successfully` })
+                                                        } catch {
+                                                            addToast({ type: 'error', message: 'Failed to update status' })
+                                                        } finally {
+                                                            setToggling(null)
+                                                        }
+                                                    }}
+                                                    disabled={toggling === set.id}
+                                                    style={{
+                                                        background: set.is_locked ? '#34c759' : '#ff3b30',
+                                                        color: '#fff',
+                                                        border: 'none',
+                                                        padding: '6px 14px',
+                                                        borderRadius: '8px',
+                                                        fontSize: '12px',
+                                                        fontWeight: 600,
+                                                        cursor: toggling === set.id ? 'not-allowed' : 'pointer',
+                                                        opacity: toggling === set.id ? 0.5 : 1,
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                >
+                                                    {toggling === set.id ? t('common.loading') : (set.is_locked ? 'Unlock' : 'Lock')}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

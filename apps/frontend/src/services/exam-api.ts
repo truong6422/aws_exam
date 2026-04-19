@@ -33,7 +33,16 @@ export interface ExamSet {
   name: string
   description: string
   is_locked: boolean
+  price_credits: number
+  is_unlocked: boolean
   question_count: number
+}
+
+export interface PurchaseResult {
+  exam_set_id: number
+  credits_spent: number
+  new_balance: number
+  unlocked_at: string
 }
 
 
@@ -191,6 +200,9 @@ export const examApi = {
 
   resumeExam: (attemptId: number) =>
     apiClient.post<ExamAttempt>(`/exams/${attemptId}/resume/`, {}),
+
+  purchaseExamSet: (setId: number) =>
+    apiClient.post<PurchaseResult>(`/questions/sets/${setId}/purchase/`, {}),
 }
 
 export const practiceApi = {

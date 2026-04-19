@@ -11,6 +11,7 @@ from .views import (
     ExamSetUpdateView,
     PracticeQuestionListView,
 )
+from apps.wallet.purchase_views import ExamSetPurchaseView
 
 app_name = "questions"
 
@@ -23,6 +24,7 @@ urlpatterns = [
         name="exam-set-list",
     ),
     path("sets/<int:pk>/", ExamSetUpdateView.as_view(), name="exam-set-update"),
+    path("sets/<int:pk>/purchase/", ExamSetPurchaseView.as_view(), name="exam-set-purchase"),
     # Bookmarks (non-question-scoped must come before <int:question_id> patterns)
     path("bookmarks/", BookmarkListView.as_view(), name="bookmark-list"),
     # Comment upvote (non-question-scoped)

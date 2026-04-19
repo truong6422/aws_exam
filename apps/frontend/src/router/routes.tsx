@@ -10,6 +10,8 @@ import RegisterPage from '@/pages/auth/register-page'
 import DashboardPage from '@/pages/dashboard/dashboard-page'
 import HistoryPage from '@/pages/history/history-page'
 import AnalyticsPage from '@/pages/analytics/analytics-page'
+import WalletPage from '@/pages/wallet/wallet-page'
+import ChatPage from '@/pages/chat/chat-page'
 
 // Exam pages
 import ExamSetupPage from '@/pages/exam/exam-setup-page'
@@ -26,6 +28,9 @@ import AdminDashboardPage from '@/pages/admin/admin-dashboard-page'
 import AdminUsersPage from '@/pages/admin/admin-users-page'
 import AdminImportPage from '@/pages/admin/admin-import-page'
 import AdminExamsPage from '@/pages/admin/admin-exams-page'
+import AdminWalletPage from '@/pages/admin/admin-wallet-page'
+import AdminChatPage from '@/pages/admin/admin-chat-page'
+import AdminSettingsPage from '@/pages/admin/admin-settings-page'
 
 // Guards
 import ProtectedRoute from '@/router/protected-route'
@@ -55,6 +60,8 @@ export const router = createBrowserRouter([
           { path: '/dashboard', element: <DashboardPage /> },
           { path: '/history', element: <HistoryPage /> },
           { path: '/analytics', element: <AnalyticsPage /> },
+          { path: '/wallet', element: <WalletPage /> },
+          { path: '/chat', element: <ChatPage /> },
 
           // Exam flow
           { path: '/exam/setup', element: <ExamSetupPage /> },
@@ -79,6 +86,9 @@ export const router = createBrowserRouter([
                   { path: 'dashboard', element: <AdminDashboardPage /> },
                   { path: 'users', element: <AdminUsersPage /> },
                   { path: 'exams', element: <AdminExamsPage /> },
+                  { path: 'wallet', element: <AdminWalletPage /> },
+                  { path: 'chat', element: <AdminChatPage /> },
+                  { path: 'settings', element: <AdminSettingsPage /> },
                   { path: 'import', element: <AdminImportPage /> },
                 ],
               },

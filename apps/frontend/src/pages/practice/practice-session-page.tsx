@@ -46,7 +46,7 @@ function PracticeQuestionItem({ index, question, isAuthenticated, isBookmarked, 
 
   const handleReveal = () => {
     if (selectedAnswers.length === 0) {
-      useUiStore.getState().addToast({ type: 'warning', message: 'Vui lòng chọn một đáp án trước.' })
+      useUiStore.getState().addToast({ type: 'warning', message: t('practice.select_answer_first') })
       return
     }
     setRevealed(true)
@@ -142,14 +142,14 @@ function PracticeQuestionItem({ index, question, isAuthenticated, isBookmarked, 
             opacity: !revealed && selectedAnswers.length === 0 ? 0.5 : 1
           }}
         >
-          {revealed ? 'Ẩn kết quả' : 'Kiểm tra đáp án'}
+          {revealed ? t('practice.hide_result') : t('practice.check_answer')}
         </button>
         <button
           onClick={() => setCommentsOpened(!commentsOpened)}
           className="btn-ghost"
           style={{ fontSize: '13px' }}
         >
-          {commentsOpened ? 'Ẩn thảo luận' : `Xem thảo luận (${question.comment_count})`}
+          {commentsOpened ? t('practice.hide_discussion') : t('practice.view_discussion', { count: question.comment_count })}
         </button>
       </div>
 
@@ -160,7 +160,7 @@ function PracticeQuestionItem({ index, question, isAuthenticated, isBookmarked, 
             onClick={() => setShowReport(true)}
             style={{ background: 'none', border: 'none', fontSize: '12px', color: 'rgba(255,82,82,0.6)', cursor: 'pointer' }}
           >
-            Báo lỗi đáp án
+            {t('practice.report_error')}
           </button>
         </div>
       )}
@@ -269,11 +269,11 @@ export default function PracticeSessionPage() {
             className="btn-ghost"
             style={{ padding: '8px 16px' }}
           >
-            ← Trước
+            ← {t('practice.prev_page')}
           </button>
 
           <div style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-            Trang {currentPage} / {totalPages}
+            {t('practice.page_counter', { current: currentPage, total: totalPages })}
           </div>
 
           <button
@@ -282,7 +282,7 @@ export default function PracticeSessionPage() {
             className="btn-ghost"
             style={{ padding: '8px 16px' }}
           >
-            Sau →
+            {t('practice.next_page')} →
           </button>
         </div>
       )}

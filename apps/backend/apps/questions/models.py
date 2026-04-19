@@ -36,6 +36,7 @@ class ExamSet(TimestampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     is_locked = models.BooleanField(default=True)
+    price_credits = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["certification", "name"]
@@ -180,3 +181,28 @@ class Bookmark(models.Model):
 
     def __str__(self) -> str:
         return f"Bookmark by {self.user_id} on Q#{self.question_id}"
+
+
+class UserExamUnlock(models.Model):
+    """Join table recording which users have paid to unlock which exam sets."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="exam_unlocks",
+    )
+    exam_set = models.ForeignKey(
+        ExamSet,
+        on_delete=models.CASCADE,
+        related_name="unlocks",
+    )
+    credits_spent = models.PositiveIntegerField()
+    unlocked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "questions_userexamunlock"
+        unique_together = ("user", "exam_set")
+        ordering = ["-unlocked_at"]
+
+    def __str__(self) -> str:
+        return f"Unlock: {self.user_id} -> ExamSet#{self.exam_set_id}"
