@@ -6,6 +6,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.exams.models import AttemptAnswer, ExamAttempt
@@ -70,12 +71,12 @@ class RegisterSerializer(serializers.Serializer):
     def validate_email(self, value):
         value = value.lower()
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+            raise serializers.ValidationError(_("A user with this email already exists."))
         return value
 
     def validate(self, data):
         if data.get("password") != data.get("confirm_password"):
-            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+            raise serializers.ValidationError({"confirm_password": _("Passwords do not match.")})
         return data
 
     def create(self, validated_data):
@@ -113,7 +114,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = self.context["request"].user
         if not user.check_password(attrs["old_password"]):
-            raise serializers.ValidationError({"old_password": "Current password is incorrect."})
+            raise serializers.ValidationError({"old_password": _("Current password is incorrect.")})
         # skip complex validation as requested
         # try:
         #     validate_password(attrs["new_password"], user=user)

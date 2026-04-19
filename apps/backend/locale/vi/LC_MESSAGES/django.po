@@ -1,0 +1,49 @@
+# Vietnamese translation for AWS Exam App
+# Copyright (C) 2026
+# This file is distributed under the same license as the AWS Exam App package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: AWS Exam App 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-19 10:00+0000\n"
+"PO-Revision-Date: 2026-04-19 10:00+0000\n"
+"Last-Translator: Translation Team\n"
+"Language-Team: Vietnamese\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: apps/accounts/serializers.py:73
+msgid "A user with this email already exists."
+msgstr "Người dùng có email này đã tồn tại."
+
+#: apps/accounts/serializers.py:78
+msgid "Passwords do not match."
+msgstr "Mật khẩu không khớp."
+
+#: apps/accounts/serializers.py:116
+msgid "Current password is incorrect."
+msgstr "Mật khẩu hiện tại không chính xác."
+
+#: apps/exams/serializers.py:25
+msgid "Certification not found."
+msgstr "Không tìm thấy chứng chỉ."
+
+#: apps/exams/serializers.py:31
+msgid "Exam set not found."
+msgstr "Không tìm thấy bộ đề thi."
+
+#: apps/exams/serializers.py:36
+msgid "Either certification_id or exam_set_id is required."
+msgstr "Cần cung cấp certification_id hoặc exam_set_id."
+
+#: apps/imports/validators.py:51
+msgid "Schema error: "
+msgstr "Lỗi schema: "
+
+#: apps/imports/validators.py:59
+#, python-format
+msgid "Certification '%s' not found"
+msgstr "Không tìm thấy chứng chỉ '%s'"

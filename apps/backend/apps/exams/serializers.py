@@ -6,6 +6,7 @@ Exam session serializers split by context:
 - ExamSubmitResponseSerializer: submit result
 - ExamReviewSerializer: post-exam review with correct answers
 """
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.questions.models import Certification
@@ -22,18 +23,18 @@ class StartExamSerializer(serializers.Serializer):
 
     def validate_certification_id(self, value):
         if value and not Certification.objects.filter(pk=value).exists():
-            raise serializers.ValidationError("Certification not found.")
+            raise serializers.ValidationError(_("Certification not found."))
         return value
 
     def validate_exam_set_id(self, value):
         from apps.questions.models import ExamSet
         if value and not ExamSet.objects.filter(pk=value).exists():
-            raise serializers.ValidationError("Exam set not found.")
+            raise serializers.ValidationError(_("Exam set not found."))
         return value
 
     def validate(self, data):
         if not data.get('certification_id') and not data.get('exam_set_id'):
-            raise serializers.ValidationError("Either certification_id or exam_set_id is required.")
+            raise serializers.ValidationError(_("Either certification_id or exam_set_id is required."))
         return data
 
 

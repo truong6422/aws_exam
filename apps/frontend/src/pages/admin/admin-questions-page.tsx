@@ -22,7 +22,7 @@ export default function AdminQuestionsPage() {
         setCertifications(data)
         setFiltered(data)
       })
-      .catch(() => setError('Failed to load certifications'))
+      .catch(() => setError(t('admin.error_load_certifications')))
       .finally(() => setLoading(false))
   }, [])
 

@@ -57,7 +57,7 @@ export default function AdminExamsPage() {
             }
             setExamSets(setsMap)
         } catch (err) {
-            addToast({ type: 'error', message: 'Failed to load exam sets' })
+            addToast({ type: 'error', message: t('admin.exams.error_load_sets') })
         } finally {
             setLoading(false)
         }
@@ -85,7 +85,7 @@ export default function AdminExamsPage() {
         }
     }
 
-    if (loading) return <div style={{ padding: '40px', color: 'rgba(255,255,255,0.5)' }}>Loading management console...</div>
+    if (loading) return <div style={{ padding: '40px', color: 'rgba(255,255,255,0.5)' }}>{t('admin.loading_console')}</div>
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '100px' }}>
@@ -112,18 +112,18 @@ export default function AdminExamsPage() {
                                 <span style={{ fontSize: '11px', color: '#0071e3', fontWeight: 700 }}>{cert.code}</span>
                             </div>
                             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                                {examSets[cert.id]?.length || 0} Sets Available
+                                {examSets[cert.id]?.length || 0} {t('admin.exams.sets_available')}
                             </div>
                         </div>
 
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr>
-                                    <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>Exam Set Name</th>
-                                    <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Questions</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>{t('admin.exams.exam_set_name')}</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>{t('admin.exams.questions')}</th>
                                     <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>{t('admin.wallet.price_column_header')}</th>
-                                    <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Status</th>
-                                    <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>Actions</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>{t('admin.exams.status')}</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>{t('admin.exams.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,7 +186,7 @@ export default function AdminExamsPage() {
                                                 color: set.is_locked ? '#ff3b30' : '#34c759',
                                                 border: set.is_locked ? '1px solid rgba(224, 69, 60, 0.2)' : '1px solid rgba(52, 199, 89, 0.2)'
                                             }}>
-                                                {set.is_locked ? 'LOCKED' : 'OPEN'}
+                                                {set.is_locked ? t('admin.exams.locked_status') : t('admin.exams.unlocked_status')}
                                             </span>
                                         </td>
                                         <td style={{ ...cellStyle, textAlign: 'right' }}>
@@ -201,9 +201,9 @@ export default function AdminExamsPage() {
                                                                 ...prev,
                                                                 [cert.id]: prev[cert.id].map(s => s.id === set.id ? { ...s, is_locked: !currentLocked } : s)
                                                             }))
-                                                            addToast({ type: 'success', message: `${!currentLocked ? 'Locked' : 'Unlocked'} successfully` })
+                                                            addToast({ type: 'success', message: `${!currentLocked ? t('admin.exams.locked_success') : t('admin.exams.unlocked_success')}` })
                                                         } catch {
-                                                            addToast({ type: 'error', message: 'Failed to update status' })
+                                                            addToast({ type: 'error', message: t('admin.exams.error_update_status') })
                                                         } finally {
                                                             setToggling(null)
                                                         }
@@ -222,7 +222,7 @@ export default function AdminExamsPage() {
                                                         transition: 'all 0.2s'
                                                     }}
                                                 >
-                                                    {toggling === set.id ? t('common.loading') : (set.is_locked ? 'Unlock' : 'Lock')}
+                                                    {toggling === set.id ? t('common.loading') : (set.is_locked ? t('admin.exams.unlock_button') : t('admin.exams.lock_button'))}
                                                 </button>
                                             </div>
                                         </td>

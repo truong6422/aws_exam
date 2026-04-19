@@ -380,7 +380,24 @@
             "all_domains": "All domains",
             "search_cert": "Search certifications...",
             "clear": "Clear"
-        }
+        },
+        "exams": {
+            "sets_available": "Sets Available",
+            "exam_set_name": "Exam Set Name",
+            "status": "Status",
+            "actions": "Actions",
+            "locked_status": "LOCKED",
+            "unlocked_status": "OPEN",
+            "locked_success": "Locked successfully",
+            "unlocked_success": "Unlocked successfully",
+            "error_load_sets": "Failed to load exam sets",
+            "error_update_status": "Failed to update status",
+            "questions": "Questions",
+            "lock_button": "Lock",
+            "unlock_button": "Unlock"
+        },
+        "loading_console": "Loading management console...",
+        "error_load_certifications": "Failed to load certifications"
     },
     "practice_extended": {
         "bookmark": {

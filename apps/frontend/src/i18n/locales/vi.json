@@ -379,7 +379,24 @@
             "all_domains": "Tất cả lĩnh vực",
             "search_cert": "Tìm kiếm chứng chỉ...",
             "clear": "Xóa"
-        }
+        },
+        "exams": {
+            "sets_available": "Bộ đề khả dụng",
+            "exam_set_name": "Tên bộ đề thi",
+            "status": "Trạng thái",
+            "actions": "Hành động",
+            "locked_status": "ĐÃ KHÓA",
+            "unlocked_status": "MỞ",
+            "locked_success": "Đã khóa thành công",
+            "unlocked_success": "Đã mở khóa thành công",
+            "error_load_sets": "Không thể tải bộ đề",
+            "error_update_status": "Không thể cập nhật trạng thái",
+            "questions": "Câu hỏi",
+            "lock_button": "Khóa",
+            "unlock_button": "Mở khóa"
+        },
+        "loading_console": "Đang tải bảng điều khiển quản trị...",
+        "error_load_certifications": "Không thể tải chứng chỉ"
     },
     "practice_extended": {
         "bookmark": {

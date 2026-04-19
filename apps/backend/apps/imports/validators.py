@@ -1,6 +1,7 @@
 """JSON schema + business logic validation for bulk question import."""
 import jsonschema
 
+from django.utils.translation import gettext_lazy as _
 from apps.questions.models import Certification
 
 QUESTION_IMPORT_SCHEMA = {
@@ -48,7 +49,7 @@ def validate_import_data(data):
     try:
         jsonschema.validate(instance=data, schema=QUESTION_IMPORT_SCHEMA)
     except jsonschema.ValidationError as e:
-        return False, [f"Schema error: {e.message}"]
+        return False, [str(_("Schema error: ")) + str(e.message)]
 
     cert_code = data.get("certification_code")
 
@@ -56,7 +57,7 @@ def validate_import_data(data):
     try:
         Certification.objects.get(code=cert_code)
     except Certification.DoesNotExist:
-        return False, [f"Certification '{cert_code}' not found"]
+        return False, [str(_("Certification '%s' not found")) % cert_code]
 
     # 3. Business logic: correct-answer counts per question
     errors = []
