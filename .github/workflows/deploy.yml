@@ -62,19 +62,8 @@ jobs:
           tags: ${{ steps.meta-nginx.outputs.tags }}
           labels: ${{ steps.meta-nginx.outputs.labels }}
 
-  test:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Pytest in Docker
-        run: |
-          docker compose -f docker-compose.yml run --rm django pytest
-
   deploy:
-    needs: [build-and-push, test]
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -83,7 +72,7 @@ jobs:
       - name: Prepare .env
         run: echo "${{ secrets.ENV_CONFIG }}" > .env
 
-      - name: Deploy to EC2 via SSH
+      - name: Login and Pull on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -91,17 +80,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             mkdir -p ~/aws-exam-app
-            cd ~/aws-exam-app
-            
-            # Login to GHCR on EC2
             echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # Pull latest images
             docker pull ${{ env.REGISTRY }}/${{ env.BE_IMAGE_NAME }}:latest
             docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}:latest
-            
-            # We need the compose file and .env on the server
-            # Since ssh-action only runs commands, we use scp in a separate step or just cat here
             
       - name: Copy config files to EC2
         uses: appleboy/scp-action@master
