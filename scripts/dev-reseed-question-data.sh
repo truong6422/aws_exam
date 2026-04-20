@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Dev-only reseed script for question bank + exam sets.
+# Server reseed script for question bank + exam sets.
 # Usage:
-#   scripts/dev-reseed-question-data.sh [service_name]
+#   scripts/dev-reseed-question-data.sh [container_name]
 # Example:
-#   scripts/dev-reseed-question-data.sh django
-#   scripts/dev-reseed-question-data.sh be
+#   scripts/dev-reseed-question-data.sh aws-exam-app-django-1
 
-SERVICE_NAME="${1:-django}"
+CONTAINER_NAME="${1:-aws-exam-app-django-1}"
 
-echo "[reseed] using docker compose service: ${SERVICE_NAME}"
+echo "[reseed] using docker container: ${CONTAINER_NAME}"
 
-docker compose exec "${SERVICE_NAME}" python manage.py shell <<'PY'
+docker exec -i "${CONTAINER_NAME}" python manage.py shell <<'PY'
 from apps.questions.models import Answer, Question, ExamSet, Certification
 from apps.exams.models import AttemptAnswer
 import importlib
