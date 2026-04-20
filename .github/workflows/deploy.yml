@@ -6,8 +6,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BE_IMAGE_NAME: ${{ github.repository }}-be
-  NGINX_IMAGE_NAME: ${{ github.repository }}-nginx
+  IMAGE_ORG: truong6422
+  BE_IMAGE_NAME: aws-exam-be
+  NGINX_IMAGE_NAME: aws-exam-nginx
 
 jobs:
   build-and-push:
@@ -31,7 +32,7 @@ jobs:
         id: meta-be
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.BE_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_ORG }}/${{ env.BE_IMAGE_NAME }}
           tags: |
             type=raw,value=latest
 
@@ -49,7 +50,7 @@ jobs:
         id: meta-nginx
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_ORG }}/${{ env.NGINX_IMAGE_NAME }}
           tags: |
             type=raw,value=latest
 
@@ -93,6 +94,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             cd ~/aws-exam-app
             tar -xzf deploy_files.tar.gz
             rm deploy_files.tar.gz
