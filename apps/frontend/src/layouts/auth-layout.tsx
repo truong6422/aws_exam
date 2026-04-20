@@ -48,7 +48,7 @@ export default function AuthLayout() {
               color: '#ffffff',
             }}
           >
-            AWS Exam Lab
+            truonglbcloud
           </h1>
           <p
             className="mt-2"
