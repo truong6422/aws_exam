@@ -78,6 +78,10 @@ export const authApi = {
   logout: (refreshToken: string) =>
     apiClient.post<{ detail: string }>('/auth/logout/', { refresh: refreshToken }),
 
+  /** POST /api/v1/auth/token/refresh/ — get new access token */
+  refresh: (refreshToken: string) =>
+    authFetch<{ access: string }>('/auth/token/refresh/', { refresh: refreshToken }),
+
   /** GET /api/v1/auth/me/ — fetch current user profile */
   getMe: () =>
     apiClient.get<User>('/auth/me/'),

@@ -19,6 +19,31 @@ function getStoredToken(): string | null {
   }
 }
 
+function getStoredRefreshToken(): string | null {
+  try {
+    const raw = localStorage.getItem('aws-exam-auth')
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { state?: { refreshToken?: string | null } }
+    return parsed?.state?.refreshToken ?? null
+  } catch {
+    return null
+  }
+}
+
+function updateStoredToken(newToken: string): void {
+  try {
+    const raw = localStorage.getItem('aws-exam-auth')
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+    if (parsed && parsed.state) {
+      parsed.state.token = newToken
+      localStorage.setItem('aws-exam-auth', JSON.stringify(parsed))
+    }
+  } catch {
+    // ignore
+  }
+}
+
 function clearAuthAndRedirect(): void {
   try {
     localStorage.removeItem('aws-exam-auth')
@@ -29,6 +54,9 @@ function clearAuthAndRedirect(): void {
 }
 
 type RequestOptions = Omit<RequestInit, 'body'> & { body?: unknown }
+
+// Track if we are currently refreshing to avoid multiple refresh calls
+let isRefreshing = false
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, headers: extraHeaders, ...rest } = options
@@ -49,9 +77,37 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
+  // Handle 401 Unauthorized
   if (response.status === 401) {
+    const refreshToken = getStoredRefreshToken()
+
+    // If we have a refresh token and aren't already refreshing, try to get a new access token
+    if (refreshToken && !isRefreshing) {
+      isRefreshing = true
+      try {
+        const refreshResponse = await fetch('/api/v1/auth/token/refresh/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken }),
+        })
+
+        if (refreshResponse.ok) {
+          const { access } = (await refreshResponse.json()) as { access: string }
+          updateStoredToken(access)
+          isRefreshing = false
+
+          // Retry the original request with the new token
+          return request<T>(path, options)
+        }
+      } catch (err) {
+        // Refresh failed
+      } finally {
+        isRefreshing = false
+      }
+    }
+
+    // If refresh failed or was not possible, logout
     clearAuthAndRedirect()
-    // Throw so callers don't try to read the body
     throw new Error('Unauthorized — redirecting to login')
   }
 

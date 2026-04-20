@@ -40,7 +40,7 @@ def api_root(request):
 
 urlpatterns = [
     # Django admin
-    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
 
     # Health check (used by Docker / k8s liveness probes)
     path("health/", include("health_check.urls")),
