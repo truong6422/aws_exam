@@ -152,7 +152,7 @@ export default function Sidebar() {
               color: '#fff',
             }}
           >
-            truonglbcloud
+            TruonglbCloud
           </span>
         ) : (
           <span style={{ fontSize: '14px', fontWeight: 600, color: '#0071e3' }}>A</span>

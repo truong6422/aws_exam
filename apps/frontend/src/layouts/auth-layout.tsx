@@ -48,7 +48,7 @@ export default function AuthLayout() {
               color: '#ffffff',
             }}
           >
-            truonglbcloud
+            TruonglbCloud
           </h1>
           <p
             className="mt-2"

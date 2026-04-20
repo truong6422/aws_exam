@@ -1,7 +1,7 @@
 # Project Context Snapshot
 
-- Generated: `2026-04-19T08:13:47+00:00`
-- Source: `session-init`
+- Generated: `2026-04-20T06:40:00+00:00`
+- Source: `workflow-auto-sync:/code-review`
 - Work item: `260418-1923-credit-wallet-exam-purchase`
 
 # Project Context
@@ -96,13 +96,13 @@
 
 ## Operational Runtime Snapshot
 
-- work_item_state: `implementation`
+- work_item_state: `validation`
 - handoff_status: `draft`
-- lifecycle_stage: `implementation`
-- lifecycle_status: `interrupted`
-- active_command: `/cook`
-- last_heartbeat_at: `2026-04-18T12:49:25+00:00`
-- recovery_command: `/cook --resume`
+- lifecycle_stage: `validation`
+- lifecycle_status: `ready_for_test`
+- active_command: ``
+- last_heartbeat_at: `2026-04-20T06:40:00+00:00`
+- recovery_command: `/quality --strict`
 
 ## Plan Progress Snapshot
 
