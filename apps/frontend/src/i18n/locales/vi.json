@@ -217,7 +217,8 @@
         "select_answer_first": "Vui lòng chọn một đáp án trước.",
         "page_counter": "Trang {{current}} / {{total}}",
         "prev_page": "Trước",
-        "next_page": "Sau"
+        "next_page": "Sau",
+        "unlock_more_hint": "Mở khóa thêm các đề thi để tăng số lượng câu hỏi luyện tập"
     },
     "comment": {
         "reference": "Tham chiếu:",
@@ -393,7 +394,14 @@
             "error_update_status": "Không thể cập nhật trạng thái",
             "questions": "Câu hỏi",
             "lock_button": "Khóa",
-            "unlock_button": "Mở khóa"
+            "unlock_button": "Mở khóa",
+            "selected_count": "Đã chọn {{count}} đề thi",
+            "bulk_edit_button": "Chỉnh sửa hàng loạt",
+            "bulk_title": "Chỉnh sửa hàng loạt",
+            "bulk_price_placeholder": "Bỏ trống để giữ nguyên",
+            "keep_status": "Giữ nguyên trạng thái",
+            "bulk_success": "Đã cập nhật {{count}} đề thi thành công",
+            "bulk_error": "Lỗi cập nhật hàng loạt"
         },
         "loading_console": "Đang tải bảng điều khiển quản trị...",
         "error_load_certifications": "Không thể tải chứng chỉ"

@@ -154,7 +154,7 @@ function PracticeQuestionItem({ index, question, isAuthenticated, isBookmarked, 
       </div>
 
       {/* Report button after reveal */}
-      {revealed && (
+      {revealed && isAuthenticated && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-10px' }}>
           <button
             onClick={() => setShowReport(true)}

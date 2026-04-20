@@ -39,16 +39,20 @@ class ExamSetListView(generics.ListAPIView):
     """GET /api/v1/questions/certifications/<certification_id>/sets/ — list exam sets."""
 
     serializer_class = ExamSetSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = []  # Sort is handled in Python code (natural sort)
 
     def get_queryset(self):
+        from django.db.models import Count
         queryset = ExamSet.objects.filter(
             certification_id=self.kwargs["certification_id"]
-        )
-        # Standard users only see unlocked sets, staff see all
-        if not self.request.user.is_staff:
-            queryset = queryset.filter(is_locked=False)
+        ).annotate(q_count=Count('questions'))
+
+        # Standard users only see unlocked sets AND complete sets (>= 65 questions)
+        user = self.request.user
+        if not user.is_authenticated or not user.is_staff:
+            from django.db.models import Q
+            queryset = queryset.filter(is_locked=False, q_count__gte=65)
         
         # Natural sort in Python for "Exam 1", "Exam 2", "Exam 10"
         import re
@@ -80,31 +84,38 @@ class PracticeQuestionListView(generics.ListAPIView):
     """GET /api/v1/questions/practice/ — paginated questions from unlocked sets."""
 
     serializer_class = PracticeQuestionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     pagination_class = PracticeQuestionPagination
 
     def get_queryset(self):
         cert_id = self.request.query_params.get("certification_id")
         user = self.request.user
 
-        # Get exam_set IDs the user can access:
-        # 1. is_locked=False AND price_credits=0  ->  free, accessible
-        # 2. is_locked=False AND UserExamUnlock exists  ->  purchased, accessible
-        # Staff can access all unlocked sets
-        if user.is_staff:
-            accessible_sets = ExamSet.objects.filter(is_locked=False).values_list(
-                "id", flat=True
-            )
-        else:
+        from django.db.models import Count, Q
+        
+        # Base filters: must not be locked
+        base_qs = ExamSet.objects.filter(is_locked=False).annotate(q_count=Count('questions'))
+        
+        # Logic: A set is accessible for practice if:
+        # 1. User is staff
+        # 2. Set is incomplete (q_count < 65) -> treat as free for practice
+        # 3. Set is free (price_credits = 0)
+        # 4. User has purchased it
+        
+        practice_free_query = Q(q_count__lt=65) | Q(price_credits=0)
+
+        if user.is_authenticated and user.is_staff:
+            accessible_sets = base_qs.values_list("id", flat=True)
+        elif user.is_authenticated:
             purchased_set_ids = UserExamUnlock.objects.filter(user=user).values_list(
                 "exam_set_id", flat=True
             )
-
-            accessible_sets = (
-                ExamSet.objects.filter(is_locked=False)
-                .filter(models.Q(price_credits=0) | models.Q(id__in=purchased_set_ids))
-                .values_list("id", flat=True)
-            )
+            accessible_sets = base_qs.filter(
+                practice_free_query | Q(id__in=purchased_set_ids)
+            ).values_list("id", flat=True)
+        else:
+            # Guests get incomplete sets and free sets
+            accessible_sets = base_qs.filter(practice_free_query).values_list("id", flat=True)
 
         qs = Question.objects.filter(
             models.Q(exam_set_id__in=accessible_sets) | models.Q(exam_set__isnull=True)
@@ -197,3 +208,52 @@ class AnswerReportCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(question=question, reporter=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ExamSetBulkUpdateView(APIView):
+    """POST /api/v1/questions/sets/bulk-update/ — update multiple exam sets (Admin only)."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        ids = request.data.get("ids", [])
+        if not ids:
+            return Response({"detail": "No IDs provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        price_credits = request.data.get("price_credits")
+        is_locked = request.data.get("is_locked")
+
+        update_fields = {}
+        if price_credits is not None:
+            update_fields["price_credits"] = price_credits
+        if is_locked is not None:
+            update_fields["is_locked"] = is_locked
+
+        if not update_fields:
+            return Response({"detail": "No fields to update."}, status=status.HTTP_400_BAD_REQUEST)
+
+        ExamSet.objects.filter(id__in=ids).update(**update_fields)
+        return Response({"detail": f"Successfully updated {len(ids)} exam sets."})
+
+
+class ExamSetFreeIncompleteView(APIView):
+    """POST /api/v1/questions/sets/free-incomplete/ — make sets with <65 questions free."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        from django.db.models import Count
+        
+        # We use annotation to find sets where the relationship 'questions' has < 65 items
+        incomplete_sets = ExamSet.objects.annotate(
+            q_count=Count('questions')
+        ).filter(q_count__lt=65, price_credits__gt=0)
+        
+        count = incomplete_sets.count()
+        incomplete_sets.update(price_credits=0)
+        
+        return Response({
+            "detail": f"Successfully set {count} incomplete sets to free.",
+            "count": count
+        })
+

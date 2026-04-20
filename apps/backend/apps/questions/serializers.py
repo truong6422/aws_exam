@@ -81,11 +81,37 @@ class ExamSetSerializer(serializers.ModelSerializer):
         model = ExamSet
         fields = ["id", "name", "description", "is_locked", "price_credits", "question_count", "is_unlocked"]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # If set is incomplete (< 65 questions), force it to appear locked for non-staff
+        request = self.context.get("request")
+        is_staff = request and request.user.is_authenticated and request.user.is_staff
+        
+        # We need q_count. It might be annotated or we calculate it.
+        q_count = getattr(instance, 'q_count', None)
+        if q_count is None:
+            q_count = instance.questions.count()
+            
+        if q_count < 65 and not is_staff:
+            data['is_locked'] = True
+            
+        return data
+
     def get_is_unlocked(self, obj):
+        # Incomplete sets (< 65 questions) are NEVER unlocked for Exam Mode (non-staff)
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return False
-        if request.user.is_staff:
+        
+        is_staff = request.user.is_staff
+        q_count = getattr(obj, 'q_count', None)
+        if q_count is None:
+            q_count = obj.questions.count()
+
+        if q_count < 65 and not is_staff:
+            return False
+
+        if is_staff:
             return True
         if obj.price_credits == 0:
             return True

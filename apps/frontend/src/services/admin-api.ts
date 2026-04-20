@@ -86,6 +86,12 @@ export const adminApi = {
   updateExamSet: (setId: number, data: { is_locked?: boolean; price_credits?: number }) =>
     apiClient.patch<any>(`/questions/sets/${setId}/`, data),
 
+  bulkUpdateExamSets: (ids: number[], data: { is_locked?: boolean; price_credits?: number }) =>
+    apiClient.post<any>('/questions/sets/bulk-update/', { ids, ...data }),
+
+  freeIncompleteExamSets: () =>
+    apiClient.post<any>('/questions/sets/free-incomplete/', {}),
+
   getUsers: (params?: { page?: number; page_size?: number; search?: string }) => {
     const query = new URLSearchParams()
     if (params?.page) query.append('page', params.page.toString())

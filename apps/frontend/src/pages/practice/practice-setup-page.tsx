@@ -61,6 +61,24 @@ export default function PracticeSetupPage() {
         subtitle={t('practice.setup_subtitle')}
       />
 
+      <div style={{
+        background: 'rgba(0, 113, 227, 0.1)',
+        border: '1px solid rgba(0, 113, 227, 0.2)',
+        borderRadius: '12px',
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        cursor: 'pointer'
+      }} onClick={() => navigate('/dashboard')}>
+        <p style={{ fontSize: '14px', color: '#fff', margin: 0, fontWeight: 500 }}>
+          {t('practice.unlock_more_hint', 'Mở khóa thêm các đề thi để tăng số lượng câu hỏi luyện tập')}
+        </p>
+        <span style={{ color: '#0071e3', fontSize: '13px', fontWeight: 600 }}>
+          {t('common.view_all_exams', 'Xem các đề thi')} →
+        </span>
+      </div>
+
       {certifications.length === 0 ? (
         <div style={{
           ...cardStyle,

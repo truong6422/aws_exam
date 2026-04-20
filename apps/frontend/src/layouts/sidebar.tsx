@@ -161,7 +161,12 @@ export default function Sidebar() {
 
       {/* Navigation links */}
       <nav className="flex-1 overflow-y-auto py-4" style={{ padding: '16px 8px' }}>
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.filter(item => {
+          if (!user) {
+            return item.to === '/practice/setup' || item.to === '/exam/setup'
+          }
+          return true
+        }).map((item) => (
           <SidebarLink key={item.to} item={item} collapsed={!sidebarOpen} />
         ))}
 
@@ -175,33 +180,58 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* User info + logout */}
+      {/* User info + logout/login */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '12px 8px' }}>
         {sidebarOpen && (
           <p
             className="mb-2 truncate"
             style={{ fontSize: '11px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.4)', padding: '0 8px' }}
           >
-            {user?.name ?? user?.email ?? 'Guest'}
+            {user?.name ?? user?.email ?? t('auth.guest_user', 'Khách')}
           </p>
         )}
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 transition-opacity hover:opacity-70"
-          style={{
-            background: 'none',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '8px',
-            padding: '8px',
-            color: 'rgba(255,255,255,0.6)',
-            cursor: 'pointer',
-            fontSize: '13px',
-            letterSpacing: '-0.12px',
-          }}
-        >
-          <span className="shrink-0"><LogoutIcon /></span>
-          {sidebarOpen && <span>{t('nav.logout')}</span>}
-        </button>
+        {user ? (
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 transition-opacity hover:opacity-70"
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px',
+              padding: '8px',
+              color: 'rgba(255,255,255,0.6)',
+              cursor: 'pointer',
+              fontSize: '13px',
+              letterSpacing: '-0.12px',
+            }}
+          >
+            <span className="shrink-0"><LogoutIcon /></span>
+            {sidebarOpen && <span>{t('nav.logout')}</span>}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/login')}
+            className="flex w-full items-center gap-3 transition-opacity hover:opacity-70"
+            style={{
+              background: '#0071e3',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 500,
+              letterSpacing: '-0.12px',
+            }}
+          >
+            <span className="shrink-0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3 13.5c0-2.48 2.02-4.5 4.5-4.5s4.5 2.02 4.5 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+              </svg>
+            </span>
+            {sidebarOpen && <span>{t('auth.login_link')}</span>}
+          </button>
+        )}
       </div>
     </aside>
   )

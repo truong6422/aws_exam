@@ -49,14 +49,21 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Protected app routes
+  // App routes
   {
-    element: <ProtectedRoute />,
+    element: <AppShell />,
     children: [
+      { path: '/', element: <Navigate to="/practice/setup" replace /> },
+
+      // Publicly accessible routes
+      { path: '/practice/setup', element: <PracticeSetupPage /> },
+      { path: '/practice', element: <PracticeSessionPage /> },
+      { path: '/practice/:sessionId', element: <PracticeSessionPage /> },
+
+      // Protected app routes
       {
-        element: <AppShell />,
+        element: <ProtectedRoute />,
         children: [
-          { path: '/', element: <Navigate to="/dashboard" replace /> },
           { path: '/dashboard', element: <DashboardPage /> },
           { path: '/history', element: <HistoryPage /> },
           { path: '/analytics', element: <AnalyticsPage /> },
@@ -68,11 +75,6 @@ export const router = createBrowserRouter([
           { path: '/exam/:sessionId', element: <ExamSessionPage /> },
           { path: '/exam/:sessionId/result', element: <ExamResultPage /> },
           { path: '/exam/:sessionId/review', element: <ExamResultPage /> },
-
-          // Practice flow
-          { path: '/practice/setup', element: <PracticeSetupPage /> },
-          { path: '/practice', element: <PracticeSessionPage /> },
-          { path: '/practice/:sessionId', element: <PracticeSessionPage /> },
 
           // Admin — nested under AppShell, guarded separately
           {

@@ -6,7 +6,7 @@ import NotificationCenter from '@/components/notification-center'
 /** Top navigation bar — Apple glass effect. */
 export default function Navbar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
-  const user = useAuthStore((s) => s.user)
+  const { user, isAuthenticated } = useAuthStore()
   const initial = (user?.name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()
 
   return (
@@ -45,23 +45,27 @@ export default function Navbar() {
 
       {/* User info */}
       <div className="flex items-center gap-3">
-        <NotificationCenter />
+        {isAuthenticated && <NotificationCenter />}
         <LanguageSwitcher variant="navbar" />
-        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}>
-          {user?.name ?? user?.email ?? 'Guest'}
-        </span>
-        <div
-          className="flex h-7 w-7 items-center justify-center text-white"
-          style={{
-            background: '#0071e3',
-            borderRadius: '50%',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '-0.12px',
-          }}
-        >
-          {initial}
-        </div>
+        {isAuthenticated && (
+          <>
+            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}>
+              {user?.name ?? user?.email}
+            </span>
+            <div
+              className="flex h-7 w-7 items-center justify-center text-white"
+              style={{
+                background: '#0071e3',
+                borderRadius: '50%',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '-0.12px',
+              }}
+            >
+              {initial}
+            </div>
+          </>
+        )}
       </div>
     </header>
   )

@@ -53,5 +53,7 @@ Thumbs.db
 lbtruong6422@gmail.com
 .credentials
 .claude/settings.local.json
+.browser-session.json
+.browser_recordings/
 CLAUDE.md
 AGENTS.md

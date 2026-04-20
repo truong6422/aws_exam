@@ -21,6 +21,8 @@ class ExamAttempt(TimestampedModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='exam_attempts',
+        null=True,
+        blank=True,
     )
     certification = models.ForeignKey(
         'questions.Certification',
@@ -70,7 +72,8 @@ class ExamAttempt(TimestampedModel):
         return self.time_remaining_seconds == 0 and self.status == 'in_progress'
 
     def __str__(self):
-        return f"{self.user.email} — {self.certification.code} — {self.status}"
+        user_email = self.user.email if self.user else "Guest"
+        return f"{user_email} — {self.certification.code} — {self.status}"
 
 
 class AttemptAnswer(models.Model):

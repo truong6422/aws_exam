@@ -3,7 +3,7 @@ Exam lifecycle views: start, autosave, submit, review, list.
 """
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -66,6 +66,8 @@ def _save_answers(attempt, answers_data):
 class ExamStartView(APIView):
     """POST /api/v1/exams/start/ — create a new exam attempt."""
 
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         serializer = StartExamSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -81,7 +83,13 @@ class ExamStartView(APIView):
                 return Response({"detail": "Exam set is locked."}, status=status.HTTP_403_FORBIDDEN)
             
             # Paywall check: STAFF users skip this
-            if exam_set.price_credits > 0 and not request.user.is_staff:
+            is_staff = request.user.is_authenticated and request.user.is_staff
+            if exam_set.price_credits > 0 and not is_staff:
+                if not request.user.is_authenticated:
+                    return Response(
+                        {"detail": "Purchase required to access this exam set. Please login to unlock."},
+                        status=status.HTTP_401_UNAUTHORIZED
+                    )
                 from apps.questions.models import UserExamUnlock
                 if not UserExamUnlock.objects.filter(user=request.user, exam_set=exam_set).exists():
                     return Response(
@@ -93,12 +101,16 @@ class ExamStartView(APIView):
             cert = Certification.objects.get(pk=cert_id)
 
         # Smart Resume logic: find existing unfinished attempt
-        existing_attempt = ExamAttempt.objects.filter(
-            user=request.user,
-            certification=cert,
-            exam_set=exam_set,
-            status__in=['in_progress', 'paused']
-        ).first()
+        user = request.user if request.user.is_authenticated else None
+        existing_attempt = None
+        
+        if user:
+            existing_attempt = ExamAttempt.objects.filter(
+                user=user,
+                certification=cert,
+                exam_set=exam_set,
+                status__in=['in_progress', 'paused']
+            ).first()
 
         if existing_attempt:
             if existing_attempt.is_expired:
@@ -113,7 +125,7 @@ class ExamStartView(APIView):
                 return Response(ExamAttemptDetailSerializer(existing_attempt).data)
 
         attempt = ExamAttempt.objects.create(
-            user=request.user,
+            user=user,
             certification=cert,
             exam_set=exam_set,
             time_limit_minutes=cert.time_limit_minutes,
@@ -130,11 +142,11 @@ class ExamStartView(APIView):
             from apps.questions.models import ExamSet, UserExamUnlock
             from django.db import models
             
-            if request.user.is_staff:
+            if is_staff:
                 accessible_set_ids = ExamSet.objects.filter(
                     certification=cert, is_locked=False
                 ).values_list("id", flat=True)
-            else:
+            elif request.user.is_authenticated:
                 purchased_set_ids = UserExamUnlock.objects.filter(
                     user=request.user
                 ).values_list("exam_set_id", flat=True)
@@ -143,6 +155,11 @@ class ExamStartView(APIView):
                     certification=cert, is_locked=False
                 ).filter(
                     models.Q(price_credits=0) | models.Q(id__in=purchased_set_ids)
+                ).values_list("id", flat=True)
+            else:
+                # Guests only get free unlocked sets
+                accessible_set_ids = ExamSet.objects.filter(
+                    certification=cert, is_locked=False, price_credits=0
                 ).values_list("id", flat=True)
 
             questions = list(
@@ -167,8 +184,11 @@ class ExamStartView(APIView):
 class ExamAutosaveView(APIView):
     """PATCH /api/v1/exams/{pk}/autosave/ — save partial answers."""
 
+    permission_classes = [permissions.AllowAny]
+
     def patch(self, request, pk):
-        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        user = request.user if request.user.is_authenticated else None
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=user)
 
         if attempt.is_expired:
             return Response(
@@ -189,8 +209,11 @@ class ExamAutosaveView(APIView):
 class ExamSubmitView(APIView):
     """POST /api/v1/exams/{pk}/submit/ — submit attempt and calculate score."""
 
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request, pk):
-        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        user = request.user if request.user.is_authenticated else None
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=user)
 
         if attempt.status != 'in_progress':
             return Response(
@@ -215,8 +238,11 @@ class ExamSubmitView(APIView):
 class ExamPauseView(APIView):
     """POST /api/v1/exams/{pk}/pause/ — pause active attempt."""
 
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request, pk):
-        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        user = request.user if request.user.is_authenticated else None
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=user)
         
         if attempt.status not in ['in_progress', 'paused']:
             return Response(
@@ -241,8 +267,11 @@ class ExamPauseView(APIView):
 class ExamResumeView(APIView):
     """POST /api/v1/exams/{pk}/resume/ — resume paused attempt."""
 
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request, pk):
-        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        user = request.user if request.user.is_authenticated else None
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=user)
 
         if attempt.status == 'in_progress':
             return Response(ExamAttemptDetailSerializer(attempt).data)
@@ -263,8 +292,11 @@ class ExamResumeView(APIView):
 class ExamReviewView(APIView):
     """GET /api/v1/exams/{pk}/review/ — full review with correct answers."""
 
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request, pk):
-        attempt = get_object_or_404(ExamAttempt, pk=pk, user=request.user)
+        user = request.user if request.user.is_authenticated else None
+        attempt = get_object_or_404(ExamAttempt, pk=pk, user=user)
 
         if attempt.status == 'in_progress':
             return Response(

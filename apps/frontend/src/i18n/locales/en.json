@@ -217,7 +217,8 @@
         "select_answer_first": "Please select an answer first.",
         "page_counter": "Page {{current}} / {{total}}",
         "prev_page": "Prev",
-        "next_page": "Next"
+        "next_page": "Next",
+        "unlock_more_hint": "Unlock more exam sets to increase the number of practice questions"
     },
     "comment": {
         "reference": "Reference:",
@@ -394,7 +395,14 @@
             "error_update_status": "Failed to update status",
             "questions": "Questions",
             "lock_button": "Lock",
-            "unlock_button": "Unlock"
+            "unlock_button": "Unlock",
+            "selected_count": "Selected {{count}} exam sets",
+            "bulk_edit_button": "Bulk Edit",
+            "bulk_title": "Bulk Edit Exam Sets",
+            "bulk_price_placeholder": "Leave empty to keep current",
+            "keep_status": "Keep current status",
+            "bulk_success": "Successfully updated {{count}} exam sets",
+            "bulk_error": "Failed to perform bulk update"
         },
         "loading_console": "Loading management console...",
         "error_load_certifications": "Failed to load certifications"
