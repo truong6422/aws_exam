@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { adminApi } from '@/services/admin-api'
-import type { Certification, Domain } from '@/services/exam-api'
+import type { Certification } from '@/services/exam-api'
 
 export interface QuestionFilters {
   certificationId: number | null
-  domainId: number | null
   search: string
 }
 
@@ -38,24 +37,14 @@ const inputStyle: React.CSSProperties = {
 export function QuestionFilters({ onFilterChange }: Props) {
   const { t } = useTranslation()
   const [certs, setCerts] = useState<Certification[]>([])
-  const [domains, setDomains] = useState<Domain[]>([])
   const [filters, setFilters] = useState<QuestionFilters>({
     certificationId: null,
-    domainId: null,
     search: '',
   })
 
   useEffect(() => {
-    adminApi.getCertifications().then(setCerts).catch(() => {})
+    adminApi.getCertifications().then(setCerts).catch(() => { })
   }, [])
-
-  useEffect(() => {
-    if (filters.certificationId) {
-      adminApi.getDomains(filters.certificationId).then(setDomains).catch(() => setDomains([]))
-    } else {
-      setDomains([])
-    }
-  }, [filters.certificationId])
 
   const update = (patch: Partial<QuestionFilters>) => {
     const next = { ...filters, ...patch }
@@ -66,12 +55,11 @@ export function QuestionFilters({ onFilterChange }: Props) {
   const handleCertChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     update({
       certificationId: e.target.value ? Number(e.target.value) : null,
-      domainId: null,
     })
   }
 
   const handleClear = () => {
-    update({ certificationId: null, domainId: null, search: '' })
+    update({ certificationId: null, search: '' })
   }
 
   return (
@@ -89,20 +77,6 @@ export function QuestionFilters({ onFilterChange }: Props) {
         ))}
       </select>
 
-      <select
-        style={{ ...selectStyle, opacity: !filters.certificationId ? 0.5 : 1 }}
-        value={filters.domainId ?? ''}
-        onChange={(e) => update({ domainId: e.target.value ? Number(e.target.value) : null })}
-        disabled={!filters.certificationId}
-      >
-        <option value="">{t('admin.filters.all_domains')}</option>
-        {domains.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.name}
-          </option>
-        ))}
-      </select>
-
       <input
         type="text"
         placeholder={t('admin.filters.search_cert')}
@@ -111,7 +85,7 @@ export function QuestionFilters({ onFilterChange }: Props) {
         onChange={(e) => update({ search: e.target.value })}
       />
 
-      {(filters.certificationId || filters.domainId || filters.search) && (
+      {(filters.certificationId || filters.search) && (
         <button
           className="btn-ghost"
           onClick={handleClear}
