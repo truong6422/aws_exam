@@ -72,28 +72,21 @@ jobs:
       - name: Prepare .env
         run: echo "${{ secrets.ENV_CONFIG }}" > .env
 
-      - name: Login and Pull on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            mkdir -p ~/aws-exam-app
-            echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ${{ env.REGISTRY }}/${{ env.BE_IMAGE_NAME }}:latest
-            docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}:latest
-            
-      - name: Copy config files to EC2
+      - name: Prepare Deployment Files
+        run: |
+          # Create a mini package with only necessary files
+          tar -czf deploy_files.tar.gz .env docker-compose.yml
+
+      - name: Copy deployment package to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".env,docker-compose.yml"
+          source: "deploy_files.tar.gz"
           target: "~/aws-exam-app"
 
-      - name: Finalize Deployment
+      - name: SSH and Restart Containers
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -101,5 +94,13 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/aws-exam-app
+            tar -xzf deploy_files.tar.gz
+            rm deploy_files.tar.gz
+            
+            # Login to GHCR
+            echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull and Update
+            docker compose pull
             docker compose up -d
             docker image prune -af
