@@ -30,13 +30,17 @@ function getStoredRefreshToken(): string | null {
   }
 }
 
-function updateStoredToken(newToken: string): void {
+function updateStoredTokens(newAccessToken: string, newRefreshToken?: string): void {
   try {
     const raw = localStorage.getItem('aws-exam-auth')
     if (!raw) return
     const parsed = JSON.parse(raw)
     if (parsed && parsed.state) {
-      parsed.state.token = newToken
+      parsed.state.token = newAccessToken
+      // ROTATE_REFRESH_TOKENS=True: backend trả refresh token mới, phải lưu lại
+      if (newRefreshToken) {
+        parsed.state.refreshToken = newRefreshToken
+      }
       localStorage.setItem('aws-exam-auth', JSON.stringify(parsed))
     }
   } catch {
@@ -55,8 +59,37 @@ function clearAuthAndRedirect(): void {
 
 type RequestOptions = Omit<RequestInit, 'body'> & { body?: unknown }
 
-// Track if we are currently refreshing to avoid multiple refresh calls
+// Track refresh state and queue concurrent 401 requests
 let isRefreshing = false
+type RefreshSubscriber = (newToken: string) => void
+let refreshSubscribers: RefreshSubscriber[] = []
+
+function subscribeTokenRefresh(cb: RefreshSubscriber): void {
+  refreshSubscribers.push(cb)
+}
+
+function notifySubscribers(newToken: string): void {
+  refreshSubscribers.forEach((cb) => cb(newToken))
+  refreshSubscribers = []
+}
+
+async function doTokenRefresh(): Promise<string> {
+  const refreshToken = getStoredRefreshToken()
+  if (!refreshToken) throw new Error('No refresh token')
+
+  const res = await fetch('/api/v1/auth/token/refresh/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh: refreshToken }),
+  })
+
+  if (!res.ok) throw new Error('Refresh failed')
+
+  // ROTATE_REFRESH_TOKENS=True: backend trả cả refresh token mới
+  const data = (await res.json()) as { access: string; refresh?: string }
+  updateStoredTokens(data.access, data.refresh)
+  return data.access
+}
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, headers: extraHeaders, ...rest } = options
@@ -79,36 +112,41 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   // Handle 401 Unauthorized
   if (response.status === 401) {
-    const refreshToken = getStoredRefreshToken()
-
-    // If we have a refresh token and aren't already refreshing, try to get a new access token
-    if (refreshToken && !isRefreshing) {
-      isRefreshing = true
-      try {
-        const refreshResponse = await fetch('/api/v1/auth/token/refresh/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh: refreshToken }),
+    // Nếu đang refresh: xếp hàng chờ, retry với token mới khi xong
+    if (isRefreshing) {
+      return new Promise<T>((resolve, reject) => {
+        subscribeTokenRefresh((newToken) => {
+          const retryHeaders = {
+            ...headers,
+            Authorization: `Bearer ${newToken}`,
+          }
+          fetch(`/api/v1${path}`, {
+            ...rest,
+            headers: retryHeaders,
+            body: body !== undefined ? JSON.stringify(body) : undefined,
+          })
+            .then((r) => (r.ok ? (r.json() as Promise<T>) : Promise.reject(new Error(`${r.status}`))))
+            .then(resolve)
+            .catch(reject)
         })
-
-        if (refreshResponse.ok) {
-          const { access } = (await refreshResponse.json()) as { access: string }
-          updateStoredToken(access)
-          isRefreshing = false
-
-          // Retry the original request with the new token
-          return request<T>(path, options)
-        }
-      } catch (err) {
-        // Refresh failed
-      } finally {
-        isRefreshing = false
-      }
+      })
     }
 
-    // If refresh failed or was not possible, logout
-    clearAuthAndRedirect()
-    throw new Error('Unauthorized — redirecting to login')
+    // Chỉ một request thực hiện refresh, các request khác xếp hàng
+    isRefreshing = true
+    try {
+      const newToken = await doTokenRefresh()
+      notifySubscribers(newToken)
+      // Retry request gốc
+      return request<T>(path, options)
+    } catch {
+      // Refresh thất bại → logout
+      refreshSubscribers = []
+      clearAuthAndRedirect()
+      throw new Error('Unauthorized — redirecting to login')
+    } finally {
+      isRefreshing = false
+    }
   }
 
   if (!response.ok) {
