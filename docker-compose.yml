@@ -1,117 +1,81 @@
-# Production compose — all services behind nginx reverse proxy.
-# Requires a fully populated .env at the repo root.
+# Single Docker Compose for production/deployment
+# Usage: docker compose up -d --build
 
 services:
-  db:
+  postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB:-aws_exam_app}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - backend_net
+      - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-aws_exam_app}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    restart: unless-stopped
+    restart: always
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     networks:
-      - backend_net
+      - internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  api:
+  django:
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
       target: production
-    restart: unless-stopped
+    restart: always
     env_file: .env
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aws_exam_app}
       REDIS_URL: redis://redis:6379/0
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - backend_net
+      - internal
     expose:
       - "8000"
-    # WhiteNoise serves static files — no shared volume required.
-    # Migrations run inside CMD in the Dockerfile.
-
-  celery:
-    build:
-      context: .
-      dockerfile: docker/backend/Dockerfile
-      target: production
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      DJANGO_SETTINGS_MODULE: config.settings.production
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - backend_net
-    command: celery -A config worker --loglevel=info --concurrency=4
-
-  frontend:
-    build:
-      context: .
-      dockerfile: docker/frontend/Dockerfile
-      target: production
-      args:
-        VITE_API_BASE_URL: /api
-    restart: unless-stopped
-    networks:
-      - frontend_net
-    expose:
-      - "80"
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 60"
 
   nginx:
     build:
       context: .
-      dockerfile: docker/nginx/Dockerfile
-    restart: unless-stopped
+      dockerfile: nginx/Dockerfile
+    restart: always
     ports:
-      - "${NGINX_HTTP_PORT:-80}:80"
-      - "${NGINX_HTTPS_PORT:-443}:443"
-    depends_on:
-      - api
-      - frontend
-    networks:
-      - backend_net
-      - frontend_net
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./docker/nginx/ssl:/etc/nginx/ssl:ro  # mount TLS certs in production
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - django
+    networks:
+      - internal
 
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  # api, celery, db, redis share this internal network
-  backend_net:
-  # nginx and frontend share this internal network
-  frontend_net:
+  internal:
+    driver: bridge
