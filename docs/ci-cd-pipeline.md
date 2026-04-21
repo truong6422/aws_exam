@@ -4,12 +4,12 @@
 
 | File | Vai trò |
 |------|---------|
-| `.github/workflows/deploy.yml` | Định nghĩa toàn bộ pipeline CI/CD |
-| `docker/backend/Dockerfile` | Build image Django (multi-stage: base / development / production) |
-| `nginx/Dockerfile` | Build image Nginx (reverse proxy) |
-| `nginx/nginx.conf` | Cấu hình routing, SSL, proxy |
-| `docker-compose.yml` | Khai báo stack production trên EC2 |
-| `.env.example` | Template biến môi trường — không chứa giá trị thật |
+| [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) | Định nghĩa toàn bộ pipeline CI/CD |
+| [`docker/backend/Dockerfile`](../docker/backend/Dockerfile) | Build image Django (multi-stage: base / development / production) |
+| [`nginx/Dockerfile`](../nginx/Dockerfile) | Build image Nginx (reverse proxy) |
+| [`nginx/nginx.conf`](../nginx/nginx.conf) | Cấu hình routing, SSL, proxy |
+| [`docker-compose.yml`](../docker-compose.yml) | Khai báo stack production trên EC2 |
+| [`.env.example`](../.env.example) | Template biến môi trường — không chứa giá trị thật |
 
 ---
 
