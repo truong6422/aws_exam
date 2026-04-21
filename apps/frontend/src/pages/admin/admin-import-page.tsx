@@ -38,7 +38,7 @@ export default function AdminImportPage() {
   }
 
   return (
-    <div style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ maxWidth: '560px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
         title={t('nav.import')}
         subtitle={t('admin.import.subtitle_desc')}

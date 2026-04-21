@@ -98,7 +98,7 @@ export default function AdminSettingsPage() {
                         {t('admin.settings.telegram_section')}
                     </h3>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                    <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-3">
                         <div>
                             <label style={labelStyle}>{t('admin.settings.telegram_support')}</label>
                             <input
@@ -153,7 +153,7 @@ export default function AdminSettingsPage() {
                         <label style={labelStyle}>{t('admin.settings.exchange_rate')}</label>
                         <input
                             type="number"
-                            style={{ ...inputStyle, width: '200px' }}
+                            style={{ ...inputStyle, width: '100%', maxWidth: '200px' }}
                             value={config.vnd_per_credit}
                             onChange={e => setConfig({ ...config, vnd_per_credit: e.target.value })}
                         />

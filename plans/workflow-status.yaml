@@ -20,7 +20,7 @@ kpi_baseline:
   test_pass_rate: 0.0
   regression_reopen_rate: 0.0
 signals:
-  current_session_id: 83399e7f-3453-4957-9921-14c552bced01
+  current_session_id: e7886bae-729a-4998-a220-b1c6b7aa600d
   gate_policy: guided
   scan_completed: true
   scan_meaningful: true
@@ -33,9 +33,9 @@ signals:
   tests_passed: false
   ui_smoke_passed: false
   security_passed: false
-  last_reported_commit: cf30cb846671c41c505522e69cea9c9a6a252fe5
+  last_reported_commit: 504427ff2a7626c70ef02a1a49eaa72e56cfd29c
   last_reported_branch: master
-  last_reported_commit_at: '2026-04-21T02:40:50+00:00'
+  last_reported_commit_at: '2026-04-21T14:51:32+00:00'
   commit_report_path: plans/reports/branches/master/commit-latest.md
   commit_report_source: auto-sync
   bootstrap_completed_at: ''
@@ -43,16 +43,16 @@ signals:
   bootstrap_status: ''
   bootstrap_actions_run: []
   bootstrap_report: ''
-  updated_at: '2026-04-21T13:44:04+00:00'
+  updated_at: '2026-04-21T15:53:58+00:00'
   scan_mode: deep
   scan_report: plans/project-scan-report.json
-  last_heartbeat_at: '2026-04-21T13:44:04+00:00'
+  last_heartbeat_at: '2026-04-21T15:53:58+00:00'
   readiness_report: plans/260418-1923-credit-wallet-exam-purchase/reports/readiness-report.json
   planning_report: plans/260315-0247-full-project-implementation/reports/readiness-report.json
   last_major_command: /code-review
-  last_major_command_at: '2026-04-21T02:48:53+00:00'
+  last_major_command_at: '2026-04-21T15:53:58+00:00'
   readiness_scope: medium
-updated_at: '2026-04-21T13:44:04+00:00'
+updated_at: '2026-04-21T15:53:58+00:00'
 created_at: '2026-04-16T13:12:06+00:00'
 derived_evidence:
 - current_step=reviewing -> phase=implementation (lifecycle-managed)

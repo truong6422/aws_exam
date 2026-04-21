@@ -1,15 +1,15 @@
 # Commit Latest Report
 
 ## Commit Metadata
-- sha: `cf30cb846671c41c505522e69cea9c9a6a252fe5`
+- sha: `504427ff2a7626c70ef02a1a49eaa72e56cfd29c`
 - branch: `master`
 - author: `truonglb <truonglb@inisoft.vn>`
-- timestamp: `2026-04-20T20:08:11+07:00`
-- message: fix: persist rotated refresh token and queue concurrent 401 requests
+- timestamp: `2026-04-21T21:06:11+07:00`
+- message: feat: add pagination and search to admin users management
 
 ## Input Context
 - command: `/code-review`
-- command_at: `2026-04-21T02:40:50+00:00`
+- command_at: `2026-04-21T14:51:32+00:00`
 
 ## Plan Context
 - plan-status: `plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml`
@@ -33,10 +33,12 @@
 - 22 checklist item(s) still open in plan-status
 
 ## Changed Files Summary
-- modified: 1
+- modified: 3
 
 ## Changed Files
-- `M` `apps/frontend/src/lib/api-client.ts`
+- `M` `apps/backend/apps/accounts/admin_views.py`
+- `M` `apps/frontend/src/pages/admin/admin-users-page.tsx`
+- `M` `apps/frontend/src/services/admin-api.ts`
 
 ## Next Action
 - next_action: Run /cook in a fresh session.
@@ -49,18 +51,18 @@
 ```json
 {
   "version": "1.0",
-  "generated_at": "2026-04-21T02:40:50+00:00",
+  "generated_at": "2026-04-21T14:51:32+00:00",
   "source": "auto-sync",
   "commit": {
-    "sha": "cf30cb846671c41c505522e69cea9c9a6a252fe5",
+    "sha": "504427ff2a7626c70ef02a1a49eaa72e56cfd29c",
     "branch": "master",
     "author": "truonglb <truonglb@inisoft.vn>",
-    "timestamp": "2026-04-20T20:08:11+07:00",
-    "message": "fix: persist rotated refresh token and queue concurrent 401 requests"
+    "timestamp": "2026-04-21T21:06:11+07:00",
+    "message": "feat: add pagination and search to admin users management"
   },
   "input_context": {
     "last_command": "/code-review",
-    "last_command_at": "2026-04-21T02:40:50+00:00"
+    "last_command_at": "2026-04-21T14:51:32+00:00"
   },
   "plan_context": {
     "plan_status_path": "plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml",
@@ -93,11 +95,19 @@
   "changed_files": [
     {
       "status": "M",
-      "path": "apps/frontend/src/lib/api-client.ts"
+      "path": "apps/backend/apps/accounts/admin_views.py"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-users-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/services/admin-api.ts"
     }
   ],
   "changed_summary": {
-    "modified": 1
+    "modified": 3
   },
   "blockers": [
     "quality gate is not passed",

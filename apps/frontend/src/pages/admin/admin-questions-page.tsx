@@ -42,7 +42,7 @@ export default function AdminQuestionsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <PageHeader title={t('admin.questions')} subtitle={t('admin.browse_question_bank')} />
         <button
           className="btn-primary"

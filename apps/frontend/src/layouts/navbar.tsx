@@ -1,13 +1,18 @@
 import { useUiStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { useIsMobile } from '@/hooks/use-is-mobile'
 import LanguageSwitcher from '@/components/language-switcher'
 import NotificationCenter from '@/components/notification-center'
 
 /** Top navigation bar — Apple glass effect. */
 export default function Navbar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
+  const toggleMobileDrawer = useUiStore((s) => s.toggleMobileDrawer)
+  const isMobile = useIsMobile()
   const { user, isAuthenticated } = useAuthStore()
   const initial = (user?.name?.[0] ?? user?.email?.[0] ?? 'G').toUpperCase()
+
+  const handleMenuToggle = isMobile ? toggleMobileDrawer : toggleSidebar
 
   return (
     <header
@@ -24,7 +29,7 @@ export default function Navbar() {
     >
       {/* Hamburger */}
       <button
-        onClick={toggleSidebar}
+        onClick={handleMenuToggle}
         aria-label="Toggle sidebar"
         style={{
           background: 'none',
@@ -49,7 +54,10 @@ export default function Navbar() {
         <LanguageSwitcher variant="navbar" />
         {isAuthenticated && (
           <>
-            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}>
+            <span
+              className="hidden md:inline"
+              style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.12px' }}
+            >
               {user?.name ?? user?.email}
             </span>
             <div

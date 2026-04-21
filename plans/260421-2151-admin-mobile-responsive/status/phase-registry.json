@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "phases": {
+    "phase-01-layout-foundation": {
+      "spec_id": "phase-01-layout-foundation",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260421-2151-admin-mobile-responsive/phase-01-layout-foundation.md"
+    },
+    "phase-02-tables-filters": {
+      "spec_id": "phase-02-tables-filters",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260421-2151-admin-mobile-responsive/phase-02-tables-filters.md"
+    },
+    "phase-03-dashboard-remaining": {
+      "spec_id": "phase-03-dashboard-remaining",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260421-2151-admin-mobile-responsive/phase-03-dashboard-remaining.md"
+    }
+  },
+  "ready": [
+    "phase-01-layout-foundation",
+    "phase-02-tables-filters",
+    "phase-03-dashboard-remaining"
+  ],
+  "in_progress": [],
+  "blocked": [],
+  "completed": [],
+  "generated_at": "2026-04-21T15:53:58+00:00"
+}

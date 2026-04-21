@@ -1,8 +1,8 @@
 # Project Context Snapshot
 
-- Generated: `2026-04-21T15:04:43+00:00`
-- Source: `session-init`
-- Work item: `260418-1923-credit-wallet-exam-purchase`
+- Generated: `2026-04-21T15:53:58+00:00`
+- Source: `workflow-heartbeat:/code-review`
+- Work item: `260421-2151-admin-mobile-responsive`
 
 # Project Context
 
@@ -96,17 +96,17 @@
 
 ## Operational Runtime Snapshot
 
-- work_item_state: `planning`
+- work_item_state: `validation`
 - handoff_status: `draft`
-- lifecycle_stage: `planning`
+- lifecycle_stage: `validation`
 - lifecycle_status: `in_progress`
-- active_command: `/plan`
-- last_heartbeat_at: `2026-04-21T15:02:19+00:00`
-- recovery_command: `/plan`
+- active_command: `/code-review`
+- last_heartbeat_at: `2026-04-21T15:53:58+00:00`
+- recovery_command: `/code-review`
 
 ## Plan Progress Snapshot
 
-- plan_status_path: `plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml`
+- plan_status_path: `plans/260421-2151-admin-mobile-responsive/plan-status.yaml`
 - plan_status: `not-started`
 - progress_pct: `0.0`
 - active_phase: `01` (not-started)

@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "work_item_id": "260421-2151-admin-mobile-responsive",
+  "state": "validation",
+  "handoff_status": "draft",
+  "last_command": "/code-review",
+  "last_event_at": "2026-04-21T15:53:58+00:00",
+  "events_count": 29,
+  "lifecycle": {
+    "stage": "validation",
+    "status": "in_progress",
+    "active_command": "/code-review",
+    "active_session_id": "e7886bae-729a-4998-a220-b1c6b7aa600d",
+    "started_at": "2026-04-21T15:41:32+00:00",
+    "last_heartbeat_at": "2026-04-21T15:53:58+00:00",
+    "completed_at": "",
+    "ttl_sec": 1800,
+    "stale": false,
+    "recovery_command": "/code-review"
+  },
+  "verification": {
+    "auto_quality_status": "queued",
+    "report_json": "",
+    "report_yaml": "",
+    "exit_code": null,
+    "review_status": "pending",
+    "review_completed_at": "",
+    "git_status": "pending",
+    "git_completed_at": ""
+  },
+  "gates": {
+    "code_review_allowed": false,
+    "git_allowed": false,
+    "reason": "quality gate has not passed"
+  },
+  "updated_at": "2026-04-21T15:53:58+00:00",
+  "created_at": "2026-04-21T14:59:42+00:00"
+}

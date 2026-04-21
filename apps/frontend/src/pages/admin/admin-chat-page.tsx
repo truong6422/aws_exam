@@ -2,9 +2,11 @@ import { useEffect, useState, useRef } from 'react'
 import { adminApi } from '@/services/admin-api'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
+import { useIsMobile } from '@/hooks/use-is-mobile'
 
 export default function AdminChatPage() {
     const { t } = useTranslation()
+    const isMobile = useIsMobile()
     const [sessions, setSessions] = useState<any[]>([])
     const [selectedUser, setSelectedUser] = useState<any | null>(null)
     const [messages, setMessages] = useState<any[]>([])
@@ -86,10 +88,11 @@ export default function AdminChatPage() {
                 overflow: 'hidden',
                 border: '1px solid rgba(255,255,255,0.08)'
             }}>
-                {/* User List */}
+                {/* User List — hidden on mobile when a user is selected */}
+                {(!isMobile || !selectedUser) && (
                 <div style={{
-                    width: '300px',
-                    borderRight: '1px solid rgba(255,255,255,0.08)',
+                    width: isMobile ? '100%' : 'min(300px, 40%)',
+                    borderRight: isMobile ? 'none' : '1px solid rgba(255,255,255,0.08)',
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
@@ -126,12 +129,23 @@ export default function AdminChatPage() {
                         )}
                     </div>
                 </div>
+                )}
 
-                {/* Chat Window */}
+                {/* Chat Window — full width on mobile when user is selected */}
+                {(!isMobile || selectedUser) && (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     {selectedUser ? (
                         <>
-                            <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {isMobile && (
+                                    <button
+                                        onClick={() => setSelectedUser(null)}
+                                        style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '4px', fontSize: '18px', lineHeight: 1 }}
+                                        aria-label="Back"
+                                    >
+                                        ←
+                                    </button>
+                                )}
                                 <span style={{ fontWeight: 600 }}>{selectedUser.name} ({selectedUser.email})</span>
                             </div>
                             <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -193,6 +207,7 @@ export default function AdminChatPage() {
                         </div>
                     )}
                 </div>
+                )}
             </div>
         </div>
     )

@@ -67,12 +67,12 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div style={{ background: '#272729', borderRadius: '12px', padding: '20px 24px', display: 'flex', gap: '40px', alignItems: 'center' }}>
+      <div style={{ background: '#272729', borderRadius: '12px', padding: '20px 24px' }}>
         <div>
           <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '16px' }}>
             {t('admin.unlock_rate_title')} ({totalSets})
           </h2>
-          <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
             <div
               style={{
                 width: '120px',

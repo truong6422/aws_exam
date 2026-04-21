@@ -1,7 +1,9 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useUiStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { useIsMobile } from '@/hooks/use-is-mobile'
 
 interface NavItem {
   labelKey: string
@@ -119,20 +121,37 @@ const ADMIN_ITEMS: NavItem[] = [
 export default function Sidebar() {
   const { t } = useTranslation()
   const sidebarOpen = useUiStore((s) => s.sidebarOpen)
+  const mobileDrawerOpen = useUiStore((s) => s.mobileDrawerOpen)
+  const closeMobileDrawer = useUiStore((s) => s.closeMobileDrawer)
   const user = useAuthStore((s) => s.user)
   const navigate = useNavigate()
   const logout = useAuthStore((s) => s.logout)
+  const isMobile = useIsMobile()
+  const location = useLocation()
+
+  // Close drawer on route change (mobile only)
+  useEffect(() => {
+    if (isMobile) closeMobileDrawer()
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
+  // Mobile: full-width drawer (280px), translate based on mobileDrawerOpen
+  // Desktop: push sidebar, width based on sidebarOpen
+  const sidebarWidth = isMobile ? '280px' : sidebarOpen ? '240px' : '60px'
+  const translateX = isMobile && !mobileDrawerOpen ? '-100%' : '0'
+  // On mobile always show labels (not collapsed); on desktop respect sidebarOpen
+  const collapsed = isMobile ? false : !sidebarOpen
+
   return (
     <aside
-      className="fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300"
+      className="fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300"
       style={{
-        width: sidebarOpen ? '240px' : '60px',
+        width: sidebarWidth,
+        transform: `translateX(${translateX})`,
         background: '#000',
         borderRight: '1px solid rgba(255,255,255,0.08)',
       }}
@@ -142,7 +161,7 @@ export default function Sidebar() {
         className="flex h-12 items-center justify-center"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '0 16px' }}
       >
-        {sidebarOpen ? (
+        {!collapsed ? (
           <span
             style={{
               fontFamily: "'SF Pro Display', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -167,14 +186,14 @@ export default function Sidebar() {
           }
           return true
         }).map((item) => (
-          <SidebarLink key={item.to} item={item} collapsed={!sidebarOpen} />
+          <SidebarLink key={item.to} item={item} collapsed={collapsed} />
         ))}
 
         {user?.is_staff && (
           <>
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', margin: '12px 0' }} />
             {ADMIN_ITEMS.map((item) => (
-              <SidebarLink key={item.to} item={item} collapsed={!sidebarOpen} />
+              <SidebarLink key={item.to} item={item} collapsed={collapsed} />
             ))}
           </>
         )}
@@ -182,7 +201,7 @@ export default function Sidebar() {
 
       {/* User info + logout/login */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '12px 8px' }}>
-        {sidebarOpen && (
+        {!collapsed && (
           <p
             className="mb-2 truncate"
             style={{ fontSize: '11px', letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.4)', padding: '0 8px' }}
@@ -206,7 +225,7 @@ export default function Sidebar() {
             }}
           >
             <span className="shrink-0"><LogoutIcon /></span>
-            {sidebarOpen && <span>{t('nav.logout')}</span>}
+            {!collapsed && <span>{t('nav.logout')}</span>}
           </button>
         ) : (
           <button
@@ -229,7 +248,7 @@ export default function Sidebar() {
                 <path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3 13.5c0-2.48 2.02-4.5 4.5-4.5s4.5 2.02 4.5 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
               </svg>
             </span>
-            {sidebarOpen && <span>{t('auth.login_link')}</span>}
+            {!collapsed && <span>{t('auth.login_link')}</span>}
           </button>
         )}
       </div>

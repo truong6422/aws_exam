@@ -197,7 +197,8 @@ export default function AdminExamsPage() {
                             </div>
                         </div>
 
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="overflow-x-auto">
+                        <table style={{ width: '100%', minWidth: '560px', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr>
                                     <th style={{ ...tableHeaderStyle, width: '40px', textAlign: 'center' }}>
@@ -330,6 +331,7 @@ export default function AdminExamsPage() {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -395,8 +397,10 @@ export default function AdminExamsPage() {
                         border: '1px solid rgba(255,255,255,0.12)',
                         borderRadius: '20px',
                         padding: '32px',
-                        width: '100%',
+                        width: '90vw',
                         maxWidth: '400px',
+                        maxHeight: '85vh',
+                        overflowY: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '24px'

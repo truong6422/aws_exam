@@ -48,13 +48,14 @@ export default function AdminUsersPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
         <PageHeader title={t('nav.users')} subtitle={t('admin.manage_accounts')} />
         <input
           type="search"
           placeholder={t('common.search')}
           value={searchInput}
           onChange={(e) => handleSearchChange(e.target.value)}
+          className="w-full md:w-[220px]"
           style={{
             padding: '8px 12px',
             borderRadius: '8px',
@@ -62,14 +63,14 @@ export default function AdminUsersPage() {
             background: 'rgba(255,255,255,0.06)',
             color: '#fff',
             fontSize: '13px',
-            width: '220px',
             outline: 'none',
           }}
         />
       </div>
 
       <div style={{ background: '#272729', borderRadius: '12px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+        <div className="overflow-x-auto">
+        <table style={{ width: '100%', minWidth: '640px', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}>
               {[t('admin.table_name'), t('admin.table_email'), t('admin.table_role'), t('admin.table_stats'), t('admin.table_joined')].map((h) => (
@@ -130,10 +131,13 @@ export default function AdminUsersPage() {
             })}
           </tbody>
         </table>
+        </div>
 
         {/* Pagination */}
         {!loading && !error && totalPages > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}
+          >
             <span>{totalCount} người dùng · trang {page}/{totalPages}</span>
             <div style={{ display: 'flex', gap: '6px' }}>
               <button
