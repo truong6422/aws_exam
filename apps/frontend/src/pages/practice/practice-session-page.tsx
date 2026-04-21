@@ -225,7 +225,18 @@ export default function PracticeSessionPage() {
     if (isAuthenticated) loadBookmarks()
   }, [isAuthenticated, loadBookmarks])
 
+  // Guard direct URL access to page 2+ without auth
+  useEffect(() => {
+    if (!isAuthenticated && currentPage > 1) {
+      setSearchParams({ certification_id: certId?.toString() || '', page: '1' })
+    }
+  }, [isAuthenticated, currentPage, certId, setSearchParams])
+
   const handlePageChange = (newPage: number) => {
+    if (!isAuthenticated && newPage > 1) {
+      navigate('/login')
+      return
+    }
     setSearchParams({
       certification_id: certId?.toString() || '',
       page: newPage.toString()
