@@ -4,6 +4,7 @@ Accounts admin views for managing users.
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.db.models import Sum
@@ -25,6 +26,8 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = AdminUserSerializer
     permission_classes = [IsAdminUser]
+    filter_backends = [SearchFilter]
+    search_fields = ['email', 'name', 'username']
 
     @action(detail=False, methods=["get"])
     def dashboard_stats(self, request):

@@ -45,6 +45,17 @@ export interface AdminUser {
   total_comments?: number
 }
 
+export interface PaginatedUsers {
+  data: AdminUser[]
+  links: {
+    prev: string | null
+    next: string | null
+    current_page: number
+    total_pages: number
+    count: number
+  }
+}
+
 export interface DashboardStats {
   users: number
   certifications: number
@@ -98,7 +109,7 @@ export const adminApi = {
     if (params?.page_size) query.append('page_size', params.page_size.toString())
     if (params?.search) query.append('search', params.search)
     const qs = query.toString()
-    return apiClient.list<AdminUser>(`/auth/users/${qs ? '?' + qs : ''}`)
+    return apiClient.get<PaginatedUsers>(`/auth/users/${qs ? '?' + qs : ''}`)
   },
 
   updateUser: (userId: number, data: Partial<AdminUser>) =>
