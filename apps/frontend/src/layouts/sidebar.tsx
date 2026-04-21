@@ -45,12 +45,12 @@ const AnalyticsIcon = () => (
   </svg>
 )
 
-const WalletIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="1" y="3" width="14" height="10" rx="2" ry="2" fill="none" />
-    <line x1="1" y1="7" x2="15" y2="7" />
-  </svg>
-)
+// WALLET_FEATURE: const WalletIcon = () => (
+//   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+//     <rect x="1" y="3" width="14" height="10" rx="2" ry="2" fill="none" />
+//     <line x1="1" y1="7" x2="15" y2="7" />
+//   </svg>
+// )
 
 const ChatIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -102,14 +102,14 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'nav.practice', to: '/practice/setup', icon: <PracticeIcon /> },
   { labelKey: 'nav.history', to: '/history', icon: <HistoryIcon /> },
   { labelKey: 'nav.analytics', to: '/analytics', icon: <AnalyticsIcon /> },
-  { labelKey: 'nav.wallet', to: '/wallet', icon: <WalletIcon /> },
+  // WALLET_FEATURE: { labelKey: 'nav.wallet', to: '/wallet', icon: <WalletIcon /> },
   { labelKey: 'nav.chat', to: '/chat', icon: <ChatIcon /> },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
   { labelKey: 'nav.admin', to: '/admin/dashboard', icon: <AdminIcon /> },
   { labelKey: 'nav.exam', to: '/admin/exams', icon: <ExamIcon /> },
-  { labelKey: 'nav.wallet', to: '/admin/wallet', icon: <WalletIcon /> },
+  // WALLET_FEATURE: { labelKey: 'nav.wallet', to: '/admin/wallet', icon: <WalletIcon /> },
   { labelKey: 'nav.chat', to: '/admin/chat', icon: <ChatIcon /> },
   { labelKey: 'nav.settings', to: '/admin/settings', icon: <SettingsIcon /> },
   { labelKey: 'nav.users', to: '/admin/users', icon: <UsersIcon /> },

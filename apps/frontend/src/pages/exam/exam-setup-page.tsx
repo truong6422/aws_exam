@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '@/components/ui/page-header'
 import { examApi, type Certification, type ExamSet, type ExamListItem } from '@/services/exam-api'
-import { walletApi } from '@/services/wallet-api'
+// WALLET_FEATURE: import { walletApi } from '@/services/wallet-api'
 import { useExamStore } from '@/stores/exam-store'
 import { useUiStore } from '@/stores/ui-store'
 import { ExamSetHistoryModal } from '@/components/exam/exam-set-history-modal'
-import { Link } from 'react-router-dom'
+// WALLET_FEATURE: import { Link } from 'react-router-dom'
 
 const cardStyle: React.CSSProperties = {
   display: 'flex',
@@ -43,10 +43,10 @@ export default function ExamSetupPage() {
   const [loadingSets, setLoadingSets] = useState(false)
   const [startingId, setStartingId] = useState<number | null>(null)
 
-  // Purchase state
-  const [userBalance, setUserBalance] = useState<number | null>(null)
-  const [purchasingId, setPurchasingId] = useState<number | null>(null)
-  const [purchaseModal, setPurchaseModal] = useState<ExamSet | null>(null)
+  // WALLET_FEATURE: Purchase state
+  // const [userBalance, setUserBalance] = useState<number | null>(null)
+  // const [purchasingId, setPurchasingId] = useState<number | null>(null)
+  // const [purchaseModal, setPurchaseModal] = useState<ExamSet | null>(null)
 
   // Modal state
   const [historyModal, setHistoryModal] = useState<{
@@ -70,10 +70,10 @@ export default function ExamSetupPage() {
       .catch(() => addToast({ type: 'error', message: t('exam.error_load') }))
       .finally(() => setLoading(false))
 
-    // Fetch user balance
-    walletApi.getWallet()
-      .then(w => setUserBalance(w.balance))
-      .catch(() => { }) // silent fail
+    // WALLET_FEATURE: Fetch user balance
+    // walletApi.getWallet()
+    //   .then(w => setUserBalance(w.balance))
+    //   .catch(() => { }) // silent fail
   }, [addToast, t])
 
   const handleSelectCert = async (cert: Certification) => {
@@ -122,28 +122,28 @@ export default function ExamSetupPage() {
     }
   }
 
-  const handlePurchase = async (examSet: ExamSet) => {
-    setPurchasingId(examSet.id)
-    setPurchaseModal(null)
-    try {
-      const result = await examApi.purchaseExamSet(examSet.id)
-      // Update local state: mark set as unlocked
-      setExamSets(prev => prev.map(s =>
-        s.id === examSet.id ? { ...s, is_unlocked: true } : s
-      ))
-      setUserBalance(result.new_balance)
-      addToast({ type: 'success', message: t('exam.purchase_success') })
-    } catch (err) {
-      const msg = (err as Error).message
-      if (msg.includes('Insufficient')) {
-        addToast({ type: 'error', message: t('exam.purchase_insufficient') })
-      } else {
-        addToast({ type: 'error', message: t('exam.purchase_error') })
-      }
-    } finally {
-      setPurchasingId(null)
-    }
-  }
+  // WALLET_FEATURE: handlePurchase disabled — uncomment to re-enable
+  // const handlePurchase = async (examSet: ExamSet) => {
+  //   setPurchasingId(examSet.id)
+  //   setPurchaseModal(null)
+  //   try {
+  //     const result = await examApi.purchaseExamSet(examSet.id)
+  //     setExamSets(prev => prev.map(s =>
+  //       s.id === examSet.id ? { ...s, is_unlocked: true } : s
+  //     ))
+  //     setUserBalance(result.new_balance)
+  //     addToast({ type: 'success', message: t('exam.purchase_success') })
+  //   } catch (err) {
+  //     const msg = (err as Error).message
+  //     if (msg.includes('Insufficient')) {
+  //       addToast({ type: 'error', message: t('exam.purchase_insufficient') })
+  //     } else {
+  //       addToast({ type: 'error', message: t('exam.purchase_error') })
+  //     }
+  //   } finally {
+  //     setPurchasingId(null)
+  //   }
+  // }
 
   // Keep old handleStart for backward compat (used if we remove the modal)
   const handleStart = handleSelectExamSet
@@ -175,6 +175,7 @@ export default function ExamSetupPage() {
           loadingStart={startingId === historyModal.examSet.id}
         />
       )}
+      {/* WALLET_FEATURE: Purchase modal hidden
       {purchaseModal && (
         <PurchaseModal
           examSet={purchaseModal}
@@ -184,6 +185,7 @@ export default function ExamSetupPage() {
           purchasing={purchasingId === purchaseModal.id}
         />
       )}
+      */}
       <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '60px' }}>
         {!selectedCert ? (
           <>
@@ -271,6 +273,7 @@ export default function ExamSetupPage() {
               </button>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <PageHeader title={selectedCert.name} subtitle={t('exam.select_set_subtitle')} />
+                {/* WALLET_FEATURE: Balance badge hidden
                 {userBalance !== null && (
                   <span style={{
                     fontSize: '12px', padding: '4px 12px', borderRadius: '100px',
@@ -281,6 +284,7 @@ export default function ExamSetupPage() {
                     {userBalance.toLocaleString()} {t('wallet.unit')}
                   </span>
                 )}
+                */}
               </div>
             </div>
 
@@ -298,10 +302,13 @@ export default function ExamSetupPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                 {examSets.map((set) => {
                   const isAdminLocked = set.is_locked
-                  const isFree = set.price_credits === 0
-                  const isUnlocked = set.is_unlocked
-                  const isPurchasable = !isAdminLocked && !isFree && !isUnlocked
-                  const canStart = !isAdminLocked && isUnlocked
+                  // WALLET_FEATURE: isFree used in commented price badge — uncomment to re-enable
+                  // const isFree = set.price_credits === 0
+                  // WALLET_FEATURE: Treat all non-locked sets as startable (ignore purchase requirement)
+                  // const isUnlocked = set.is_unlocked
+                  // const isPurchasable = !isAdminLocked && !isFree && !isUnlocked
+                  // const canStart = !isAdminLocked && isUnlocked
+                  const canStart = !isAdminLocked
 
                   return (
                     <div
@@ -315,13 +322,14 @@ export default function ExamSetupPage() {
                       }}
                       onClick={() => {
                         if (canStart) handleStart(set)
-                        else if (isPurchasable) setPurchaseModal(set)
+                        // WALLET_FEATURE: else if (isPurchasable) setPurchaseModal(set)
                       }}
                       className="hover-card"
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>{set.name}</h4>
+                          {/* WALLET_FEATURE: Price badge hidden
                           {!isAdminLocked && (
                             <div>
                               <span style={{
@@ -339,6 +347,7 @@ export default function ExamSetupPage() {
                               </span>
                             </div>
                           )}
+                          */}
                         </div>
                         {isAdminLocked && (
                           <div style={{
@@ -365,7 +374,7 @@ export default function ExamSetupPage() {
                       </div>
 
                       <button
-                        disabled={isAdminLocked || startingId !== null || (purchasingId !== null)}
+                        disabled={isAdminLocked || startingId !== null}
                         className={canStart ? "btn-primary" : "btn-secondary"}
                         style={{
                           width: '100%',
@@ -375,18 +384,14 @@ export default function ExamSetupPage() {
                         onClick={(e) => {
                           e.stopPropagation()
                           if (canStart) handleStart(set)
-                          else if (isPurchasable) setPurchaseModal(set)
+                          // WALLET_FEATURE: else if (isPurchasable) setPurchaseModal(set)
                         }}
                       >
                         {startingId === set.id
                           ? t('exam.starting')
-                          : purchasingId === set.id
-                            ? t('exam.purchasing')
-                            : isAdminLocked
-                              ? t('exam.locked')
-                              : canStart
-                                ? t('exam.start_button')
-                                : `${t('exam.unlock_button')} (${set.price_credits.toLocaleString()} ${t('wallet.unit')})`
+                          : isAdminLocked
+                            ? t('exam.locked')
+                            : t('exam.start_button')
                         }
                       </button>
                     </div>
@@ -401,6 +406,7 @@ export default function ExamSetupPage() {
   )
 }
 
+/* WALLET_FEATURE: PurchaseModal component hidden — uncomment to re-enable
 function PurchaseModal({ examSet, userBalance, onClose, onConfirm, purchasing }: {
   examSet: ExamSet
   userBalance: number
@@ -489,3 +495,4 @@ function PurchaseModal({ examSet, userBalance, onClose, onConfirm, purchasing }:
     </div>
   )
 }
+*/

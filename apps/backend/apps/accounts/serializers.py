@@ -37,7 +37,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return result["total"] or 0
 
     def _get_total_questions_done(self, obj):
-        return AttemptAnswer.objects.filter(attempt__user=obj).count()
+        return AttemptAnswer.objects.filter(attempt__user=obj, selected_answers__isnull=False).distinct().count()
 
     def _get_total_comments(self, obj):
         return Comment.objects.filter(author=obj).count()
