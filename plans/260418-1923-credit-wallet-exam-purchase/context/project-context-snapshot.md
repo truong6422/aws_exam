@@ -1,7 +1,7 @@
 # Project Context Snapshot
 
-- Generated: `2026-04-21T02:48:53+00:00`
-- Source: `workflow-auto-sync:/code-review`
+- Generated: `2026-04-21T03:16:52+00:00`
+- Source: `session-init`
 - Work item: `260418-1923-credit-wallet-exam-purchase`
 
 # Project Context
