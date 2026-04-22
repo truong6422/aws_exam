@@ -230,4 +230,7 @@ export const practiceApi = {
 
   reportAnswer: (questionId: number, reason: string) =>
     apiClient.post<{ id: number; reason: string }>(`/questions/${questionId}/report/`, { reason }),
+
+  markQuestionViewed: (questionId: number) =>
+    apiClient.post<{ ok: boolean }>('/questions/practice/viewed/', { question_id: questionId }),
 }

@@ -297,6 +297,7 @@
         "questions_done": "questions done",
         "comments_amount": "comments",
         "total_exam_time": "Total Exam Time",
+        "total_questions_done": "Total Questions Done",
         "unlock_rate_title": "Exam Set Unlock Rate",
         "unlocked_label": "Unlocked",
         "locked_label": "Locked",

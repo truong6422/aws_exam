@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.db.models import Sum
 
-from apps.questions.models import Certification, Question, ExamSet
-from apps.exams.models import ExamAttempt
+from apps.questions.models import Certification, Question, ExamSet, PracticeQuestionView
+from apps.exams.models import AttemptAnswer, ExamAttempt
 
 from .serializers import AdminUserSerializer
 
@@ -34,12 +34,15 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         total_users = User.objects.count()
         total_certs = Certification.objects.count()
         total_questions = Question.objects.count()
-        
+
         exam_sets = ExamSet.objects.all()
         unlocked_exam_sets = exam_sets.filter(is_locked=False).count()
         total_exam_sets = exam_sets.count()
 
         total_time_seconds = ExamAttempt.objects.aggregate(total=Sum("accumulated_seconds"))["total"] or 0
+
+        total_exam_answers = AttemptAnswer.objects.count()
+        total_practice_views = PracticeQuestionView.objects.count()
 
         return Response({
             "users": total_users,
@@ -50,5 +53,6 @@ class AdminUserViewSet(viewsets.ModelViewSet):
                 "unlocked": unlocked_exam_sets,
                 "locked": total_exam_sets - unlocked_exam_sets
             },
-            "total_time_seconds": total_time_seconds
+            "total_time_seconds": total_time_seconds,
+            "total_questions_done": total_exam_answers + total_practice_views,
         })

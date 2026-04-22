@@ -66,6 +66,7 @@ export interface DashboardStats {
     locked: number
   }
   total_time_seconds: number
+  total_questions_done: number
 }
 
 export interface TopUpRequestAdmin {

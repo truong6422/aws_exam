@@ -51,6 +51,10 @@ function PracticeQuestionItem({ index, question, isAuthenticated, isBookmarked, 
     }
     setRevealed(true)
     setCommentsOpened(true)
+    // Track unique practice view (fire-and-forget, non-blocking)
+    if (isAuthenticated) {
+      practiceApi.markQuestionViewed(question.id).catch(() => {})
+    }
   }
 
   const getIsCorrect = (answerId: number): boolean => {

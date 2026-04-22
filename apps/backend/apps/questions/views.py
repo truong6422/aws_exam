@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
-from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, Question, UserExamUnlock
+from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, PracticeQuestionView, Question, UserExamUnlock
 from .serializers import (
     AnswerReportSerializer,
     CertificationSerializer,
@@ -243,17 +243,34 @@ class ExamSetFreeIncompleteView(APIView):
 
     def post(self, request):
         from django.db.models import Count
-        
+
         # We use annotation to find sets where the relationship 'questions' has < 65 items
         incomplete_sets = ExamSet.objects.annotate(
             q_count=Count('questions')
         ).filter(q_count__lt=65, price_credits__gt=0)
-        
+
         count = incomplete_sets.count()
         incomplete_sets.update(price_credits=0)
-        
+
         return Response({
             "detail": f"Successfully set {count} incomplete sets to free.",
             "count": count
         })
+
+
+class PracticeViewedView(APIView):
+    """POST /api/v1/questions/practice/viewed/ — record that authenticated user viewed an answer."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        question_id = request.data.get("question_id")
+        try:
+            question_id = int(question_id)
+        except (TypeError, ValueError):
+            return Response({"detail": "question_id required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        question = get_object_or_404(Question, pk=question_id)
+        PracticeQuestionView.objects.get_or_create(user=request.user, question=question)
+        return Response({"ok": True})
 

@@ -206,3 +206,23 @@ class UserExamUnlock(models.Model):
 
     def __str__(self) -> str:
         return f"Unlock: {self.user_id} -> ExamSet#{self.exam_set_id}"
+
+
+class PracticeQuestionView(models.Model):
+    """Records unique practice question views per user (one row per user+question pair)."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="practice_views",
+    )
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="practice_views"
+    )
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "question")
+
+    def __str__(self) -> str:
+        return f"PracticeView: {self.user_id} → Q#{self.question_id}"

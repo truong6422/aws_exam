@@ -12,6 +12,7 @@ from .views import (
     ExamSetBulkUpdateView,
     ExamSetFreeIncompleteView,
     PracticeQuestionListView,
+    PracticeViewedView,
 )
 from apps.wallet.purchase_views import ExamSetPurchaseView
 
@@ -19,6 +20,7 @@ app_name = "questions"
 
 urlpatterns = [
     path("practice/", PracticeQuestionListView.as_view(), name="practice-question-list"),
+    path("practice/viewed/", PracticeViewedView.as_view(), name="practice-viewed"),
     path("certifications/", CertificationListView.as_view(), name="certification-list"),
     path(
         "certifications/<int:certification_id>/sets/",

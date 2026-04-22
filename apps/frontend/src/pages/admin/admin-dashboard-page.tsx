@@ -35,6 +35,7 @@ export default function AdminDashboardPage() {
     { label: t('admin.questions'), value: stats?.questions ?? 0 },
     { label: t('admin.users_count'), value: stats?.users ?? 0 },
     { label: t('admin.total_exam_time'), value: stats ? formatTime(stats.total_time_seconds) : '—' },
+    { label: t('admin.total_questions_done'), value: stats?.total_questions_done ?? 0 },
   ]
 
   const totalSets = stats?.exam_sets.total || 0
