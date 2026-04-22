@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.exams.models import AttemptAnswer, ExamAttempt
-from apps.questions.models import Comment
+from apps.questions.models import Comment, PracticeQuestionView
 from django.db.models import Sum
 
 User = get_user_model()
@@ -37,7 +37,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return result["total"] or 0
 
     def _get_total_questions_done(self, obj):
-        return AttemptAnswer.objects.filter(attempt__user=obj, selected_answers__isnull=False).distinct().count()
+        exam_count = AttemptAnswer.objects.filter(attempt__user=obj, selected_answers__isnull=False).distinct().count()
+        practice_count = PracticeQuestionView.objects.filter(user=obj).count()
+        return exam_count + practice_count
 
     def _get_total_comments(self, obj):
         return Comment.objects.filter(author=obj).count()
