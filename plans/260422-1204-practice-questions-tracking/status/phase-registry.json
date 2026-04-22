@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "phases": {
+    "phase-01-backend": {
+      "spec_id": "phase-01-backend",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260422-1204-practice-questions-tracking/phase-01-backend.md"
+    },
+    "phase-02-frontend": {
+      "spec_id": "phase-02-frontend",
+      "status": "pending",
+      "blockedBy": [],
+      "assignee": "",
+      "claimed_at": "",
+      "file": "plans/260422-1204-practice-questions-tracking/phase-02-frontend.md"
+    }
+  },
+  "ready": [
+    "phase-01-backend",
+    "phase-02-frontend"
+  ],
+  "in_progress": [],
+  "blocked": [],
+  "completed": [],
+  "generated_at": "2026-04-22T06:31:06+00:00"
+}

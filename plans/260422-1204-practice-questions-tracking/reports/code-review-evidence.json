@@ -1,0 +1,9 @@
+{
+  "type": "code-review",
+  "phase_file": "/home/truong/project/aws-exam-app/plans/260422-1204-practice-questions-tracking/phase-02-frontend.md",
+  "score": 8.5,
+  "critical_issues": 0,
+  "reviewer": "code-reviewer",
+  "timestamp": "2026-04-22T06:58:08.986Z",
+  "generated_by": "mark-evidence.cjs"
+}

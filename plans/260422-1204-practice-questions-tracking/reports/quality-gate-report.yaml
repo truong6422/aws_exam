@@ -1,0 +1,160 @@
+version: '1.0'
+generated_at: '2026-04-22T06:31:05+00:00'
+project_root: /home/truong/project/aws-exam-app
+requested_project_root: /home/truong/project/aws-exam-app
+mode: changed
+scope: auto
+strict: false
+lifecycle_origin: manual
+lifecycle_command: /quality
+ui_engine: auto
+ui_coverage: impacted
+changed_files_count: 31
+changed_files:
+- apps/backend/apps/accounts/admin_views.py
+- apps/backend/apps/questions/models.py
+- apps/backend/apps/questions/urls.py
+- apps/backend/apps/questions/views.py
+- apps/frontend/src/i18n/locales/en.json
+- apps/frontend/src/i18n/locales/vi.json
+- apps/frontend/src/pages/admin/admin-dashboard-page.tsx
+- apps/frontend/src/pages/practice/practice-session-page.tsx
+- apps/frontend/src/services/admin-api.ts
+- apps/frontend/src/services/exam-api.ts
+- plans/260421-2151-admin-mobile-responsive/context/project-context-snapshot.md
+- plans/260421-2151-admin-mobile-responsive/status/events.ndjson
+- plans/260421-2151-admin-mobile-responsive/status/item-status.json
+- plans/reports/branches/master/commit-latest.md
+- plans/work-items.yaml
+- plans/workflow-status.yaml
+- apps/backend/apps/questions/migrations/0008_practicequestionview.py
+- plans/260421-2151-admin-mobile-responsive/reports/Explore-260422-1205-codebase.md
+- plans/260422-1204-practice-questions-tracking/brainstorm/decision-handoff.json
+- plans/260422-1204-practice-questions-tracking/brainstorm/latest.json
+- plans/260422-1204-practice-questions-tracking/context/project-context-snapshot.md
+- plans/260422-1204-practice-questions-tracking/phase-01-backend.md
+- plans/260422-1204-practice-questions-tracking/phase-02-frontend.md
+- plans/260422-1204-practice-questions-tracking/plan-status.yaml
+- plans/260422-1204-practice-questions-tracking/plan.md
+- plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.json
+- plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.yaml
+- plans/260422-1204-practice-questions-tracking/status/auto-quality.log
+- plans/260422-1204-practice-questions-tracking/status/events.ndjson
+- plans/260422-1204-practice-questions-tracking/status/item-status.json
+- plans/260422-1204-practice-questions-tracking/status/phase-registry.json
+checks:
+  hardcoded:
+    name: hardcoded
+    applicable: true
+    passed: true
+    detail: No hard-coded secret/config findings
+    command: ''
+    execution: {}
+  skill_markdown_links:
+    name: skill_markdown_links
+    applicable: false
+    passed: true
+    detail: No broken local links in SKILL.md files
+    command: ''
+    execution: {}
+  skill_artifacts:
+    name: skill_artifacts
+    applicable: false
+    passed: true
+    detail: No tracked skill artifacts detected
+    command: ''
+    execution: {}
+  skill_script_smoke:
+    name: skill_script_smoke
+    applicable: false
+    passed: true
+    detail: Smoke script not configured
+    command: ''
+    execution: {}
+  lint:
+    name: lint
+    applicable: false
+    passed: true
+    detail: No lint script detected in package.json
+    command: ''
+    execution: {}
+  typecheck:
+    name: typecheck
+    applicable: false
+    passed: true
+    detail: No typecheck script detected in package.json
+    command: ''
+    execution: {}
+  build:
+    name: build
+    applicable: false
+    passed: true
+    detail: No build script detected in package.json
+    command: ''
+    execution: {}
+  tests:
+    name: tests
+    applicable: false
+    passed: true
+    detail: No test script detected in package.json
+    command: ''
+    execution: {}
+  ui_smoke:
+    name: ui_smoke
+    applicable: false
+    passed: true
+    detail: Backend-only project — E2E not applicable
+    command: ''
+    execution: {}
+  dependency_audit:
+    name: dependency_audit
+    applicable: false
+    passed: true
+    detail: Dependency audit not applicable
+    command: ''
+    execution: {}
+hardcoded_findings: []
+skill_markdown_issues: []
+skill_artifact_matches: []
+warnings:
+- 'Non-blocking required step pending: playwright-mcp runtime UI validation has not
+  completed.'
+recommended_actions:
+- 'Run required non-blocking step: /test ui <target-url-or-route> (run Playwright
+  MCP and attach evidence).'
+summary:
+  quality_gate_passed: true
+  security_passed: true
+  failing_checks: []
+  soft_failed_checks: []
+  frontend_impacted: true
+required_runtime_steps:
+  ui_validation:
+    required: true
+    tool: playwright-mcp
+    status: pending
+    blocking: false
+    reason: UI/frontend scope detected; browser flow validation is required as a non-blocking
+      step.
+    recommended_command: /test ui <target-url-or-route> (run Playwright MCP and attach
+      evidence)
+    check_name: ui_smoke
+    check_detail: Backend-only project — E2E not applicable
+e2e_tool_detected: none
+project_type:
+  web: false
+  react_native: false
+  flutter: false
+  ios_native: false
+  android_native: false
+  backend_only: true
+spec_coverage:
+  available: false
+  reason: no_frontmatter
+routing_enforced: true
+active_work_item_id: 260422-1204-practice-questions-tracking
+active_work_item_path: plans/260422-1204-practice-questions-tracking
+artifacts:
+  json: plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.json
+  yaml: plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.yaml
+  markdown: null

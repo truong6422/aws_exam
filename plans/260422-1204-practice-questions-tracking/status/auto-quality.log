@@ -1,0 +1,312 @@
+# Auto Quality Log
+generated_at: 2026-04-22T05:45:24.477Z
+exit_code: 2
+
+## stdout
+{
+  "version": "1.0",
+  "generated_at": "2026-04-22T05:45:24+00:00",
+  "project_root": "/home/truong/project/aws-exam-app",
+  "requested_project_root": "/home/truong/project/aws-exam-app",
+  "mode": "full",
+  "scope": "auto",
+  "strict": true,
+  "lifecycle_origin": "auto-cook",
+  "lifecycle_command": "/test",
+  "ui_engine": "auto",
+  "ui_coverage": "impacted",
+  "changed_files_count": 29,
+  "changed_files": [
+    "apps/backend/apps/accounts/admin_views.py",
+    "apps/backend/apps/questions/models.py",
+    "apps/backend/apps/questions/urls.py",
+    "apps/backend/apps/questions/views.py",
+    "apps/frontend/src/i18n/locales/en.json",
+    "apps/frontend/src/i18n/locales/vi.json",
+    "apps/frontend/src/pages/admin/admin-dashboard-page.tsx",
+    "apps/frontend/src/pages/practice/practice-session-page.tsx",
+    "apps/frontend/src/services/admin-api.ts",
+    "apps/frontend/src/services/exam-api.ts",
+    "plans/260421-2151-admin-mobile-responsive/context/project-context-snapshot.md",
+    "plans/260421-2151-admin-mobile-responsive/status/events.ndjson",
+    "plans/260421-2151-admin-mobile-responsive/status/item-status.json",
+    "plans/reports/branches/master/commit-latest.md",
+    "plans/work-items.yaml",
+    "plans/workflow-status.yaml",
+    "apps/backend/apps/questions/migrations/0008_practicequestionview.py",
+    "plans/260421-2151-admin-mobile-responsive/reports/Explore-260422-1205-codebase.md",
+    "plans/260422-1204-practice-questions-tracking/brainstorm/decision-handoff.json",
+    "plans/260422-1204-practice-questions-tracking/brainstorm/latest.json",
+    "plans/260422-1204-practice-questions-tracking/context/project-context-snapshot.md",
+    "plans/260422-1204-practice-questions-tracking/phase-01-backend.md",
+    "plans/260422-1204-practice-questions-tracking/phase-02-frontend.md",
+    "plans/260422-1204-practice-questions-tracking/plan-status.yaml",
+    "plans/260422-1204-practice-questions-tracking/plan.md",
+    "plans/260422-1204-practice-questions-tracking/status/auto-quality.lock",
+    "plans/260422-1204-practice-questions-tracking/status/events.ndjson",
+    "plans/260422-1204-practice-questions-tracking/status/item-status.json",
+    "plans/260422-1204-practice-questions-tracking/status/phase-registry.json"
+  ],
+  "checks": {
+    "hardcoded": {
+      "name": "hardcoded",
+      "applicable": true,
+      "passed": false,
+      "detail": "Found 20 possible hard-coded secrets/config entries",
+      "command": "",
+      "execution": {}
+    },
+    "skill_markdown_links": {
+      "name": "skill_markdown_links",
+      "applicable": false,
+      "passed": true,
+      "detail": "No broken local links in SKILL.md files",
+      "command": "",
+      "execution": {}
+    },
+    "skill_artifacts": {
+      "name": "skill_artifacts",
+      "applicable": false,
+      "passed": true,
+      "detail": "No tracked skill artifacts detected",
+      "command": "",
+      "execution": {}
+    },
+    "skill_script_smoke": {
+      "name": "skill_script_smoke",
+      "applicable": false,
+      "passed": true,
+      "detail": "Smoke script not configured",
+      "command": "",
+      "execution": {}
+    },
+    "lint": {
+      "name": "lint",
+      "applicable": false,
+      "passed": true,
+      "detail": "No lint script detected in package.json",
+      "command": "",
+      "execution": {}
+    },
+    "typecheck": {
+      "name": "typecheck",
+      "applicable": false,
+      "passed": true,
+      "detail": "No typecheck script detected in package.json",
+      "command": "",
+      "execution": {}
+    },
+    "build": {
+      "name": "build",
+      "applicable": false,
+      "passed": true,
+      "detail": "No build script detected in package.json",
+      "command": "",
+      "execution": {}
+    },
+    "tests": {
+      "name": "tests",
+      "applicable": false,
+      "passed": true,
+      "detail": "No test script detected in package.json",
+      "command": "",
+      "execution": {}
+    },
+    "ui_smoke": {
+      "name": "ui_smoke",
+      "applicable": false,
+      "passed": true,
+      "detail": "Backend-only project \u2014 E2E not applicable",
+      "command": "",
+      "execution": {}
+    },
+    "dependency_audit": {
+      "name": "dependency_audit",
+      "applicable": false,
+      "passed": true,
+      "detail": "Dependency audit not applicable",
+      "command": "",
+      "execution": {}
+    }
+  },
+  "hardcoded_findings": [
+    {
+      "file": "apps/backend/conftest.py",
+      "line": 28,
+      "rule": "secret-assignment",
+      "snippet": "def _make(email=\"user@example.com\", password=\"testpass123\", **kwargs):"
+    },
+    {
+      "file": "apps/backend/conftest.py",
+      "line": 44,
+      "rule": "secret-assignment",
+      "snippet": "password=\"admin123\","
+    },
+    {
+      "file": "apps/backend/core/reverse_search/__init__.py",
+      "line": 36,
+      "rule": "env-config-endpoint",
+      "snippet": "base_url = \"https://www.google.com/search?tbm=isch&hl=en\""
+    },
+    {
+      "file": "apps/backend/core/reverse_search/__init__.py",
+      "line": 129,
+      "rule": "env-config-endpoint",
+      "snippet": "base_url = \"https://www.bing.com/images/search?\""
+    },
+    {
+      "file": "apps/backend/apps/accounts/tests/test_auth.py",
+      "line": 45,
+      "rule": "secret-assignment",
+      "snippet": "user_factory(email=\"test@example.com\", password=\"testpass123\")"
+    },
+    {
+      "file": "apps/backend/apps/accounts/tests/test_jwt_blacklist.py",
+      "line": 14,
+      "rule": "secret-assignment",
+      "snippet": "def _login(self, client_plain, email='student@example.com', password='testpass123'):"
+    },
+    {
+      "file": "apps/backend/apps/accounts/tests/test_jwt_blacklist.py",
+      "line": 84,
+      "rule": "secret-assignment",
+      "snippet": "password='pass123'"
+    },
+    {
+      "file": "apps/backend/apps/accounts/tests/conftest.py",
+      "line": 17,
+      "rule": "secret-assignment",
+      "snippet": "password='testpass123',"
+    },
+    {
+      "file": "apps/backend/apps/imports/tests/conftest.py",
+      "line": 21,
+      "rule": "secret-assignment",
+      "snippet": "password='testpass123',"
+    },
+    {
+      "file": "apps/backend/apps/imports/tests/conftest.py",
+      "line": 31,
+      "rule": "secret-assignment",
+      "snippet": "password='staffpass123',"
+    },
+    {
+      "file": "apps/backend/apps/questions/tests/test_community_apis.py",
+      "line": 33,
+      "rule": "secret-assignment",
+      "snippet": "self.user = User.objects.create_user(username=\"user_a\", email=\"a@test.com\", password=\"pass123!\")"
+    },
+    {
+      "file": "apps/backend/apps/questions/tests/test_community_apis.py",
+      "line": 34,
+      "rule": "secret-assignment",
+      "snippet": "self.other = User.objects.create_user(username=\"user_b\", email=\"b@test.com\", password=\"pass123!\")"
+    },
+    {
+      "file": "apps/backend/apps/questions/tests/test_community_apis.py",
+      "line": 82,
+      "rule": "secret-assignment",
+      "snippet": "self.user = User.objects.create_user(username=\"user_c\", email=\"c@test.com\", password=\"pass123!\")"
+    },
+    {
+      "file": "apps/backend/apps/questions/tests/test_community_apis.py",
+      "line": 114,
+      "rule": "secret-assignment",
+      "snippet": "self.user = User.objects.create_user(username=\"user_d\", email=\"d@test.com\", password=\"pass123!\")"
+    },
+    {
+      "file": "apps/backend/apps/exams/tests/test_autosave.py",
+      "line": 66,
+      "rule": "secret-assignment",
+      "snippet": "password='pass123'"
+    },
+    {
+      "file": "apps/backend/apps/exams/tests/conftest.py",
+      "line": 27,
+      "rule": "secret-assignment",
+      "snippet": "password='testpass123',"
+    },
+    {
+      "file": "apps/backend/apps/exams/tests/conftest.py",
+      "line": 37,
+      "rule": "secret-assignment",
+      "snippet": "password='staffpass123',"
+    },
+    {
+      "file": ".venv/lib/python3.12/site-packages/psycopg2/__init__.py",
+      "line": 90,
+      "rule": "secret-assignment",
+      "snippet": "conn = psycopg2.connect(database=\"test\", user=\"postgres\", password=\"secret\")"
+    },
+    {
+      "file": ".venv/lib/python3.12/site-packages/httpx/_urls.py",
+      "line": 336,
+      "rule": "secret-assignment",
+      "snippet": "username=\"jo@gmail.com\", password=\"a secret\""
+    },
+    {
+      "file": ".venv/lib/python3.12/site-packages/httpx/_client.py",
+      "line": 404,
+      "rule": "env-config-endpoint",
+      "snippet": "# >>> client = Client(base_url=\"https://www.example.com/subpath\")"
+    }
+  ],
+  "skill_markdown_issues": [],
+  "skill_artifact_matches": [],
+  "warnings": [
+    "Non-blocking required step pending: playwright-mcp runtime UI validation has not completed.",
+    "Strict mode: lint check is unavailable (not applicable for this project type).",
+    "Strict mode: typecheck check is unavailable (not applicable for this project type).",
+    "Strict mode: build check is unavailable (not applicable for this project type).",
+    "Strict mode: tests check is unavailable (not applicable for this project type)."
+  ],
+  "recommended_actions": [
+    "Move detected secrets/config values to environment variables or secure config files.",
+    "Run required non-blocking step: /test ui <target-url-or-route> (run Playwright MCP and attach evidence)."
+  ],
+  "summary": {
+    "quality_gate_passed": false,
+    "security_passed": false,
+    "failing_checks": [
+      "hardcoded"
+    ],
+    "soft_failed_checks": [],
+    "frontend_impacted": true
+  },
+  "required_runtime_steps": {
+    "ui_validation": {
+      "required": true,
+      "tool": "playwright-mcp",
+      "status": "pending",
+      "blocking": false,
+      "reason": "UI/frontend scope detected; browser flow validation is required as a non-blocking step.",
+      "recommended_command": "/test ui <target-url-or-route> (run Playwright MCP and attach evidence)",
+      "check_name": "ui_smoke",
+      "check_detail": "Backend-only project \u2014 E2E not applicable"
+    }
+  },
+  "e2e_tool_detected": "none",
+  "project_type": {
+    "web": false,
+    "react_native": false,
+    "flutter": false,
+    "ios_native": false,
+    "android_native": false,
+    "backend_only": true
+  },
+  "spec_coverage": {
+    "available": false,
+    "reason": "no_frontmatter"
+  },
+  "routing_enforced": true,
+  "active_work_item_id": "260422-1204-practice-questions-tracking",
+  "active_work_item_path": "plans/260422-1204-practice-questions-tracking",
+  "artifacts": {
+    "json": "plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.json",
+    "yaml": "plans/260422-1204-practice-questions-tracking/reports/quality-gate-report.yaml",
+    "markdown": null
+  }
+}
+
+
+## stderr

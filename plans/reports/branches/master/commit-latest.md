@@ -1,21 +1,21 @@
 # Commit Latest Report
 
 ## Commit Metadata
-- sha: `504427ff2a7626c70ef02a1a49eaa72e56cfd29c`
+- sha: `607ea24618208a4668b0587d27ef285eff775a1f`
 - branch: `master`
 - author: `truonglb <truonglb@inisoft.vn>`
-- timestamp: `2026-04-21T21:06:11+07:00`
-- message: feat: add pagination and search to admin users management
+- timestamp: `2026-04-21T22:55:40+07:00`
+- message: fix ui mobile
 
 ## Input Context
-- command: `/code-review`
-- command_at: `2026-04-21T14:51:32+00:00`
+- command: `/cook`
+- command_at: `2026-04-22T05:30:08+00:00`
 
 ## Plan Context
-- plan-status: `plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml`
+- plan-status: `plans/260422-1204-practice-questions-tracking/plan-status.yaml`
 - progress_pct: `0.0`
-- checklist_open: `22`
-- next_phase: `plans/260418-1923-credit-wallet-exam-purchase/phase-01-db-models.md`
+- checklist_open: `10`
+- next_phase: `plans/260422-1204-practice-questions-tracking/phase-01-backend.md`
 
 ## Artifact Summary
 - workflow-status: `plans/workflow-status.yaml`
@@ -30,15 +30,53 @@
 
 ## Blockers
 - quality gate is not passed
-- 22 checklist item(s) still open in plan-status
+- 10 checklist item(s) still open in plan-status
 
 ## Changed Files Summary
-- modified: 3
+- added: 17
+- modified: 23
 
 ## Changed Files
-- `M` `apps/backend/apps/accounts/admin_views.py`
+- `A` `apps/frontend/src/hooks/use-is-mobile.ts`
+- `M` `apps/frontend/src/i18n/locales/en.json`
+- `M` `apps/frontend/src/i18n/locales/vi.json`
+- `M` `apps/frontend/src/layouts/admin-layout.tsx`
+- `M` `apps/frontend/src/layouts/app-shell.tsx`
+- `M` `apps/frontend/src/layouts/navbar.tsx`
+- `M` `apps/frontend/src/layouts/sidebar.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-chat-page.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-dashboard-page.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-exams-page.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-import-page.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-questions-page.tsx`
+- `M` `apps/frontend/src/pages/admin/admin-settings-page.tsx`
 - `M` `apps/frontend/src/pages/admin/admin-users-page.tsx`
-- `M` `apps/frontend/src/services/admin-api.ts`
+- `M` `apps/frontend/src/stores/ui-store.ts`
+- `M` `apps/frontend/tsconfig.tsbuildinfo`
+- `M` `plans/260418-1923-credit-wallet-exam-purchase/context/project-context-snapshot.md`
+- `M` `plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml`
+- `A` `plans/260418-1923-credit-wallet-exam-purchase/reports/Explore-260421-2201-admin-quick-ref.md`
+- `A` `plans/260418-1923-credit-wallet-exam-purchase/reports/Explore-260421-2201-admin-ui-structure.md`
+- `A` `plans/260418-1923-credit-wallet-exam-purchase/reports/brainstorm-bootstrap-warning-2026-04-21T14-51-42-784Z.md`
+- `A` `plans/260418-1923-credit-wallet-exam-purchase/reports/researcher-260421-2154-responsive-admin-tailwind-retrofit.md`
+- `M` `plans/260418-1923-credit-wallet-exam-purchase/status/events.ndjson`
+- `M` `plans/260418-1923-credit-wallet-exam-purchase/status/item-status.json`
+- `M` `plans/260418-1923-credit-wallet-exam-purchase/status/phase-registry.json`
+- `A` `plans/260421-2151-admin-mobile-responsive/brainstorm/decision-handoff.json`
+- `A` `plans/260421-2151-admin-mobile-responsive/brainstorm/latest.json`
+- `A` `plans/260421-2151-admin-mobile-responsive/context/project-context-snapshot.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/phase-01-layout-foundation.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/phase-02-tables-filters.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/phase-03-dashboard-remaining.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/plan-status.yaml`
+- `A` `plans/260421-2151-admin-mobile-responsive/plan.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/reports/tester-260421-2228-frontend-typecheck-lint-build.md`
+- `A` `plans/260421-2151-admin-mobile-responsive/status/events.ndjson`
+- `A` `plans/260421-2151-admin-mobile-responsive/status/item-status.json`
+- `A` `plans/260421-2151-admin-mobile-responsive/status/phase-registry.json`
+- `M` `plans/reports/branches/master/commit-latest.md`
+- `M` `plans/work-items.yaml`
+- `M` `plans/workflow-status.yaml`
 
 ## Next Action
 - next_action: Run /cook in a fresh session.
@@ -51,29 +89,29 @@
 ```json
 {
   "version": "1.0",
-  "generated_at": "2026-04-21T14:51:32+00:00",
+  "generated_at": "2026-04-22T05:30:08+00:00",
   "source": "auto-sync",
   "commit": {
-    "sha": "504427ff2a7626c70ef02a1a49eaa72e56cfd29c",
+    "sha": "607ea24618208a4668b0587d27ef285eff775a1f",
     "branch": "master",
     "author": "truonglb <truonglb@inisoft.vn>",
-    "timestamp": "2026-04-21T21:06:11+07:00",
-    "message": "feat: add pagination and search to admin users management"
+    "timestamp": "2026-04-21T22:55:40+07:00",
+    "message": "fix ui mobile"
   },
   "input_context": {
-    "last_command": "/code-review",
-    "last_command_at": "2026-04-21T14:51:32+00:00"
+    "last_command": "/cook",
+    "last_command_at": "2026-04-22T05:30:08+00:00"
   },
   "plan_context": {
-    "plan_status_path": "plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml",
+    "plan_status_path": "plans/260422-1204-practice-questions-tracking/plan-status.yaml",
     "progress_pct": 0.0,
-    "checklist_open": 22,
+    "checklist_open": 10,
     "next_phase": {
       "phase_id": "01",
-      "phase_label": "Db Models",
-      "file": "plans/260418-1923-credit-wallet-exam-purchase/phase-01-db-models.md",
+      "phase_label": "Backend",
+      "file": "plans/260422-1204-practice-questions-tracking/phase-01-backend.md",
       "status": "not-started",
-      "checklist_open": 0
+      "checklist_open": 5
     }
   },
   "artifact_summary": {
@@ -94,8 +132,56 @@
   },
   "changed_files": [
     {
+      "status": "A",
+      "path": "apps/frontend/src/hooks/use-is-mobile.ts"
+    },
+    {
       "status": "M",
-      "path": "apps/backend/apps/accounts/admin_views.py"
+      "path": "apps/frontend/src/i18n/locales/en.json"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/i18n/locales/vi.json"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/layouts/admin-layout.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/layouts/app-shell.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/layouts/navbar.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/layouts/sidebar.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-chat-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-dashboard-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-exams-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-import-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-questions-page.tsx"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/src/pages/admin/admin-settings-page.tsx"
     },
     {
       "status": "M",
@@ -103,15 +189,116 @@
     },
     {
       "status": "M",
-      "path": "apps/frontend/src/services/admin-api.ts"
+      "path": "apps/frontend/src/stores/ui-store.ts"
+    },
+    {
+      "status": "M",
+      "path": "apps/frontend/tsconfig.tsbuildinfo"
+    },
+    {
+      "status": "M",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/context/project-context-snapshot.md"
+    },
+    {
+      "status": "M",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/plan-status.yaml"
+    },
+    {
+      "status": "A",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/reports/Explore-260421-2201-admin-quick-ref.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/reports/Explore-260421-2201-admin-ui-structure.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/reports/brainstorm-bootstrap-warning-2026-04-21T14-51-42-784Z.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/reports/researcher-260421-2154-responsive-admin-tailwind-retrofit.md"
+    },
+    {
+      "status": "M",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/status/events.ndjson"
+    },
+    {
+      "status": "M",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/status/item-status.json"
+    },
+    {
+      "status": "M",
+      "path": "plans/260418-1923-credit-wallet-exam-purchase/status/phase-registry.json"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/brainstorm/decision-handoff.json"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/brainstorm/latest.json"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/context/project-context-snapshot.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/phase-01-layout-foundation.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/phase-02-tables-filters.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/phase-03-dashboard-remaining.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/plan-status.yaml"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/plan.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/reports/tester-260421-2228-frontend-typecheck-lint-build.md"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/status/events.ndjson"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/status/item-status.json"
+    },
+    {
+      "status": "A",
+      "path": "plans/260421-2151-admin-mobile-responsive/status/phase-registry.json"
+    },
+    {
+      "status": "M",
+      "path": "plans/reports/branches/master/commit-latest.md"
+    },
+    {
+      "status": "M",
+      "path": "plans/work-items.yaml"
+    },
+    {
+      "status": "M",
+      "path": "plans/workflow-status.yaml"
     }
   ],
   "changed_summary": {
-    "modified": 3
+    "added": 17,
+    "modified": 23
   },
   "blockers": [
     "quality gate is not passed",
-    "22 checklist item(s) still open in plan-status"
+    "10 checklist item(s) still open in plan-status"
   ],
   "next_action": "Run /cook in a fresh session.",
   "next_action_struct": {
