@@ -40,7 +40,8 @@
         "import": "Nhập dữ liệu",
         "settings": "Cài đặt",
         "logout": "Đăng xuất",
-        "feedback": "Phản hồi"
+        "feedback": "Phản hồi",
+        "notifications": "Thông báo"
     },
     "dashboard": {
         "title": "Bảng điều khiển",

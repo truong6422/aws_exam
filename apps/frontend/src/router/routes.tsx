@@ -32,6 +32,7 @@ import AdminFeedbackPage from '@/pages/admin/admin-feedback-page'
 // WALLET_FEATURE: import AdminWalletPage from '@/pages/admin/admin-wallet-page'
 import AdminChatPage from '@/pages/admin/admin-chat-page'
 import AdminSettingsPage from '@/pages/admin/admin-settings-page'
+import AdminNotificationsPage from '@/pages/admin/admin-notifications-page'
 
 // Guards
 import ProtectedRoute from '@/router/protected-route'
@@ -94,6 +95,7 @@ export const router = createBrowserRouter([
               { path: 'chat', element: <AdminChatPage /> },
               { path: 'settings', element: <AdminSettingsPage /> },
               { path: 'import', element: <AdminImportPage /> },
+              { path: 'notifications', element: <AdminNotificationsPage /> },
             ],
           },
             ],

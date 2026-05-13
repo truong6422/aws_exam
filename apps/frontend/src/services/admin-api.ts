@@ -83,6 +83,23 @@ export interface TopUpRequestAdmin {
   approved_at: string | null
 }
 
+export interface BroadcastNotificationPayload {
+  title: string
+  message: string
+  notification_type: 'system' | 'survey' | 'announcement'
+  action_type: 'none' | 'rate_app'
+  link?: string
+  target_type: 'all' | 'active' | 'inactive' | 'selected'
+  target_ids?: number[]
+  exclude_admin?: boolean
+}
+
+export interface BroadcastResult {
+  status: 'ok'
+  sent_count: number
+  message: string
+}
+
 // ── API ───────────────────────────────────────────────────────────────────────
 
 export const adminApi = {
@@ -154,4 +171,15 @@ export const adminApi = {
   getChatMessages: (userId: number) => apiClient.get<any[]>(`/chat/admin/messages/?user_id=${userId}`),
   sendChatMessage: (userId: number, message: string) =>
     apiClient.post<any>('/chat/admin/send/', { user_id: userId, message }),
+
+  // Notification Management
+  broadcastNotification: (data: BroadcastNotificationPayload) =>
+    apiClient.post<BroadcastResult>('/notifications/admin/broadcast/', data),
+
+  getNotificationHistory: (params?: { target_type?: string }) => {
+    const query = new URLSearchParams()
+    if (params?.target_type) query.append('target_type', params.target_type)
+    const qs = query.toString()
+    return apiClient.get<any[]>(`/notifications/admin/history/${qs ? '?' + qs : ''}`)
+  },
 }

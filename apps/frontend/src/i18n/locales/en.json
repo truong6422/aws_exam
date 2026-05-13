@@ -39,7 +39,8 @@
         "questions": "Questions",
         "import": "Import",
         "settings": "Settings",
-        "logout": "Logout"
+        "logout": "Logout",
+        "notifications": "Notifications"
     },
     "dashboard": {
         "title": "Dashboard",

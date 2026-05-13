@@ -7,6 +7,20 @@ class Notification(models.Model):
         ("wallet", "Wallet"),
         ("chat", "Chat"),
         ("system", "System"),
+        ("survey", "Survey"),
+        ("announcement", "Announcement"),
+    )
+
+    ACTION_TYPES = (
+        ("none", "No Action"),
+        ("rate_app", "Rate App"),
+    )
+
+    TARGET_TYPES = (
+        ("all", "All Users"),
+        ("active", "Active Users (with exam attempts)"),
+        ("inactive", "Inactive Users (no exam attempts)"),
+        ("selected", "Selected Users"),
     )
 
     user = models.ForeignKey(
@@ -18,6 +32,10 @@ class Notification(models.Model):
         max_length=20, choices=NOTIFICATION_TYPES, default="system"
     )
     link = models.CharField(max_length=255, blank=True, null=True)
+    action_type = models.CharField(
+        max_length=50, choices=ACTION_TYPES, default="none", blank=True
+    )
+    action_data = models.JSONField(default=dict, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
