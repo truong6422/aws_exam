@@ -11,6 +11,10 @@ from .views import (
     ExamSetUpdateView,
     ExamSetBulkUpdateView,
     ExamSetFreeIncompleteView,
+    FeedbackCreateView,
+    FeedbackListView,
+    FeedbackSummaryView,
+    FeedbackUpdateView,
     PracticeQuestionListView,
     PracticeViewedView,
 )
@@ -55,4 +59,9 @@ urlpatterns = [
         AnswerReportCreateView.as_view(),
         name="answer-report-create",
     ),
+    # Feedback endpoints
+    path("feedback/", FeedbackCreateView.as_view(), name="feedback-create"),
+    path("feedback/<int:pk>/", FeedbackUpdateView.as_view(), name="feedback-update"),
+    path("feedback/all/", FeedbackListView.as_view(), name="feedback-list"),
+    path("feedback/summary/", FeedbackSummaryView.as_view(), name="feedback-summary"),
 ]

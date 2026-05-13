@@ -39,7 +39,8 @@
         "questions": "Câu hỏi",
         "import": "Nhập dữ liệu",
         "settings": "Cài đặt",
-        "logout": "Đăng xuất"
+        "logout": "Đăng xuất",
+        "feedback": "Phản hồi"
     },
     "dashboard": {
         "title": "Bảng điều khiển",
@@ -482,5 +483,24 @@
         "topup_pending": "Chờ xác nhận",
         "topup_approved": "Đã duyệt",
         "topup_rejected": "Bị từ chối"
+    },
+    "feedback": {
+        "title": "Đánh giá của bạn",
+        "subtitle": "Giúp chúng tôi cải thiện dịch vụ",
+        "question": "Bạn cảm thấy website của chúng tôi như thế nào?",
+        "placeholder": "Chia sẻ trải nghiệm của bạn với chúng tôi...",
+        "comment_label": "Nhận xét của bạn",
+        "optional": "Tùy chọn - giúp chúng tôi hiểu rõ hơn",
+        "send": "Gửi đánh giá",
+        "thanks": "Cảm ơn bạn!",
+        "thanks_message": "Phản hồi của bạn giúp chúng tôi cải thiện dịch vụ.",
+        "rating_1": "Rất không hài lòng",
+        "rating_2": "Không hài lòng",
+        "rating_3": "Bình thường",
+        "rating_4": "Hài lòng",
+        "rating_5": "Rất hài lòng",
+        "happy": "Tốt",
+        "neutral": "Bình thường",
+        "sad": "Chưa tốt"
     }
 }

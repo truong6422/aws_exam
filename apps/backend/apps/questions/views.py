@@ -9,12 +9,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
-from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, PracticeQuestionView, Question, UserExamUnlock
+from .models import AnswerReport, Bookmark, Certification, Comment, ExamSet, Feedback, PracticeQuestionView, Question, UserExamUnlock
 from .serializers import (
     AnswerReportSerializer,
     CertificationSerializer,
     CommentSerializer,
     ExamSetSerializer,
+    FeedbackCreateSerializer,
+    FeedbackSerializer,
     PracticeQuestionSerializer,
 )
 from django.db import models
@@ -273,4 +275,69 @@ class PracticeViewedView(APIView):
         question = get_object_or_404(Question, pk=question_id)
         PracticeQuestionView.objects.get_or_create(user=request.user, question=question)
         return Response({"ok": True})
+
+
+class FeedbackCreateView(generics.CreateAPIView):
+    """POST /api/v1/feedback/ — create feedback (authenticated users only)."""
+
+    serializer_class = FeedbackCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class FeedbackListView(generics.ListAPIView):
+    """GET /api/v1/questions/feedback/all/ — list all feedback (admin only)."""
+
+    serializer_class = FeedbackSerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        queryset = Feedback.objects.select_related('user').order_by('-created_at')
+        
+        # Filter by status
+        status = self.request.query_params.get('status')
+        if status in ['new', 'reviewed', 'resolved']:
+            queryset = queryset.filter(status=status)
+        
+        # Filter by rating
+        rating = self.request.query_params.get('rating')
+        if rating and rating.isdigit():
+            queryset = queryset.filter(rating=int(rating))
+        
+        return queryset
+
+
+class FeedbackUpdateView(generics.UpdateAPIView):
+    """PATCH /api/v1/feedback/<pk>/ — update feedback status (admin only)."""
+
+    serializer_class = FeedbackSerializer
+    permission_classes = [IsAdminUser]
+    queryset = Feedback.objects.all()
+    http_method_names = ["patch"]
+
+
+class FeedbackSummaryView(APIView):
+    """GET /api/v1/feedback/summary/ — get feedback statistics (admin only)."""
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        from django.db.models import Count
+
+        total = Feedback.objects.count()
+        rating_counts = Feedback.objects.values('rating').annotate(count=Count('id'))
+        rating_dict = {item['rating']: item['count'] for item in rating_counts}
+        new_count = Feedback.objects.filter(status='new').count()
+        reviewed = Feedback.objects.filter(status='reviewed').count()
+        resolved = Feedback.objects.filter(status='resolved').count()
+        return Response({
+            'total': total,
+            'ratings': {str(k): v for k, v in rating_dict.items()},
+            'new': new_count,
+            'reviewed': reviewed,
+            'resolved': resolved,
+        })
 

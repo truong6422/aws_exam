@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 import LanguageSwitcher from '@/components/language-switcher'
 import NotificationCenter from '@/components/notification-center'
+import FeedbackButton from '@/components/feedback/feedback-button'
 
 /** Top navigation bar — Apple glass effect. */
 export default function Navbar() {
@@ -49,7 +50,8 @@ export default function Navbar() {
       </button>
 
       {/* User info */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {isAuthenticated && <FeedbackButton variant="icon" />}
         {isAuthenticated && <NotificationCenter />}
         <LanguageSwitcher variant="navbar" />
         {isAuthenticated && (

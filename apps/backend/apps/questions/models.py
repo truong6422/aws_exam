@@ -226,3 +226,37 @@ class PracticeQuestionView(models.Model):
 
     def __str__(self) -> str:
         return f"PracticeView: {self.user_id} → Q#{self.question_id}"
+
+
+class Feedback(TimestampedModel):
+    """User feedback about the website (rating + comment)."""
+
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
+
+    STATUS_NEW = "new"
+    STATUS_REVIEWED = "reviewed"
+    STATUS_RESOLVED = "resolved"
+    STATUS_CHOICES = [
+        (STATUS_NEW, "New"),
+        (STATUS_REVIEWED, "Reviewed"),
+        (STATUS_RESOLVED, "Resolved"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="feedbacks",
+    )
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+    comment = models.TextField(max_length=5000, blank=True)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Feedback {self.rating}★ by {self.user_id or 'anonymous'} [{self.status}]"

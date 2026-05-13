@@ -28,6 +28,7 @@ import AdminDashboardPage from '@/pages/admin/admin-dashboard-page'
 import AdminUsersPage from '@/pages/admin/admin-users-page'
 import AdminImportPage from '@/pages/admin/admin-import-page'
 import AdminExamsPage from '@/pages/admin/admin-exams-page'
+import AdminFeedbackPage from '@/pages/admin/admin-feedback-page'
 // WALLET_FEATURE: import AdminWalletPage from '@/pages/admin/admin-wallet-page'
 import AdminChatPage from '@/pages/admin/admin-chat-page'
 import AdminSettingsPage from '@/pages/admin/admin-settings-page'
@@ -80,20 +81,21 @@ export const router = createBrowserRouter([
           {
             element: <AdminRoute />,
             children: [
-              {
-                path: '/admin',
-                element: <AdminLayout />,
-                children: [
-                  { index: true, element: <Navigate to="/admin/dashboard" replace /> },
-                  { path: 'dashboard', element: <AdminDashboardPage /> },
-                  { path: 'users', element: <AdminUsersPage /> },
-                  { path: 'exams', element: <AdminExamsPage /> },
-                  // WALLET_FEATURE: { path: 'wallet', element: <AdminWalletPage /> },
-                  { path: 'chat', element: <AdminChatPage /> },
-                  { path: 'settings', element: <AdminSettingsPage /> },
-                  { path: 'import', element: <AdminImportPage /> },
-                ],
-              },
+          {
+            path: '/admin',
+            element: <AdminLayout />,
+            children: [
+              { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+              { path: 'dashboard', element: <AdminDashboardPage /> },
+              { path: 'users', element: <AdminUsersPage /> },
+              { path: 'exams', element: <AdminExamsPage /> },
+              { path: 'feedback', element: <AdminFeedbackPage /> },
+              // WALLET_FEATURE: { path: 'wallet', element: <AdminWalletPage /> },
+              { path: 'chat', element: <AdminChatPage /> },
+              { path: 'settings', element: <AdminSettingsPage /> },
+              { path: 'import', element: <AdminImportPage /> },
+            ],
+          },
             ],
           },
         ],

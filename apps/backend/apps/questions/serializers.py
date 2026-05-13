@@ -6,7 +6,7 @@ Question serializers split by context:
 """
 from rest_framework import serializers
 
-from .models import Answer, AnswerReport, Certification, Comment, ExamSet, Question
+from .models import Answer, AnswerReport, Certification, Comment, ExamSet, Feedback, Question
 
 
 class AnswerExamSerializer(serializers.ModelSerializer):
@@ -181,3 +181,33 @@ class AnswerReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnswerReport
         fields = ["id", "reason"]
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    user_email = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Feedback
+        fields = ["id", "rating", "comment", "status", "user_email", "user_name", "created_at"]
+        read_only_fields = ["id", "user_email", "user_name", "created_at"]
+
+    def get_user_email(self, obj):
+        return obj.user.email if obj.user else None
+
+    def get_user_name(self, obj):
+        if not obj.user:
+            return None
+        full_name = obj.user.get_full_name()
+        return full_name if full_name else obj.user.email.split("@")[0]
+
+
+class FeedbackCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ["rating", "comment"]
+
+    def validate_rating(self, value):
+        if not isinstance(value, int) or value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be an integer between 1 and 5.")
+        return value
