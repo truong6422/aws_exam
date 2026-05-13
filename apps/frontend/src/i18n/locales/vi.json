@@ -503,5 +503,27 @@
         "happy": "Tốt",
         "neutral": "Bình thường",
         "sad": "Chưa tốt"
+    },
+    "donate": {
+        "title": "Buy Me Trà Đá",
+        "subtitle": "Nếu bạn thấy website này hữu ích, hãy cùng đóng góp để duy trì nền tảng này cho cộng đồng",
+        "story": "Website này được xây dựng và duy trì hoàn toàn bởi một cá nhân. Chi phí vận hành (server, domain, ...) mỗi tháng không hề nhỏ. Nếu bạn thấy nền tảng này giúp ích cho việc học tập của mình, hãy cùng đóng góp một phần nhỏ để mình có thể duy trì và phát triển thêm. Mỗi đóng góp đều được ghi nhận và là động lực để nền tảng ngày càng tốt hơn. Cảm ơn bạn!",
+        "cta_support": "Ủng hộ ly trà đá",
+        "maybe_later": "Để sau",
+        "scan_hint": "Quét mã QR bằng ứng dụng ngân hàng",
+        "open_donate": "Mở trang ủng hộ",
+        "buy_me_coffee": "Buy Me Trà Đá",
+        "close": "Đóng",
+        "aria_modal": "Buy Me Trà Đá",
+        "qr_alt": "Mã QR chuyển khoản MB Bank",
+        "footer": "Mọi đóng góp đều được ghi nhận ❤️",
+        "tap_to_zoom": "Nhấn để phóng to",
+        "click_to_zoom": "Nhấn vào QR để phóng to",
+        "zoom_hint": "Nhấn bất kỳ đâu để đóng",
+        "qr_zoomed": "Mã QR phóng to",
+        "close_zoom": "Đóng mã QR",
+        "zoomed_title": "Quét để ủng hộ",
+        "zoomed_subtitle": "Phóng to để quét dễ dàng hơn",
+        "tap_to_zoom_out": "Thu nhỏ"
     }
 }

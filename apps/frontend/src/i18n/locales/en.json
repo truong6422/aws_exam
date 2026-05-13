@@ -484,5 +484,27 @@
         "topup_pending": "Pending",
         "topup_approved": "Approved",
         "topup_rejected": "Rejected"
+    },
+    "donate": {
+        "title": "Buy Me Trà Đá",
+        "subtitle": "If you find this website helpful, please contribute to keep this platform running for the community",
+        "story": "This website is built and maintained entirely by an individual. The operating costs (server, domain, etc.) each month are not small. If you find this platform helpful for your learning, please contribute a small part so I can keep it running and improving. Every contribution is acknowledged and serves as motivation to make the platform even better. Thank you!",
+        "cta_support": "Support with a trà đá",
+        "maybe_later": "Maybe later",
+        "scan_hint": "Scan QR code with your banking app",
+        "open_donate": "Open support page",
+        "buy_me_coffee": "Buy Me Trà Đá",
+        "close": "Close",
+        "aria_modal": "Buy Me Trà Đá",
+        "qr_alt": "MB Bank QR code for transfer",
+        "footer": "Every contribution is acknowledged ❤️",
+        "tap_to_zoom": "Tap to zoom",
+        "click_to_zoom": "Click QR to zoom",
+        "zoom_hint": "Tap anywhere to close",
+        "qr_zoomed": "QR code zoomed",
+        "close_zoom": "Close QR",
+        "zoomed_title": "Scan to support",
+        "zoomed_subtitle": "Zoomed for easier scanning",
+        "tap_to_zoom_out": "Zoom out"
     }
 }
