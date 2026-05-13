@@ -151,10 +151,6 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
               </svg>
             </div>
             
-            {/* DEBUG: Text để test */}
-            <div style={{ color: '#fff', fontSize: '12px', marginBottom: '8px' }}>
-              ⬆️ Icon ở trên này
-            </div>
 
             <h2
               style={{

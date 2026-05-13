@@ -36,7 +36,7 @@ export default function DonateFab({ onClick }: DonateFabProps) {
       }}
     >
       {/* Cốc trà đá icon */}
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block', flexShrink: 0 }}>
         <path
           d="M5 5h12l-1.5 14H6.5L5 5z"
           stroke="#fff"
