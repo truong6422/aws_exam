@@ -1,5 +1,5 @@
-# Generated migration to add ModelMixin fields to existing Feedback table
-# Note: created_at already exists from 0009_feedback, only adding missing fields
+# Generated migration to add remaining ModelMixin fields to existing Feedback table
+# Note: created_at, updated_at already exist from 0009_feedback
 
 from django.db import migrations, models
 
@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='feedback',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True),
+            name='updated_by',
+            field=models.BigIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='feedback',
@@ -28,17 +28,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='feedback',
-            name='is_deleted',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='feedback',
-            name='updated_at',
+            name='deleted_at',
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='feedback',
-            name='updated_by',
-            field=models.BigIntegerField(blank=True, null=True),
+            name='is_deleted',
+            field=models.BooleanField(default=False),
         ),
     ]
