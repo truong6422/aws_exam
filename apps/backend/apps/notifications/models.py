@@ -38,6 +38,7 @@ class Notification(models.Model):
     action_data = models.JSONField(default=dict, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    broadcast_id = models.UUIDField(null=True, blank=True, db_index=True)
 
     class Meta:
         ordering = ["-created_at"]

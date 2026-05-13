@@ -2,8 +2,9 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.contrib.auth import get_user_model
+import uuid
 
 from .models import Notification
 from .serializers import NotificationSerializer, BroadcastNotificationSerializer
@@ -77,6 +78,9 @@ class AdminBroadcastNotificationView(APIView):
 
         target_users = queryset.only("id")
 
+        # Generate broadcast_id for this batch of notifications
+        batch_broadcast_id = uuid.uuid4()
+
         notifications_to_create = [
             Notification(
                 user=user,
@@ -86,6 +90,7 @@ class AdminBroadcastNotificationView(APIView):
                 action_type=data["action_type"],
                 link=data.get("link", ""),
                 action_data=data.get("action_data", {}),
+                broadcast_id=batch_broadcast_id,
             )
             for user in target_users
         ]
@@ -95,7 +100,8 @@ class AdminBroadcastNotificationView(APIView):
         return Response({
             "status": "ok",
             "sent_count": len(notifications_to_create),
-            "message": f"Successfully sent to {len(notifications_to_create)} users"
+            "message": f"Successfully sent to {len(notifications_to_create)} users",
+            "broadcast_id": str(batch_broadcast_id),
         })
 
 
@@ -103,24 +109,46 @@ class AdminNotificationHistoryView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = NotificationSerializer
 
-    def get_queryset(self):
-        if not self.request.user.is_staff:
-            return Notification.objects.none()
+    def list(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response({"error": "Admin only"}, status=status.HTTP_403_FORBIDDEN)
 
-        queryset = Notification.objects.all().order_by("-created_at")
+        # Get distinct broadcasts with count
+        queryset = Notification.objects.filter(
+            broadcast_id__isnull=False
+        ).values(
+            'broadcast_id', 'title', 'message', 'notification_type',
+            'action_type'
+        ).annotate(
+            recipient_count=Count('id'),
+            created_at=Min('created_at'),
+        ).order_by('-created_at')
 
-        notification_type = self.request.query_params.get("notification_type")
+        notification_type = request.query_params.get("notification_type")
         if notification_type:
             queryset = queryset.filter(notification_type=notification_type)
 
-        target_type = self.request.query_params.get("target_type")
-        if target_type == "active":
-            queryset = queryset.annotate(
-                attempt_count=Count("user__exam_attempts")
-            ).filter(attempt_count__gt=0)
-        elif target_type == "inactive":
-            queryset = queryset.annotate(
-                attempt_count=Count("user__exam_attempts")
-            ).filter(attempt_count=0)
+        # Manual pagination
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
+        start = (page - 1) * page_size
+        end = start + page_size
 
-        return queryset
+        total_count = queryset.count()
+        paginated = list(queryset[start:end])
+
+        return Response({
+            "data": [{
+                "id": item['broadcast_id'],
+                "title": item['title'],
+                "message": item['message'],
+                "notification_type": item['notification_type'],
+                "action_type": item['action_type'],
+                "recipient_count": item['recipient_count'],
+                "created_at": item['created_at'].isoformat(),
+            } for item in paginated],
+            "links": {
+                "total_pages": (total_count + page_size - 1) // page_size,
+                "count": total_count,
+            }
+        })

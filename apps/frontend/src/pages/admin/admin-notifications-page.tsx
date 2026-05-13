@@ -26,14 +26,13 @@ const TARGET_TYPES: { value: TargetType; label: string }[] = [
 ]
 
 interface SentNotification {
-  id: number
+  id: string
   title: string
   message: string
   notification_type: NotificationType
   action_type: ActionType
-  target_type: TargetType
+  recipient_count: number
   created_at: string
-  user_email?: string
 }
 
 function CreateNotificationModal({
@@ -211,19 +210,43 @@ function CreateNotificationModal({
 
           {/* Message */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px' }}>
-              Nội dung *
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                Nội dung *
+              </label>
+              <span style={{
+                fontSize: '11px',
+                color: message.length > 5000 ? '#ff453a' : message.length > 4500 ? '#ff9f0a' : 'rgba(255,255,255,0.4)',
+                fontWeight: message.length > 4500 ? 600 : 400,
+              }}>
+                {message.length} / 5000
+              </span>
+            </div>
             <textarea
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                const newValue = e.target.value
+                if (newValue.length <= 5000) {
+                  setMessage(newValue)
+                }
+              }}
+              onPaste={(e) => {
+                e.preventDefault()
+                const pastedText = e.clipboardData.getData('text')
+                const currentLength = message.length
+                const remainingChars = 5000 - currentLength
+                if (remainingChars > 0) {
+                  const truncatedText = pastedText.slice(0, remainingChars)
+                  setMessage(message + truncatedText)
+                }
+              }}
               placeholder="Nhập nội dung thông báo..."
-              rows={3}
+              rows={4}
               style={{
                 width: '100%',
                 padding: '10px 12px',
                 borderRadius: '8px',
-                border: '1px solid rgba(255,255,255,0.12)',
+                border: `1px solid ${message.length > 5000 ? 'rgba(255,69,58,0.5)' : 'rgba(255,255,255,0.12)'}`,
                 background: 'rgba(255,255,255,0.06)',
                 color: '#fff',
                 fontSize: '14px',
@@ -231,6 +254,7 @@ function CreateNotificationModal({
                 resize: 'vertical',
                 fontFamily: 'inherit',
                 boxSizing: 'border-box',
+                transition: 'border-color 0.2s ease',
               }}
             />
           </div>
@@ -624,6 +648,9 @@ export default function AdminNotificationsPage() {
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)', display: { xs: 'none', md: 'table-cell' } as any }}>
                     HÀNH ĐỘNG
                   </th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)', display: { xs: 'none', md: 'table-cell' } as any }}>
+                    NGƯỜI NHẬN
+                  </th>
                   <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, letterSpacing: '-0.12px', color: 'rgba(255,255,255,0.5)' }}>
                     NGÀY GỬI
                   </th>
@@ -632,10 +659,10 @@ export default function AdminNotificationsPage() {
               <tbody>
                 {notifications.map((notif) => (
                   <tr key={notif.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td style={{ padding: '12px 16px', maxWidth: '280px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontWeight: 500, color: '#fff' }}>{notif.title}</span>
-                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <span style={{ fontWeight: 500, color: '#fff', wordBreak: 'break-word' }}>{notif.title}</span>
+                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word', lineHeight: '1.4' }}>
                           {notif.message}
                         </span>
                       </div>
@@ -645,6 +672,18 @@ export default function AdminNotificationsPage() {
                     </td>
                     <td style={{ padding: '12px 16px', display: { xs: 'none', md: 'table-cell' } as any }}>
                       {getActionBadge(notif.action_type)}
+                    </td>
+                    <td style={{ padding: '12px 16px', display: { xs: 'none', md: 'table-cell' } as any, textAlign: 'center' }}>
+                      <span style={{
+                        background: 'rgba(48,209,88,0.15)',
+                        color: '#30d158',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                      }}>
+                        {notif.recipient_count} người
+                      </span>
                     </td>
                     <td style={{ padding: '12px 16px', color: 'rgba(255,255,255,0.6)', fontSize: '12px', whiteSpace: 'nowrap' }}>
                       {formatDate(notif.created_at)}
