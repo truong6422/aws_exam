@@ -1,7 +1,6 @@
 # Generated migration to add ModelMixin fields to existing Feedback table
+# Note: created_at already exists from 0009_feedback, only adding missing fields
 
-import django.db.models.deletion
-from django.conf import settings
 from django.db import migrations, models
 
 
@@ -9,15 +8,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('questions', '0010_alter_feedback_comment_max_length'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='feedback',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, null=True),
-        ),
         migrations.AddField(
             model_name='feedback',
             name='created_by',
