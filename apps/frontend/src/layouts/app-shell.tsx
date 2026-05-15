@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './sidebar'
 import Navbar from './navbar'
@@ -7,7 +7,6 @@ import { useUiStore } from '@/stores/ui-store'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 import DonateModal from '@/components/donate/donate-modal'
 import DonateFab from '@/components/donate/donate-fab'
-import { useAuthStore } from '@/stores/auth-store'
 
 /** Root shell: sidebar + top navbar + page outlet — Apple dark theme. */
 export default function AppShell() {
@@ -15,27 +14,9 @@ export default function AppShell() {
   const mobileDrawerOpen = useUiStore((s) => s.mobileDrawerOpen)
   const closeMobileDrawer = useUiStore((s) => s.closeMobileDrawer)
   const isMobile = useIsMobile()
-  const { isAuthenticated } = useAuthStore()
   const [donateOpen, setDonateOpen] = useState(false)
-  const donateShownRef = useRef(false)
 
   const contentMargin = isMobile ? '0px' : sidebarOpen ? '240px' : '60px'
-
-    // Show donate modal once on first authenticated load (after 3s delay)
-  useEffect(() => {
-    if (!isAuthenticated) return
-    if (donateShownRef.current) return
-
-    const timer = setTimeout(() => {
-      if (!sessionStorage.getItem('donate_modal_shown')) {
-        donateShownRef.current = true
-        sessionStorage.setItem('donate_modal_shown', 'true')
-        setDonateOpen(true)
-      }
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [isAuthenticated])
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#000' }}>
